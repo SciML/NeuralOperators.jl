@@ -10,6 +10,9 @@ using Zygote
 using ChainRulesCore
 using GeometricFlux
 using Statistics
+using Polynomials
+using SpecialPolynomials
+using LinearAlgebra
 
 # kernels
 include("Transform/Transform.jl")
