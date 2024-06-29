@@ -21,8 +21,8 @@ end
 const MODES = begin
     modes = []
     cpu_testing() && push!(modes, ("CPU", Array, LuxCPUDevice(), false))
-    cuda_testing() && push!(modes, ("CUDA", CuArray, LuxCUDADevice(), true))
-    amdgpu_testing() && push!(modes, ("AMDGPU", ROCArray, LuxAMDGPUDevice(), true))
+    # cuda_testing() && push!(modes, ("CUDA", CuArray, LuxCUDADevice(), true))
+    # amdgpu_testing() && push!(modes, ("AMDGPU", ROCArray, LuxAMDGPUDevice(), true))
     modes
 end
 

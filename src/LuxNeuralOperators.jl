@@ -12,6 +12,7 @@ using PrecompileTools: @recompile_invalidations
     using NNlib: NNlib, ⊠
     using Random: Random, AbstractRNG
     using Reexport: @reexport
+    using Integrals
 end
 
 const CRC = ChainRulesCore
@@ -26,10 +27,12 @@ include("layers.jl")
 
 include("fno.jl")
 include("deeponet.jl")
+include("iko.jl")
 
 export FourierTransform
 export SpectralConv, OperatorConv, SpectralKernel, OperatorKernel
 export FourierNeuralOperator
 export DeepONet
+export IntegralKernel, IntegralKernelOperator
 
 end
