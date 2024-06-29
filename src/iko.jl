@@ -68,12 +68,12 @@ function IntegralKernelOperator(lifting::L1, kernels::Vector{L2}, projection::L3
     return @compact(; lifting, kernels, projection, domain,
         dispatch=:IntegralKernelOperator) do x
         v = lifting(x)
-        D = sort(lifting(domain))
+        D = sort(lifting(domain), dims = 2)
 
         for kernel in kernels
             v = kernel((v, D)) # kernel evaluation
 
-            D = sort(kernel((D, D))) # update domain of integration for next kernel
+            D = sort(kernel((D, D)), dims = 2) # update domain of integration for next kernel
         end
 
         v = projection(v)
