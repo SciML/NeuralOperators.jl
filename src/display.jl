@@ -1,11 +1,11 @@
-function Base.show(io::IO, model::conv) where {conv <: OperatorConv}
-    # print(io, model.name*"()  # "*string(Lux.parameterlength(model))*" parameters")
-    print(io, model.name)
-end
+# function Base.show(io::IO, model::conv) where {conv <: OperatorConv}
+#     # print(io, model.name*"()  # "*string(Lux.parameterlength(model))*" parameters")
+#     print(io, model.name)
+# end
 
-function Base.show(io::IO, ::MIME"text/plain", model::conv) where {conv <: OperatorConv}
-    show(io, model.name)
-end
+# function Base.show(io::IO, ::MIME"text/plain", model::conv) where {conv <: OperatorConv}
+#     show(io, model.name)
+# end
 
 function Base.show(io::IO, model::Lux.CompactLuxLayer{:DeepONet})
     _print_wrapper_model(io, "Branch net :\n", model.layers.branch)
