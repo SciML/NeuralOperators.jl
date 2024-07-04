@@ -12,7 +12,7 @@ Constructs a DeepONet composed of Dense layers. Make sure the last node of `bran
   - `branch_activation`: activation function for branch net
   - `trunk_activation`: activation function for trunk net
   - `additional`: `Lux` network to pass the output of DeepONet, to include additional operations
-for embeddings, defaults to `nothing`
+    for embeddings, defaults to `nothing`
 
 ## References
 
@@ -35,8 +35,9 @@ julia> size(first(deeponet((u, y), ps, st)))
 (10, 5)
 ```
 """
-function DeepONet(; branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16),
-        branch_activation=identity, trunk_activation=identity, additional = nothing)
+function DeepONet(;
+        branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16), branch_activation=identity,
+        trunk_activation=identity, additional=nothing)
 
     # checks for last dimension size
     @argcheck branch[end]==trunk[end] "Branch and Trunk net must share the same amount of \
@@ -49,7 +50,7 @@ function DeepONet(; branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16),
     trunk_net = Chain([Dense(trunk[i] => trunk[i + 1], trunk_activation)
                        for i in 1:(length(trunk) - 1)]...)
 
-    return DeepONet(branch_net, trunk_net, additional = additional)
+    return DeepONet(branch_net, trunk_net; additional=additional)
 end
 
 """
@@ -65,8 +66,8 @@ nets output should have the same first dimension.
 
 ## Keyword Arguments
 
-- `additional`: `Lux` network to pass the output of DeepONet, to include additional operations
-for embeddings, defaults to `nothing`
+  - `additional`: `Lux` network to pass the output of DeepONet, to include additional operations
+    for embeddings, defaults to `nothing`
 
 ## References
 
@@ -93,7 +94,7 @@ julia> size(first(deeponet((u, y), ps, st)))
 (10, 5)
 ```
 """
-function DeepONet(branch::L1, trunk::L2; additional = nothing) where {L1, L2}
+function DeepONet(branch::L1, trunk::L2; additional=nothing) where {L1, L2}
     return @compact(; branch, trunk, additional, dispatch=:DeepONet) do (u, y)
         t = trunk(y)   # p x N x nb...
         b = branch(u)  # p x nb...
