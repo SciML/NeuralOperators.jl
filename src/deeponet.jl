@@ -32,7 +32,7 @@ Branch net :
         layer_3 = Dense(32 => 16),      # 528 parameters
     ),
 )
-
+ 
 Trunk net :
 (
     Chain(
@@ -99,7 +99,7 @@ Branch net :
         layer_3 = Dense(32 => 16),      # 528 parameters
     ),
 )
-
+ 
 Trunk net :
 (
     Chain(
@@ -142,18 +142,24 @@ Additional net :
 """
 function DeepONet(branch::L1, trunk::L2; additional=nothing) where {L1, L2}
     return @compact(; branch, trunk, additional, dispatch=:DeepONet) do (u, y)
-        t = trunk(y)   # p x N x nb...
-        b = branch(u)  # p x nb...
+        t = trunk(y)   # p x N x nb
+        b = branch(u)  # p x u_size... x nb
 
         @argcheck size(t, 1)==size(b, 1) "Branch and Trunk net must share the same \
                                           amount of nodes in the last layer. Otherwise \
                                           Σᵢ bᵢⱼ tᵢₖ won't work."
 
-        if isnothing(additional)
-            out_ = __project(b, t)
-        else
-            out_ = additional(__project(b, t))
-        end
-        @return out_
+        @return __project(b, t, additional)
+    end
+end
+
+function Base.show(io::IO, ::MIME"text/plain", x::CompactLuxLayer{:DeepONet})
+    # show(io, x)
+    _print_wrapper_model(io, "Branch net :\n", x.layers.branch)
+    print(io, "\n \n")
+    _print_wrapper_model(io, "Trunk net :\n", x.layers.trunk)
+    if :additional in keys(x.layers)
+        print(io, "\n \n")
+        _print_wrapper_model(io, "Additional net :\n", x.layers.additional)
     end
 end
