@@ -32,7 +32,6 @@ Branch net :
         layer_3 = Dense(32 => 16),      # 528 parameters
     ),
 )
- 
 Trunk net :
 (
     Chain(
@@ -99,7 +98,6 @@ Branch net :
         layer_3 = Dense(32 => 16),      # 528 parameters
     ),
 )
- 
 Trunk net :
 (
     Chain(

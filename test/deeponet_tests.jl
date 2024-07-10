@@ -18,8 +18,8 @@
             deeponet = DeepONet(; branch=setup.branch, trunk=setup.trunk)
 
             ps, st = Lux.setup(rng, deeponet) |> dev
-            @inferred deeponet((u, y), ps, st)
-            @jet deeponet((u, y), ps, st)
+            @inferred first(deeponet((u, y), ps, st))
+            @jet first(deeponet((u, y), ps, st))
 
             pred = first(deeponet((u, y), ps, st))
             @test setup.out_size == size(pred)
@@ -43,8 +43,8 @@
                 branch=setup.branch, trunk=setup.trunk, additional=setup.additional)
 
             ps, st = Lux.setup(rng, deeponet) |> dev
-            @inferred deeponet((u, y), ps, st)
-            @jet deeponet((u, y), ps, st)
+            @inferred first(deeponet((u, y), ps, st))
+            @jet first(deeponet((u, y), ps, st))
 
             pred = first(deeponet((u, y), ps, st))
             @test setup.out_size == size(pred)
