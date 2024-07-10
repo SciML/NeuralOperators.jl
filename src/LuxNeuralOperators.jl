@@ -12,7 +12,6 @@ using PrecompileTools: @recompile_invalidations
     using NNlib: NNlib, ⊠, batched_adjoint
     using Random: Random, AbstractRNG
     using Reexport: @reexport
-    import Base: show
 end
 
 const CRC = ChainRulesCore
