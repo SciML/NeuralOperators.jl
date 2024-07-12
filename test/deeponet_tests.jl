@@ -36,7 +36,7 @@
                 branch=(64, 32, 32, 16), trunk=(8, 8, 8, 16),
                 additional=Dense(16 => 4), name="Vector")]
 
-        @testset "Additonal layer: $(setup.name)" for setup in setups
+        @testset "Additional layer: $(setup.name)" for setup in setups
             u = rand(Float32, setup.u_size...) |> aType
             y = rand(Float32, setup.y_size...) |> aType
             deeponet = DeepONet(;
