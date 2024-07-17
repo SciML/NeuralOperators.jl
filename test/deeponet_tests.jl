@@ -50,7 +50,7 @@
 
             deeponet = DeepONet(Chain(Dense(64 => 32), Dense(32 => 32), Dense(32 => 20)),
                 Chain(Dense(1 => 8), Dense(8 => 8), Dense(8 => 16)))
-                display(deeponet)
+            display(deeponet)
             ps, st = Lux.setup(rng, deeponet) |> dev
             @test_throws ArgumentError deeponet((u, y), ps, st)
         end
