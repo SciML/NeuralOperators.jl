@@ -16,9 +16,8 @@
             u = rand(Float32, setup.u_size...) |> aType
             y = rand(Float32, setup.y_size...) |> aType
             deeponet = DeepONet(; branch=setup.branch, trunk=setup.trunk)
-            display(deeponet)
-            ps, st = Lux.setup(rng, deeponet) |> dev
 
+            ps, st = Lux.setup(rng, deeponet) |> dev
             @inferred first(deeponet((u, y), ps, st))
             @jet first(deeponet((u, y), ps, st))
 
@@ -26,19 +25,26 @@
             @test setup.out_size == size(pred)
         end
 
-        @testset "Additonal layer" begin
-            u = rand(Float32, 64, 1, 5) |> aType # sensor_points x nb
-            y = rand(Float32, 1, 10, 5) |> aType # ndims x N x nb
-            out_size = (4, 10, 5)
+        setups = [
+            (u_size=(64, 5), y_size=(1, 10, 5), out_size=(4, 10, 5),
+                branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16),
+                additional=Dense(16 => 4), name="Scalar"),
+            (u_size=(64, 1, 5), y_size=(1, 10, 5), out_size=(4, 10, 5),
+                branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16),
+                additional=Dense(16 => 4), name="Scalar II"),
+            (u_size=(64, 3, 5), y_size=(8, 10, 5), out_size=(4, 3, 10, 5),
+                branch=(64, 32, 32, 16), trunk=(8, 8, 8, 16),
+                additional=Dense(16 => 4), name="Vector")]
 
-            branch_net = Chain(Dense(64 => 32), Dense(32 => 32), Dense(32 => 16))
-            trunk_net = Chain(Dense(1 => 8), Dense(8 => 8), Dense(8 => 16))
-            additional = Chain(Dense(1 => 4))
-            deeponet = DeepONet(branch_net, trunk_net; additional=additional)
-            display(deeponet)
-            ps, st = Lux.setup(rng, deeponet)
-            @inferred deeponet((u, y), ps, st)
-            @jet deeponet((u, y), ps, st)
+        @testset "Additional layer: $(setup.name)" for setup in setups
+            u = rand(Float32, setup.u_size...) |> aType
+            y = rand(Float32, setup.y_size...) |> aType
+            deeponet = DeepONet(;
+                branch=setup.branch, trunk=setup.trunk, additional=setup.additional)
+
+            ps, st = Lux.setup(rng, deeponet) |> dev
+            @inferred first(deeponet((u, y), ps, st))
+            @jet first(deeponet((u, y), ps, st))
 
             pred = first(deeponet((u, y), ps, st))
             @test setup.out_size == size(pred)
@@ -50,7 +56,7 @@
 
             deeponet = DeepONet(Chain(Dense(64 => 32), Dense(32 => 32), Dense(32 => 20)),
                 Chain(Dense(1 => 8), Dense(8 => 8), Dense(8 => 16)))
-            display(deeponet)
+
             ps, st = Lux.setup(rng, deeponet) |> dev
             @test_throws ArgumentError deeponet((u, y), ps, st)
         end

@@ -106,14 +106,3 @@ function DeepONet(branch::L1, trunk::L2; additional=nothing) where {L1, L2}
         @return __project(b, t, additional)
     end
 end
-
-function Base.show(io::IO, ::MIME"text/plain", x::CompactLuxLayer{:DeepONet})
-    # show(io, x)
-    _print_wrapper_model(io, "Branch net :\n", x.layers.branch)
-    print(io, "\n \n")
-    _print_wrapper_model(io, "Trunk net :\n", x.layers.trunk)
-    if :additional in keys(x.layers)
-        print(io, "\n \n")
-        _print_wrapper_model(io, "Additional net :\n", x.layers.additional)
-    end
-end
