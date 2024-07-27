@@ -25,7 +25,7 @@ end
     ch::L
 end
 
-for f in (:DeepONet3,)
+for f in (:DeepONet, :FourierNeuralOperator)
     @eval Lux.setup(rng::RNG, l::L) where {RNG <: AbstractRNG, L <: $f} = Lux.setup(
         rng, l.ch)
     @eval (model::($f))(x::T, ps::NamedTuple, st::NamedTuple) where {T} = model.ch(
