@@ -15,6 +15,8 @@ const CRC = ChainRulesCore
 
 @reexport using Lux
 
+abstract type NeuralOperator end
+
 @concrete struct DeepONet{L} <: NeuralOperator
     ch::L
 end
@@ -24,8 +26,10 @@ end
 end
 
 for f in (:DeepONet3,)
-    @eval Lux.setup(rng::RNG, l::L) where {RNG <: AbstractRNG, L <: $f} = Lux.setup(rng, l.ch)
-    @eval (model::($f))(x::T, ps::NamedTuple, st::NamedTuple) where {T} = model.ch(x, ps, st)
+    @eval Lux.setup(rng::RNG, l::L) where {RNG <: AbstractRNG, L <: $f} = Lux.setup(
+        rng, l.ch)
+    @eval (model::($f))(x::T, ps::NamedTuple, st::NamedTuple) where {T} = model.ch(
+        x, ps, st)
 end
 
 include("utils.jl")
