@@ -52,9 +52,9 @@ function FourierNeuralOperator(
     project = perm ? Chain(Conv(kernel_size, map₂, σ), Conv(kernel_size, map₃)) :
               Chain(Dense(map₂, σ), Dense(map₃))
 
-    return Chain(; lifting,
+    return FourierNeuralOperator(Chain(; lifting,
         mapping=Chain([SpectralKernel(chs[i] => chs[i + 1], modes, σ; permuted, kwargs...)
                        for i in 2:(C - 3)]...),
         project,
-        name="FourierNeuralOperator")
+        name="FourierNeuralOperator"))
 end
