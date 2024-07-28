@@ -30,6 +30,8 @@ for f in (:DeepONet, :FourierNeuralOperator)
         rng, l.ch)
     @eval (model::($f))(x::T, ps::NamedTuple, st::NamedTuple) where {T} = model.ch(
         x, ps, st)
+    @eval Lux.Experimental.TrainState(model::L, args...; kwargs...) where {L <: $f} = Lux.Experimental.TrainState(
+        model.ch, args...; kwargs...)
 end
 
 include("utils.jl")
