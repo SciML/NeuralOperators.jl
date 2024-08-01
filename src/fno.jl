@@ -52,9 +52,12 @@ function FourierNeuralOperator(;
     project = perm ? Chain(Conv(kernel_size, map₂, σ), Conv(kernel_size, map₃)) :
               Chain(Dense(map₂, σ), Dense(map₃))
 
-    return FourierNeuralOperator(Chain(; lifting,
+    ch = Chain(; lifting,
         mapping=Chain([SpectralKernel(chs[i] => chs[i + 1], modes, σ; permuted, kwargs...)
                        for i in 2:(C - 3)]...),
-        project,
-        name="FourierNeuralOperator"))
+        project)
+
+    return @compact(; ch, dispatch=:FourierNeuralOperator) do x
+        @return ch(x)
+    end
 end
