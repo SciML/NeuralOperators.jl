@@ -95,7 +95,7 @@ julia> size(first(deeponet((u, y), ps, st)))
 ```
 """
 function DeepONet(branch::L1, trunk::L2; additional=nothing) where {L1, L2}
-    ch = @compact(; branch, trunk, additional, dispatch=:DeepONet) do (u, y)
+    return @compact(; branch, trunk, additional, dispatch=:DeepONet) do (u, y)
         t = trunk(y)   # p x N x nb
         b = branch(u)  # p x u_size... x nb
 
@@ -105,5 +105,4 @@ function DeepONet(branch::L1, trunk::L2; additional=nothing) where {L1, L2}
 
         @return __project(b, t, additional)
     end
-    return DeepONet(ch)
 end
