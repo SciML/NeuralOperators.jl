@@ -1,60 +1,5 @@
 """
-    DeepONet(; branch = (64, 32, 32, 16), trunk = (1, 8, 8, 16),
-    	branch_activation = identity, trunk_activation = identity)
-
-Constructs a DeepONet composed of Dense layers. Make sure the last node of `branch` and
-`trunk` are same.
-
-## Keyword arguments:
-
-  - `branch`: Tuple of integers containing the number of nodes in each layer for branch net
-  - `trunk`: Tuple of integers containing the number of nodes in each layer for trunk net
-  - `branch_activation`: activation function for branch net
-  - `trunk_activation`: activation function for trunk net
-  - `additional`: `Lux` network to pass the output of DeepONet, to include additional operations
-    for embeddings, defaults to `nothing`
-
-## References
-
-[1] Lu Lu, Pengzhan Jin, George Em Karniadakis, "DeepONet: Learning nonlinear operators for
-identifying differential equations based on the universal approximation theorem of
-operators", doi: https://arxiv.org/abs/1910.03193
-
-## Example
-
-```jldoctest
-julia> deeponet = DeepONet(; branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16));
-
-julia> ps, st = Lux.setup(Xoshiro(), deeponet);
-
-julia> u = rand(Float32, 64, 5);
-
-julia> y = rand(Float32, 1, 10, 5);
-
-julia> size(first(deeponet((u, y), ps, st)))
-(10, 5)
-```
-"""
-function DeepONet(;
-        branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16), branch_activation=identity,
-        trunk_activation=identity, additional=nothing)
-
-    # checks for last dimension size
-    @argcheck branch[end]==trunk[end] "Branch and Trunk net must share the same amount of \
-                                       nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't \
-                                       work."
-
-    branch_net = Chain([Dense(branch[i] => branch[i + 1], branch_activation)
-                        for i in 1:(length(branch) - 1)]...)
-
-    trunk_net = Chain([Dense(trunk[i] => trunk[i + 1], trunk_activation)
-                       for i in 1:(length(trunk) - 1)]...)
-
-    return DeepONet(branch_net, trunk_net; additional)
-end
-
-"""
-    DeepONet(branch, trunk)
+    DeepONet(branch, trunk; additional)
 
 Constructs a DeepONet from a `branch` and `trunk` architectures. Make sure that both the
 nets output should have the same first dimension.
@@ -94,15 +39,74 @@ julia> size(first(deeponet((u, y), ps, st)))
 (10, 5)
 ```
 """
-function DeepONet(branch::L1, trunk::L2; additional=nothing) where {L1, L2}
-    return @compact(; branch, trunk, additional, dispatch=:DeepONet) do (u, y)
-        t = trunk(y)   # p x N x nb
-        b = branch(u)  # p x u_size... x nb
+struct DeepONet{L1, L2, L3} <:
+       Lux.AbstractExplicitContainerLayer{(:branch, :trunk, :additional)}
+    branch::L1
+    trunk::L2
+    additional::L3
+end
 
-        @argcheck size(t, 1)==size(b, 1) "Branch and Trunk net must share the same \
-                                          amount of nodes in the last layer. Otherwise \
-                                          Σᵢ bᵢⱼ tᵢₖ won't work."
+DeepONet(branch, trunk) = DeepONet(branch, trunk, NoOpLayer())
 
-        @return __project(b, t, additional)
-    end
+"""
+    DeepONet(; branch = (64, 32, 32, 16), trunk = (1, 8, 8, 16),
+    	branch_activation = identity, trunk_activation = identity)
+
+Constructs a DeepONet composed of Dense layers. Make sure the last node of `branch` and
+`trunk` are same.
+
+## Keyword arguments:
+
+  - `branch`: Tuple of integers containing the number of nodes in each layer for branch net
+  - `trunk`: Tuple of integers containing the number of nodes in each layer for trunk net
+  - `branch_activation`: activation function for branch net
+  - `trunk_activation`: activation function for trunk net
+  - `additional`: `Lux` network to pass the output of DeepONet, to include additional operations
+    for embeddings, defaults to `nothing`
+
+## References
+
+[1] Lu Lu, Pengzhan Jin, George Em Karniadakis, "DeepONet: Learning nonlinear operators for
+identifying differential equations based on the universal approximation theorem of
+operators", doi: https://arxiv.org/abs/1910.03193
+
+## Example
+
+```jldoctest
+julia> deeponet = DeepONet(; branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16));
+
+julia> ps, st = Lux.setup(Xoshiro(), deeponet);
+
+julia> u = rand(Float32, 64, 5);
+
+julia> y = rand(Float32, 1, 10, 5);
+
+julia> size(first(deeponet((u, y), ps, st)))
+(10, 5)
+```
+"""
+function DeepONet(;
+        branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16), branch_activation=identity,
+        trunk_activation=identity, additional=NoOpLayer())
+
+    # checks for last dimension size
+    @argcheck branch[end]==trunk[end] "Branch and Trunk net must share the same amount of \
+                                       nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't \
+                                       work."
+
+    branch_net = Chain([Dense(branch[i] => branch[i + 1], branch_activation)
+                        for i in 1:(length(branch) - 1)]...)
+
+    trunk_net = Chain([Dense(trunk[i] => trunk[i + 1], trunk_activation)
+                       for i in 1:(length(trunk) - 1)]...)
+
+    return DeepONet(branch_net, trunk_net, additional)
+end
+
+function (deeponet::DeepONet)(
+        u::T1, y::T2, ps, st::NamedTuple) where {T1 <: AbstractArray, T2 <: AbstractArray}
+    b, st_b = deeponet.branch(u, ps.branch, st.branch)
+    t, st_t = deeponet.trunk(y, ps.trunk, st.trunk)
+    out, st_a = __project(b, t, deeponet.additional)
+    return out, (branch=st_b, trunk=st_t, additional=st_a)
 end
