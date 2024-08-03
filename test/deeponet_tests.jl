@@ -18,10 +18,10 @@
             deeponet = DeepONet(; branch=setup.branch, trunk=setup.trunk)
 
             ps, st = Lux.setup(rng, deeponet) |> dev
-            @inferred first(deeponet((u, y), ps, st))
-            @jet first(deeponet((u, y), ps, st))
+            @inferred first(deeponet(u, y, ps, st))
+            @jet first(deeponet(u, y, ps, st))
 
-            pred = first(deeponet((u, y), ps, st))
+            pred = first(deeponet(u, y, ps, st))
             @test setup.out_size == size(pred)
         end
 
@@ -43,10 +43,10 @@
                 branch=setup.branch, trunk=setup.trunk, additional=setup.additional)
 
             ps, st = Lux.setup(rng, deeponet) |> dev
-            @inferred first(deeponet((u, y), ps, st))
-            @jet first(deeponet((u, y), ps, st))
+            @inferred first(deeponet(u, y, ps, st))
+            @jet first(deeponet(u, y, ps, st))
 
-            pred = first(deeponet((u, y), ps, st))
+            pred = first(deeponet(u, y, ps, st))
             @test setup.out_size == size(pred)
 
             __f = (u, y, ps) -> sum(abs2, first(deeponet((u, y), ps, st)))
@@ -62,7 +62,7 @@
                 Chain(Dense(1 => 8), Dense(8 => 8), Dense(8 => 16)))
 
             ps, st = Lux.setup(rng, deeponet) |> dev
-            @test_throws ArgumentError deeponet((u, y), ps, st)
+            @test_throws ArgumentError deeponet(u, y, ps, st)
         end
     end
 end

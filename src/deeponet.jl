@@ -107,6 +107,12 @@ function (deeponet::DeepONet)(
         u::T1, y::T2, ps, st::NamedTuple) where {T1 <: AbstractArray, T2 <: AbstractArray}
     b, st_b = deeponet.branch(u, ps.branch, st.branch)
     t, st_t = deeponet.trunk(y, ps.trunk, st.trunk)
-    out, st_a = __project(b, t, deeponet.additional)
+
+    @argcheck size(b, 1)==size(t, 1) "Branch and Trunk net must share the same amount of \
+    nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't \
+    work."
+
+    out, st_a = __project(
+        b, t, (; ch=deeponet.additional, ps=ps.additional, st=st.additional))
     return out, (branch=st_b, trunk=st_t, additional=st_a)
 end
