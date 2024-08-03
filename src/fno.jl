@@ -37,6 +37,13 @@ julia> size(first(fno(u, ps, st)))
 (1, 1024, 5)
 ```
 """
+@concrete struct FourierNeuralOperator{L1, L2, L3} <:
+       Lux.AbstractExplicitContainerLayer{(:lifting, :mapping, :project)}
+    lifting::L1
+    mapping::L2
+    project::L3
+end
+
 function FourierNeuralOperator(;
         σ=gelu, chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128, 1), modes::Dims{M}=(16,),
         permuted::Val{perm}=Val(false), kwargs...) where {C, M, perm}
@@ -52,12 +59,15 @@ function FourierNeuralOperator(;
     project = perm ? Chain(Conv(kernel_size, map₂, σ), Conv(kernel_size, map₃)) :
               Chain(Dense(map₂, σ), Dense(map₃))
 
-    ch = Chain(; lifting,
-        mapping=Chain([SpectralKernel(chs[i] => chs[i + 1], modes, σ; permuted, kwargs...)
-                       for i in 2:(C - 3)]...),
-        project)
+    mapping = Chain([SpectralKernel(chs[i] => chs[i + 1], modes, σ; permuted, kwargs...)
+                     for i in 2:(C - 3)]...)
 
-    return @compact(; ch, dispatch=:FourierNeuralOperator) do x
-        @return ch(x)
-    end
+    return FourierNeuralOperator(lifting, mapping, project)
+end
+
+function (fno::FourierNeuralOperator)(x::T, ps, st::NamedTuple) where {T}
+    lift, st_lift = fno.lifting(x, ps.lifting, st.lifting)
+    mapping, st_mapping = fno.mapping(lift, ps.mapping, st.mapping)
+    project, st_project = fno.project(mapping, ps.project, st.project)
+    return project, (lifting=st_lift, mapping=st_mapping, project=st_project)
 end
