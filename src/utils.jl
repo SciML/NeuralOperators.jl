@@ -13,7 +13,7 @@ end
     if size(b, 2) == 1 || size(t, 2) == 1
         return sum(b .* t; dims=1), () # 1 x N x nb
     else
-        return batched_matmul(batched_adjoint(b), t) # u x N x b
+        return __batched_mul(batched_adjoint(b), t), () # u x N x b
     end
 end
 
