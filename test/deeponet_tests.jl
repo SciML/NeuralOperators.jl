@@ -62,7 +62,7 @@
                 Chain(Dense(1 => 8), Dense(8 => 8), Dense(8 => 16)))
 
             ps, st = Lux.setup(rng, deeponet) |> dev
-            @test_throws ArgumentError deeponet((u, y), ps, st)
+            @test_throws ArgumentError deeponet(u, y, ps, st)
         end
     end
 end
