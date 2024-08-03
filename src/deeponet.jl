@@ -113,6 +113,6 @@ function (deeponet::DeepONet)(
     work."
 
     out, st_a = __project(
-        b, t, (; ch=deeponet.additional, ps=ps.additional, st=st.additional))
+        b, t, deeponet.additional, (;ps=ps.additional, st=st.additional))
     return out, (branch=st_b, trunk=st_t, additional=st_a)
 end
