@@ -1,16 +1,10 @@
-using Pkg
+using ThreadPinning
+pinthreads(:cores)
+threadinfo()
 
-Pkg.activate(".")
+using BenchmarkTools, NeuralOperators, Random, Optimisers, Zygote
 
-using MKL
-
-using NeuralOperators
-using BenchmarkTools
-using Random
-using Optimisers
-using Zygote
-
-rng = Random.default_rng()
+rng = Xoshiro(1234)
 
 train!(args...; kwargs...) = train!(MSELoss(), AutoZygote(), args...; kwargs...)
 
@@ -86,3 +80,5 @@ print("| --- | --- | --- | \n")
 for i in 1:5
     print("| $i | $(t_fwd[i] * 1000) ms | $(t_train[i] * 1000) ms | \n")
 end
+
+
