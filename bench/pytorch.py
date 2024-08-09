@@ -12,7 +12,7 @@ fwd_timed_arr = [0.0] * 5
 training_timed_arr = [0.0] * 5
 
 for i in range(1, 6):
-    setup_code = f"""eval_points = 128
+    setup_code = f"""eval_points = 64
 batch_size = 64
 dim_y = 1
 m = 32

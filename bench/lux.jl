@@ -1,3 +1,6 @@
+using Pkg
+Pkg.activate(".")
+
 using ThreadPinning
 pinthreads(:cores)
 threadinfo()
@@ -49,7 +52,7 @@ for i in 1:5
 end
 
 # DeepONets
-eval_points = 128
+eval_points = 1
 batch_size = 64
 dim_y = 1
 m = 32
