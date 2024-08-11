@@ -27,7 +27,7 @@ kernels, and two `Dense` layers to project data back to the scalar field of inte
 ## Example
 
 ```jldoctest
-julia> fno = FourierNeuralOperator(gelu; chs=(2, 64, 64, 128, 1), modes=(16,));
+julia> fno = FourierNeuralOperator(; σ=gelu, chs=(2, 64, 64, 128, 1), modes=(16,));
 
 julia> ps, st = Lux.setup(Xoshiro(), fno);
 
@@ -38,7 +38,7 @@ julia> size(first(fno(u, ps, st)))
 ```
 """
 @concrete struct FourierNeuralOperator{L1, L2, L3} <:
-       Lux.AbstractExplicitContainerLayer{(:lifting, :mapping, :project)}
+                 Lux.AbstractExplicitContainerLayer{(:lifting, :mapping, :project)}
     lifting::L1
     mapping::L2
     project::L3

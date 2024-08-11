@@ -1,5 +1,5 @@
 """
-    DeepONet(branch, trunk; additional)
+    DeepONet(branch, trunk, additional)
 
 Constructs a DeepONet from a `branch` and `trunk` architectures. Make sure that both the
 nets output should have the same first dimension.
@@ -40,7 +40,7 @@ julia> size(first(deeponet((u, y), ps, st)))
 ```
 """
 @concrete struct DeepONet{L1, L2, L3} <:
-       Lux.AbstractExplicitContainerLayer{(:branch, :trunk, :additional)}
+                 Lux.AbstractExplicitContainerLayer{(:branch, :trunk, :additional)}
     branch::L1
     trunk::L2
     additional::L3
@@ -112,7 +112,6 @@ function (deeponet::DeepONet)(
     nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't \
     work."
 
-    out, st_a = __project(
-        b, t, deeponet.additional, (;ps=ps.additional, st=st.additional))
+    out, st_a = __project(b, t, deeponet.additional, (; ps=ps.additional, st=st.additional))
     return out, (branch=st_b, trunk=st_t, additional=st_a)
 end
