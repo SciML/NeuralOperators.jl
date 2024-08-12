@@ -116,11 +116,13 @@ julia> OperatorKernel(2 => 5, (16,), FourierTransform{ComplexF64}; permuted=Val(
 
 ```
 """
-struct OperatorKernel{L1, L2} <: Lux.AbstractExplicitContainerLayer{(:lin, :conv)}
-    lin::L2
-    conv::L1
+@concrete struct OperatorKernel <: Lux.AbstractExplicitContainerLayer{(:lin, :conv)}
+    lin
+    conv
     activation::Function
 end
+
+OperatorKernel(lin, conv) = OperatorKernel(lin, conv, identity)
 
 function OperatorKernel(ch::Pair{<:Integer, <:Integer}, modes::Dims{N}, transform::Type{TR},
         act::A=identity; allow_fast_activation::Bool=false, permuted::Val{perm}=Val(false),
@@ -132,11 +134,11 @@ function OperatorKernel(ch::Pair{<:Integer, <:Integer}, modes::Dims{N}, transfor
     return OperatorKernel(lin, conv, act)
 end
 
-function (op::OperatorKernel)(x::T1, ps, st::NamedTuple) where {T1 <: AbstractArray}
+function (op::OperatorKernel)(x::AbstractArray, ps, st::NamedTuple)
     x_conv, st_conv = op.conv(x, ps.conv, st.conv)
     x_lin, st_lin = op.lin(x, ps.lin, st.lin)
 
-    out = @. op.activation(x_conv + x_lin)
+    out = fast_activation!!(op.activation, x_conv .+ x_lin)
     return out, (lin=st_lin, conv=st_conv)
 end
 

@@ -39,11 +39,11 @@ julia> size(first(deeponet((u, y), ps, st)))
 (10, 5)
 ```
 """
-@concrete struct DeepONet{L1, L2, L3} <:
+@concrete struct DeepONet <:
                  Lux.AbstractExplicitContainerLayer{(:branch, :trunk, :additional)}
-    branch::L1
-    trunk::L2
-    additional::L3
+    branch
+    trunk
+    additional
 end
 
 DeepONet(branch, trunk) = DeepONet(branch, trunk, NoOpLayer())
@@ -103,14 +103,13 @@ function DeepONet(;
     return DeepONet(branch_net, trunk_net, additional)
 end
 
-function (deeponet::DeepONet)(
-        u::T1, y::T2, ps, st::NamedTuple) where {T1 <: AbstractArray, T2 <: AbstractArray}
-    b, st_b = deeponet.branch(u, ps.branch, st.branch)
-    t, st_t = deeponet.trunk(y, ps.trunk, st.trunk)
+function (deeponet::DeepONet)(x, ps, st::NamedTuple)
+    b, st_b = deeponet.branch(x[1], ps.branch, st.branch)
+    t, st_t = deeponet.trunk(x[2], ps.trunk, st.trunk)
 
     @argcheck size(b, 1)==size(t, 1) "Branch and Trunk net must share the same amount of \
-    nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't \
-    work."
+                                      nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't \
+                                      work."
 
     out, st_a = __project(b, t, deeponet.additional, (; ps=ps.additional, st=st.additional))
     return out, (branch=st_b, trunk=st_t, additional=st_a)

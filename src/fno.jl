@@ -37,11 +37,11 @@ julia> size(first(fno(u, ps, st)))
 (1, 1024, 5)
 ```
 """
-@concrete struct FourierNeuralOperator{L1, L2, L3} <:
+@concrete struct FourierNeuralOperator <:
                  Lux.AbstractExplicitContainerLayer{(:lifting, :mapping, :project)}
-    lifting::L1
-    mapping::L2
-    project::L3
+    lifting
+    mapping
+    project
 end
 
 function FourierNeuralOperator(;
@@ -65,7 +65,7 @@ function FourierNeuralOperator(;
     return FourierNeuralOperator(lifting, mapping, project)
 end
 
-function (fno::FourierNeuralOperator)(x::T, ps, st::NamedTuple) where {T}
+function (fno::FourierNeuralOperator)(x::AbstractArray, ps, st::NamedTuple)
     lift, st_lift = fno.lifting(x, ps.lifting, st.lifting)
     mapping, st_mapping = fno.mapping(lift, ps.mapping, st.mapping)
     project, st_project = fno.project(mapping, ps.project, st.project)
