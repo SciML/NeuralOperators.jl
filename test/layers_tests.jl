@@ -14,7 +14,7 @@
         @testset "$(op) $(length(setup.m))D: permuted = $(setup.permuted)" for setup in setups,
             op in opconv
 
-            p = Lux.__unwrap_val(setup.permuted)
+            p = Lux.Utils.unwrap_val(setup.permuted)
             in_chs = ifelse(p, setup.x_size[end - 1], first(setup.x_size))
             out_chs = ifelse(p, setup.y_size[end - 1], first(setup.y_size))
             ch = 64 => out_chs

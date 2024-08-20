@@ -9,11 +9,8 @@ using LuxCore: LuxCore, AbstractExplicitLayer, AbstractExplicitContainerLayer
 using LuxLib: batched_matmul
 using NNlib: NNlib, batched_adjoint
 using Random: Random, AbstractRNG
-using Reexport: @reexport
 
 const CRC = ChainRulesCore
-
-@reexport using Lux
 
 include("utils.jl")
 include("transform.jl")
