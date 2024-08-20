@@ -31,11 +31,10 @@
             @jet m(x, ps, st)
 
             data = [(x, aType(rand(rng, Float32, setup.y_size...)))]
-            broken = mode == "AMDGPU"
             @test begin
                 l2, l1 = train!(m, ps, st, data; epochs=10)
                 l2 < l1
-            end broken=broken
+            end
 
             __f = (x, ps) -> sum(abs2, first(m(x, ps, st)))
             test_gradients(__f, x, ps; atol=1.0f-3, rtol=1.0f-3,
