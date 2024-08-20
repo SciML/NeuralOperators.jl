@@ -39,8 +39,7 @@ julia> size(first(deeponet((u, y), ps, st)))
 (10, 5)
 ```
 """
-@concrete struct DeepONet <:
-                 Lux.AbstractExplicitContainerLayer{(:branch, :trunk, :additional)}
+@concrete struct DeepONet <: AbstractExplicitContainerLayer{(:branch, :trunk, :additional)}
     branch
     trunk
     additional

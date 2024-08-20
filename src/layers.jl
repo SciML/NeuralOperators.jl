@@ -116,7 +116,7 @@ julia> OperatorKernel(2 => 5, (16,), FourierTransform{ComplexF64}; permuted=Val(
 
 ```
 """
-@concrete struct OperatorKernel <: Lux.AbstractExplicitContainerLayer{(:lin, :conv)}
+@concrete struct OperatorKernel <: AbstractExplicitContainerLayer{(:lin, :conv)}
     lin
     conv
     activation <: Function
