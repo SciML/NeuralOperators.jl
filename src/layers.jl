@@ -119,7 +119,7 @@ julia> OperatorKernel(2 => 5, (16,), FourierTransform{ComplexF64}; permuted=Val(
 @concrete struct OperatorKernel <: Lux.AbstractExplicitContainerLayer{(:lin, :conv)}
     lin
     conv
-    activation::Function
+    activation <: Function
 end
 
 OperatorKernel(lin, conv) = OperatorKernel(lin, conv, identity)

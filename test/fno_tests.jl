@@ -10,6 +10,7 @@
 
         @testset "$(length(setup.modes))D: permuted = $(setup.permuted)" for setup in setups
             fno = FourierNeuralOperator(; setup.chs, setup.modes, setup.permuted)
+            display(fno)
             ps, st = Lux.setup(rng, fno) |> dev
 
             x = rand(rng, Float32, setup.x_size...) |> aType

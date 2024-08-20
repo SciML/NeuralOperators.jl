@@ -6,7 +6,7 @@ using MLDataDevices
 
 LuxTestUtils.jet_target_modules!(["NeuralOperators", "Lux", "LuxLib"])
 
-const BACKEND_GROUP = lowercase(get(ENV, "BACKEND_GROUP", "All")) 
+const BACKEND_GROUP = lowercase(get(ENV, "BACKEND_GROUP", "All"))
 
 if BACKEND_GROUP == "all" || BACKEND_GROUP == "cuda"
     using LuxCUDA
