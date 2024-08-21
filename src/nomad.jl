@@ -83,10 +83,9 @@ julia> size(first(nomad((u, y), ps, st)))
 ```
 """
 function NOMAD(; approximator=(8, 32, 32, 16), decoder=(18, 16, 8, 8),
-               approximator_activation=identity, decoder_activation=identity,
-               concatenate=__merge)
+        approximator_activation=identity, decoder_activation=identity, concatenate=__merge)
     approximator_net = Chain([Dense(approximator[i] => approximator[i + 1],
-                                    approximator_activation)
+                                  approximator_activation)
                               for i in 1:(length(approximator) - 1)]...)
 
     decoder_net = Chain([Dense(decoder[i] => decoder[i + 1], decoder_activation)
