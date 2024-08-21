@@ -1,13 +1,13 @@
-@inline function __project(
-        b::AbstractArray{T1, 2}, t::AbstractArray{T2, 3}, ::NoOpLayer, _) where {T1, T2}
+@inline function __project(b::AbstractArray{T1, 2}, t::AbstractArray{T2, 3}, ::NoOpLayer,
+                           _) where {T1, T2}
     # b : p x nb
     # t : p x N x nb
     b_ = reshape(b, size(b, 1), 1, size(b, 2)) # p x 1 x nb
     return dropdims(sum(b_ .* t; dims=1); dims=1), () # N x nb
 end
 
-@inline function __project(
-        b::AbstractArray{T1, 3}, t::AbstractArray{T2, 3}, ::NoOpLayer, _) where {T1, T2}
+@inline function __project(b::AbstractArray{T1, 3}, t::AbstractArray{T2, 3}, ::NoOpLayer,
+                           _) where {T1, T2}
     # b : p x u x nb
     # t : p x N x nb
     if size(b, 2) == 1 || size(t, 2) == 1
@@ -17,8 +17,8 @@ end
     end
 end
 
-@inline function __project(
-        b::AbstractArray{T1, N}, t::AbstractArray{T2, 3}, ::NoOpLayer, _) where {T1, T2, N}
+@inline function __project(b::AbstractArray{T1, N}, t::AbstractArray{T2, 3}, ::NoOpLayer,
+                           _) where {T1, T2, N}
     # b : p x u_size x nb
     # t : p x N x nb
     u_size = size(b)[2:(end - 1)]
@@ -32,16 +32,16 @@ end
     return dropdims(sum(b_ .* t_; dims=1); dims=1), () # u_size x N x nb
 end
 
-@inline function __project(b::AbstractArray{T1, 2}, t::AbstractArray{T2, 3},
-        additional::T, params) where {T1, T2, T}
+@inline function __project(b::AbstractArray{T1, 2}, t::AbstractArray{T2, 3}, additional::T,
+                           params) where {T1, T2, T}
     # b : p x nb
     # t : p x N x nb
     b_ = reshape(b, size(b, 1), 1, size(b, 2)) # p x 1 x nb
     return additional(b_ .* t, params.ps, params.st) # p x N x nb => out_dims x N x nb
 end
 
-@inline function __project(b::AbstractArray{T1, 3}, t::AbstractArray{T2, 3},
-        additional::T, params) where {T1, T2, T}
+@inline function __project(b::AbstractArray{T1, 3}, t::AbstractArray{T2, 3}, additional::T,
+                           params) where {T1, T2, T}
     # b : p x u x nb
     # t : p x N x nb
 
@@ -55,8 +55,8 @@ end
     end
 end
 
-@inline function __project(b::AbstractArray{T1, N}, t::AbstractArray{T2, 3},
-        additional::T, params) where {T1, T2, N, T}
+@inline function __project(b::AbstractArray{T1, N}, t::AbstractArray{T2, 3}, additional::T,
+                           params) where {T1, T2, N, T}
     # b : p x u_size x nb
     # t : p x N x nb
     u_size = size(b)[2:(end - 1)]
@@ -68,4 +68,36 @@ end
     # p x (1,1,1...) x N x nb
 
     return additional(b_ .* t_, params.ps, params.st) # p x u_size x N x nb => out_size x N x nb
+end
+
+@inline function __batch_vectorize(x::AbstractArray{T, N}) where {T, N}
+    dim_length = ndims(x) - 1
+    nb = size(x)[end]
+
+    slice = [Colon() for _ in 1:dim_length]
+    return reduce(hcat, [vec(view(x, slice..., i)) for i in 1:nb])
+end
+
+@inline function __merge(x::AbstractArray{T1, 2},
+                             y::AbstractArray{T1, 2}) where {T1, T2}
+    return cat(x, y; dims=1)
+end
+
+@inline function __merge(x::AbstractArray{T1, N1},
+                             y::AbstractArray{T1, 2}) where {T1, T2, N1}
+    x_ = __batch_vectorize(x)
+    return cat(x_, y; dims=1)
+end
+
+@inline function __merge(x::AbstractArray{T1, 2},
+                             y::AbstractArray{T1, N2}) where {T1, T2, N2}
+    y_ = __batch_vectorize(y)
+    return cat(x, y_; dims=1)
+end
+
+@inline function __merge(x::AbstractArray{T1, N1},
+                             y::AbstractArray{T1, N2}) where {T1, T2, N1, N2}
+    x_ = __batch_vectorize(x)
+    y_ = __batch_vectorize(y)
+    return cat(x_, y_; dims=1)
 end
