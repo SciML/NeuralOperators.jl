@@ -13,7 +13,7 @@
             (b_size=(16, 4, 3, 3, 5), t_size=(16, 10, 5),
                 out_size=(4, 3, 3, 10, 5), additional=NoOpLayer(), name="Tensor"),
             (b_size=(16, 5), t_size=(16, 10, 5), out_size=(4, 10, 5),
-                additional=Dense(16 => 4), name="addtional : Scalar"),
+                additional=Dense(16 => 4), name="additional : Scalar"),
             (b_size=(16, 1, 5), t_size=(16, 10, 5), out_size=(4, 10, 5),
                 additional=Dense(16 => 4), name="additional : Scalar II"),
             (b_size=(16, 3, 5), t_size=(16, 10, 5), out_size=(4, 3, 10, 5),
