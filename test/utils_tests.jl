@@ -17,7 +17,10 @@
             (b_size=(16, 1, 5), t_size=(16, 10, 5), out_size=(4, 10, 5),
                 additional=Dense(16 => 4), name="additional : Scalar II"),
             (b_size=(16, 3, 5), t_size=(16, 10, 5), out_size=(4, 3, 10, 5),
-                additional=Dense(16 => 4), name="additional : Vector")]
+                additional=Dense(16 => 4), name="additional : Vector"),
+            (b_size=(16, 4, 3, 3, 5), t_size=(16, 10, 5), out_size=(3, 4, 3, 4, 10, 5),
+                additional=Chain(Dense(16 => 4), ReshapeLayer((3, 4, 3, 4, 10))),
+                name="additional : Tensor")]
 
         @testset "project : $(setup.name)" for setup in setups
             b = rand(Float32, setup.b_size...) |> aType
@@ -32,7 +35,7 @@
 
         setups = [(x_size=(6, 5), y_size=(4, 5), out_size=(10, 5), name="Scalar"),
             (x_size=(4, 3, 5), y_size=(8, 5), out_size=(20, 5), name="Vector I"),
-            (x_size=(4, 6, 5), y_size=(2, 3, 5), out_size=(30, 5), name="Vector II"),
+            (x_size=(4, 6, 5), y_size=(6, 5), out_size=(30, 5), name="Vector II"),
             (x_size=(4, 2, 3, 5), y_size=(2, 2, 3, 5), out_size=(36, 5), name="Tensor")]
 
         @testset "merge $(setup.name)" for setup in setups
