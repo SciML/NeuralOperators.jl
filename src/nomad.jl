@@ -48,7 +48,7 @@ NOMAD(approximator, decoder) = NOMAD(approximator, decoder, __merge)
 
 """
     NOMAD(; approximator = (8, 32, 32, 16), decoder = (18, 16, 8, 8),
-    	approximator_activation = identity, decoder_activation = identity)
+        approximator_activation = identity, decoder_activation = identity)
 
 Constructs a NOMAD composed of Dense layers. Make sure that
 last node of `approximator` + coordinate length = first node of `decoder`

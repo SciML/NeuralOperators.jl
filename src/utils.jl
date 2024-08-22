@@ -85,18 +85,18 @@ end
 @inline function __merge(
         x::AbstractArray{T1, N1}, y::AbstractArray{T2, 2}) where {T1, T2, N1}
     x_ = __batch_vectorize(x)
-    return cat(x_, y; dims=1)
+    return vcat(x_, y)
 end
 
 @inline function __merge(
         x::AbstractArray{T1, 2}, y::AbstractArray{T2, N2}) where {T1, T2, N2}
     y_ = __batch_vectorize(y)
-    return cat(x, y_; dims=1)
+    return vcat(x, y_)
 end
 
 @inline function __merge(
         x::AbstractArray{T1, N1}, y::AbstractArray{T2, N2}) where {T1, T2, N1, N2}
     x_ = __batch_vectorize(x)
     y_ = __batch_vectorize(y)
-    return cat(x_, y_; dims=1)
+    return vcat(x_, y_)
 end
