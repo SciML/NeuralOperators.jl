@@ -34,7 +34,7 @@
         end
 
         setups = [(x_size=(6, 5), y_size=(4, 5), out_size=(10, 5), name="Scalar"),
-            (x_size=(4, 3, 5), y_size=(8, 5), out_size=(20, 5), name="Vector I"),
+            (x_size=(12, 5), y_size=(8, 5), out_size=(20, 5), name="Vector I"),
             (x_size=(4, 6, 5), y_size=(6, 5), out_size=(30, 5), name="Vector II"),
             (x_size=(4, 2, 3, 5), y_size=(2, 2, 3, 5), out_size=(36, 5), name="Tensor")]
 
