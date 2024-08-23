@@ -1,5 +1,9 @@
 pages = [
-    "Home" => "index.md",
-    # "fno_tut" => "tutorials/fno.md",
-    # "deeponet" => "tutorials/deeponet.md",
+    "NeuralOperators.jl" => "index.md",
+    "Tutorials" => Any[
+        "FNO" => "tutorials/fno.md",
+        "DeepONet" => "tutorials/deeponet.md",
+        "NOMAD" => "tutorials/nomad.md"
+    ],
+    "Building blocks" => "api.md"
 ]
