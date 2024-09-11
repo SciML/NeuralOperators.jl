@@ -1,6 +1,4 @@
-# API
-
-## Building blocks
+# Building blocks
 
 ```@docs
 OperatorConv

@@ -12,8 +12,70 @@ y
 \end{align*}
 ```
 
-
 ## Usage
+
+Let's try to learn the anti-derivative operator for 
+```math
+u(x) = sin(\alpha x)
+```
+That is, we want to learn
+```math
+\mathcal{G} : u \rightarrow v \\
+```
+such that
+```math
+v(x) = \frac{du}{dx} \quad \forall \; x \in [0, 2\pi], \; \alpha \in [0.5, 1]
+```
+
+### Copy-pastable code
+
+```@example nomad_tut
+using NeuralOperators
+using Lux
+using Random
+using Optimisers
+using Zygote
+using Plots
+
+rng = Random.default_rng()
+
+eval_points = 1
+data_size = 128
+dim_y = 1
+m = 32
+
+xrange = range(0, 2π; length=m) .|> Float32
+u_data = zeros(Float32, m, data_size)
+α = 0.5f0 .+ 0.5f0 .* rand(Float32, data_size)
+
+y_data = rand(Float32, 1, eval_points, data_size) .* 2π
+v_data = zeros(Float32, eval_points, data_size)
+for i in 1:data_size
+    u_data[:, i] .= sin.(α[i] .* xrange)
+    v_data[:, i] .= -inv(α[i]) .* cos.(α[i] .* y_data[1, :, i])
+end
+
+nomad = NOMAD(Chain(Dense(m => 8, σ), Dense(8 => 8, σ), Dense(8 => 7)),
+              Chain(Dense(8 => 4, σ), Dense(4 => 1)))
+
+ps, st = Lux.setup(rng, nomad);
+data = [((u_data, y_data), v_data)];
+
+function train!(loss, backend, model, ps, st, data; epochs=10)
+    losses = []
+    tstate = Training.TrainState(model, ps, st, Adam(0.01f0))
+    for _ in 1:epochs, (x, y) in data
+        _, _, _, tstate = Training.single_train_step!(backend, loss, (x, y), tstate)
+        push!(losses, loss(first(model(x, ps, st)), y))
+    end
+
+    return losses
+end
+
+train!(args...; kwargs...) = train!(MSELoss(), AutoZygote(), args...; kwargs...)
+losses = train!(nomad, ps, st, data; epochs = 100)
+plot(losses; ylabel="mse loss", xlabel="iterations", label= "loss")
+```
 
 ## API
 ```@docs
