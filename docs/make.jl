@@ -13,9 +13,9 @@ makedocs(; sitename = "NeuralOperators.jl",
     doctest = false,
     linkcheck = true,
     warnonly = [:docs_block, :missing_docs],
-    modules = [NeuralOperators],)
-    # format = Documenter.HTML(; assets = ["assets/favicon.ico"],
-    #     canonical = "https://docs.sciml.ai/NeuralOperators.jl/stable/"),
-    # pages = pages)
+    modules = [NeuralOperators],
+    format = Documenter.HTML(; assets = ["assets/favicon.ico"],
+        canonical = "https://lux.csail.mit.edu/NeuralOperators.jl/stable/"),
+    pages = pages)
 
-deploydocs(; repo = "github.com/SciML/NeuralOperators.jl.git", push_preview = true)
+deploydocs(; repo = "github.com/LuxDL/NeuralOperators.jl.git", push_preview = true)

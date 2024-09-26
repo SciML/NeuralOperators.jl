@@ -24,3 +24,22 @@ steps:
     agents:
       queue: "juliagpu"
     command: "buildkite-agent pipeline upload .buildkite/testing.yml"
+
+  - label: "Documentation"
+    plugins:
+      - JuliaCI/julia#v1:
+          version: "1"
+    command: |
+      julia --project=docs -e '
+        println("--- :julia: Instantiating project")
+        using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
+        println("+++ :julia: Building documentation")
+        include("docs/make.jl")'
+    agents:
+      queue: "juliagpu"
+      cuda: "*"
+    if: build.message !~ /\[skip docs\]/ && !build.pull_request.draft
+    timeout_in_minutes: 120
+
+env:
+  # SECRET_DOCUMENTER_KEY: 
