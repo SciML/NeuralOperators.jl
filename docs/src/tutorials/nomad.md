@@ -1,4 +1,5 @@
-# Nonlinear Manifold Decoders for Operator Learning (NOMADs) 
+# Nonlinear Manifold Decoders for Operator Learning (NOMADs)
+
 NOMADs are similar to DeepONets in the aspect that they can learn when the input and output function spaces are defined on different domains. Their architecture is different and use nonlinearity to the latent codes to obtain the operator approximation.
 The architecture involves an approximator to encode the input function space, which is directly concatenated with the input function coordinates, and passed into a decoder net to give the output function at the given coordinate.
 
@@ -14,15 +15,20 @@ y
 
 ## Usage
 
-Let's try to learn the anti-derivative operator for 
+Let's try to learn the anti-derivative operator for
+
 ```math
 u(x) = sin(\alpha x)
 ```
+
 That is, we want to learn
+
 ```math
 \mathcal{G} : u \rightarrow v \\
 ```
+
 such that
+
 ```math
 v(x) = \frac{du}{dx} \quad \forall \; x \in [0, 2\pi], \; \alpha \in [0.5, 1]
 ```
@@ -56,7 +62,7 @@ for i in 1:data_size
 end
 
 nomad = NOMAD(Chain(Dense(m => 8, σ), Dense(8 => 8, σ), Dense(8 => 7)),
-              Chain(Dense(8 => 4, σ), Dense(4 => 1)))
+    Chain(Dense(8 => 4, σ), Dense(4 => 1)))
 
 ps, st = Lux.setup(rng, nomad);
 data = [((u_data, y_data), v_data)];
@@ -73,11 +79,12 @@ function train!(loss, backend, model, ps, st, data; epochs=10)
 end
 
 train!(args...; kwargs...) = train!(MSELoss(), AutoZygote(), args...; kwargs...)
-losses = train!(nomad, ps, st, data; epochs = 100)
-plot(losses; ylabel="mse loss", xlabel="iterations", label= "loss")
+losses = train!(nomad, ps, st, data; epochs=100)
+plot(losses; ylabel="mse loss", xlabel="iterations", label="loss")
 ```
 
 ## API
+
 ```@docs
 NOMAD
 ```

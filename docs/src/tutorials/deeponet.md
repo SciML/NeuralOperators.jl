@@ -2,7 +2,6 @@
 
 DeepONets are another class of networks that learn the mapping between two function spaces by encoding the input function space and the location of the output space. The latent code of the input space is then projected on the location laten code to give the output. This allows the network to learn the mapping between two functions defined on different spaces.
 
-
 ```math
 \begin{align*}
 u(y) \xrightarrow{\text{branch}} & \; b \\
@@ -15,15 +14,20 @@ y \; \; \xrightarrow{\text{trunk}} \; \; & t
 
 ## Usage
 
-Let's try to learn the anti-derivative operator for 
+Let's try to learn the anti-derivative operator for
+
 ```math
 u(x) = sin(\alpha x)
 ```
+
 That is, we want to learn
+
 ```math
 \mathcal{G} : u \rightarrow v \\
 ```
+
 such that
+
 ```math
 v(x) = \frac{du}{dx} \quad \forall \; x \in [0, 2\pi], \; \alpha \in [0.5, 1]
 ```
@@ -57,7 +61,7 @@ for i in 1:data_size
 end
 
 deeponet = DeepONet(Chain(Dense(m => 8, σ), Dense(8 => 8, σ), Dense(8 => 8, σ)),
-                    Chain(Dense(1 => 4, σ), Dense(4 => 8, σ)))
+    Chain(Dense(1 => 4, σ), Dense(4 => 8, σ)))
 
 ps, st = Lux.setup(rng, deeponet)
 data = [((u_data, y_data), v_data)]
@@ -74,11 +78,12 @@ function train!(loss, backend, model, ps, st, data; epochs=10)
 end
 
 train!(args...; kwargs...) = train!(MSELoss(), AutoZygote(), args...; kwargs...)
-losses = train!(deeponet, ps, st, data; epochs = 100)
-plot(losses; ylabel="mse loss", xlabel="iterations", label= "loss")
-``` 
+losses = train!(deeponet, ps, st, data; epochs=100)
+plot(losses; ylabel="mse loss", xlabel="iterations", label="loss")
+```
 
 ## API
+
 ```@docs
 DeepONet
 ```

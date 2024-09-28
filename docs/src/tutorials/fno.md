@@ -7,6 +7,7 @@ FNOs are a subclass of Neural Operators that learn the learn the kernel $\Kappa_
 ```
 
 The kernel makes up a block $v_t(x)$ which passes the information to the next block as:
+
 ```math
 v^{(t+1)}(x) = \sigma((W^{(t)}v^{(t)} + \Kappa^{(t)}v^{(t)})(x))
 ```
@@ -20,18 +21,25 @@ FNOs choose a specific kernel $\kappa(x,y) = \kappa(x-y)$, converting the kernel
 &= \mathcal{F}^{-1}(\mathcal{F}(\kappa_{\theta}) \mathcal{F}(u))(x) \quad \forall x \in D
 \end{align*}
 ```
+
 where $\mathcal{F}$ denotes the fourier transform. Usually, not all the modes in the frequency domain are used with the higher modes often being truncated.
+
 ## Usage
 
-Let's try to learn the anti-derivative operator for 
+Let's try to learn the anti-derivative operator for
+
 ```math
 u(x) = sin(\alpha x)
 ```
+
 That is, we want to learn
+
 ```math
 \mathcal{G} : u \rightarrow v \\
 ```
+
 such that
+
 ```math
 v(x) = \frac{du}{dx} \quad \forall \; x \in [0, 2\pi], \; \alpha \in [0.5, 1]
 ```
@@ -51,14 +59,14 @@ rng = Random.default_rng()
 data_size = 128
 m = 32
 
-xrange = range(0, 2π, length = m) .|> Float32;
+xrange = range(0, 2π; length=m) .|> Float32;
 u_data = zeros(Float32, m, 1, data_size);
 α = 0.5f0 .+ 0.5f0 .* rand(Float32, data_size);
 v_data = zeros(Float32, m, 1, data_size);
 
 for i in 1:data_size
-    u_data[:, 1, i] .= sin.(α[i].* xrange);
-    v_data[:, 1, i] .=  - inv(α[i]) .* cos.(α[i].* xrange);
+    u_data[:, 1, i] .= sin.(α[i] .* xrange)
+    v_data[:, 1, i] .= -inv(α[i]) .* cos.(α[i] .* xrange)
 end
 
 fno = FourierNeuralOperator(gelu; chs=(1, 64, 64, 128, 1), modes=(16,), permuted=Val(true))
@@ -78,11 +86,12 @@ function train!(loss, backend, model, ps, st, data; epochs=10)
 end
 
 train!(args...; kwargs...) = train!(MSELoss(), AutoZygote(), args...; kwargs...)
-losses = train!(fno, ps, st, data; epochs = 100)
-plot(losses; ylabel="mse loss", xlabel="iterations", label= "loss")
+losses = train!(fno, ps, st, data; epochs=100)
+plot(losses; ylabel="mse loss", xlabel="iterations", label="loss")
 ```
 
 ## API
+
 ```@docs
 FourierNeuralOperator
 ```
