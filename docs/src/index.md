@@ -1,10 +1,11 @@
 # NeuralOperators
 
-`NeuralOperators.jl` is a package written in Julia to provide the architectures for learning mapping between function spaces, and learning grid invariant solution of PDEs. It provides `Lux.jl` architectures, which you can train by writing your own training code or using the `Lux`'s [training API](https://lux.csail.mit.edu/stable/tutorials/beginner/2_PolynomialFitting)
+`NeuralOperators.jl` is a package written in Julia to provide the architectures for learning
+mapping between function spaces, and learning grid invariant solution of PDEs.
 
 ## Installation
 
-On Julia 1.10 and greater, you can install `NeuralOperators.jl` as
+On Julia 1.10+, you can install `NeuralOperators.jl` by running
 
 ```julia
 import Pkg
@@ -16,12 +17,6 @@ Currently provided operator architectures are :
   - [Fourier Neural Operators (FNOs)](tutorials/fno.md)
   - [DeepONets](tutorials/deeponet.md)
   - [Nonlinear Manifold Decoders for Operator Learning (NOMADs)](tutorials/nomad.md)
-
-## Benchmark
-
-TODO : Link to SciMLBenchmarks page
-
-## Citation
 
 ## Reproducibility
 

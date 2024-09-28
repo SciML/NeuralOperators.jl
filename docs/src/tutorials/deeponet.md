@@ -1,6 +1,9 @@
 # DeepONets
 
-DeepONets are another class of networks that learn the mapping between two function spaces by encoding the input function space and the location of the output space. The latent code of the input space is then projected on the location laten code to give the output. This allows the network to learn the mapping between two functions defined on different spaces.
+DeepONets are another class of networks that learn the mapping between two function spaces
+by encoding the input function space and the location of the output space. The latent code
+of the input space is then projected on the location laten code to give the output. This
+allows the network to learn the mapping between two functions defined on different spaces.
 
 ```math
 \begin{align*}
@@ -34,13 +37,8 @@ v(x) = \frac{du}{dx} \quad \forall \; x \in [0, 2\pi], \; \alpha \in [0.5, 1]
 
 ### Copy-pastable code
 
-```@example deeponet_tut
-using NeuralOperators
-using Lux
-using Random
-using Optimisers
-using Zygote
-using Plots
+```@example deeponet_tutorial
+using NeuralOperators, Lux, Random, Optimisers, Zygote, CairoMakie
 
 rng = Random.default_rng()
 
@@ -60,30 +58,26 @@ for i in 1:data_size
     v_data[:, i] .= -inv(α[i]) .* cos.(α[i] .* y_data[1, :, i])
 end
 
-deeponet = DeepONet(Chain(Dense(m => 8, σ), Dense(8 => 8, σ), Dense(8 => 8, σ)),
-    Chain(Dense(1 => 4, σ), Dense(4 => 8, σ)))
+deeponet = DeepONet(
+    Chain(Dense(m => 8, σ), Dense(8 => 8, σ), Dense(8 => 8, σ)),
+    Chain(Dense(1 => 4, σ), Dense(4 => 8, σ))
+)
 
 ps, st = Lux.setup(rng, deeponet)
 data = [((u_data, y_data), v_data)]
 
-function train!(loss, backend, model, ps, st, data; epochs=10)
+function train!(model, ps, st, data; epochs=10)
     losses = []
-    tstate = Training.TrainState(model, ps, st, Adam(0.01f0))
+    tstate = Training.TrainState(model, ps, st, Adam(0.001f0))
     for _ in 1:epochs, (x, y) in data
-        _, _, _, tstate = Training.single_train_step!(backend, loss, (x, y), tstate)
-        push!(losses, loss(first(model(x, ps, st)), y))
+        _, loss, _, tstate = Training.single_train_step!(AutoZygote(), MSELoss(), (x, y),
+            tstate)
+        push!(losses, loss)
     end
-
     return losses
 end
 
-train!(args...; kwargs...) = train!(MSELoss(), AutoZygote(), args...; kwargs...)
-losses = train!(deeponet, ps, st, data; epochs=100)
-plot(losses; ylabel="mse loss", xlabel="iterations", label="loss")
-```
+losses = train!(deeponet, ps, st, data; epochs=1000)
 
-## API
-
-```@docs
-DeepONet
+lines(losses)
 ```

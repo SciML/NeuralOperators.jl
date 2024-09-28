@@ -1,6 +1,7 @@
 # Fourier Neural Operators (FNOs)
 
-FNOs are a subclass of Neural Operators that learn the learn the kernel $\Kappa_{\theta}$, parameterized on $\theta$ between function spaces:
+FNOs are a subclass of Neural Operators that learn the learn the kernel $\Kappa_{\theta}$,
+parameterized on $\theta$ between function spaces:
 
 ```math
 (\Kappa_{\theta}u)(x) = \int_D \kappa_{\theta}(a(x), a(y), x, y) dy  \quad \forall x \in D
@@ -12,7 +13,8 @@ The kernel makes up a block $v_t(x)$ which passes the information to the next bl
 v^{(t+1)}(x) = \sigma((W^{(t)}v^{(t)} + \Kappa^{(t)}v^{(t)})(x))
 ```
 
-FNOs choose a specific kernel $\kappa(x,y) = \kappa(x-y)$, converting the kernel into a convolution operation, which can be efficiently computed in the fourier domain.
+FNOs choose a specific kernel $\kappa(x,y) = \kappa(x-y)$, converting the kernel into a
+convolution operation, which can be efficiently computed in the fourier domain.
 
 ```math
 \begin{align*}
@@ -22,7 +24,8 @@ FNOs choose a specific kernel $\kappa(x,y) = \kappa(x-y)$, converting the kernel
 \end{align*}
 ```
 
-where $\mathcal{F}$ denotes the fourier transform. Usually, not all the modes in the frequency domain are used with the higher modes often being truncated.
+where $\mathcal{F}$ denotes the fourier transform. Usually, not all the modes in the
+frequency domain are used with the higher modes often being truncated.
 
 ## Usage
 
@@ -46,13 +49,8 @@ v(x) = \frac{du}{dx} \quad \forall \; x \in [0, 2\pi], \; \alpha \in [0.5, 1]
 
 ### Copy-pastable code
 
-```@example fno_tut
-using NeuralOperators
-using Lux
-using Random
-using Optimisers
-using Zygote
-using Plots
+```@example fno_tutorial
+using NeuralOperators, Lux, Random, Optimisers, Zygote, CairoMakie
 
 rng = Random.default_rng()
 
@@ -74,24 +72,18 @@ fno = FourierNeuralOperator(gelu; chs=(1, 64, 64, 128, 1), modes=(16,), permuted
 ps, st = Lux.setup(rng, fno);
 data = [(u_data, v_data)];
 
-function train!(loss, backend, model, ps, st, data; epochs=10)
+function train!(model, ps, st, data; epochs=10)
     losses = []
     tstate = Training.TrainState(model, ps, st, Adam(0.01f0))
     for _ in 1:epochs, (x, y) in data
-        _, _, _, tstate = Training.single_train_step!(backend, loss, (x, y), tstate)
-        push!(losses, loss(first(model(x, ps, st)), y))
+        _, loss, _, tstate = Training.single_train_step!(AutoZygote(), MSELoss(), (x, y),
+            tstate)
+        push!(losses, loss)
     end
-
     return losses
 end
 
-train!(args...; kwargs...) = train!(MSELoss(), AutoZygote(), args...; kwargs...)
 losses = train!(fno, ps, st, data; epochs=100)
-plot(losses; ylabel="mse loss", xlabel="iterations", label="loss")
-```
 
-## API
-
-```@docs
-FourierNeuralOperator
+lines(losses)
 ```
