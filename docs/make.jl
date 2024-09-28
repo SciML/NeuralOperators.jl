@@ -15,9 +15,10 @@ makedocs(;
     linkcheck=true,
     modules=[NeuralOperators],
     format=Documenter.HTML(;
-        assets=["assets/favicon.ico"],
-        canonical="https://luxdl.github.io/NeuralOperators.jl/"),
+        prettyurls=get(ENV, "CI", "false") == "true",
+        canonical="https://docs.sciml.ai/NeuralOperators/stable/",
+        assets=["assets/favicon.ico"]),
     pages
 )
 
-deploydocs(; repo="github.com/LuxDL/NeuralOperators.jl.git", push_preview=true)
+deploydocs(; repo="github.com/SciML/NeuralOperators.jl.git", push_preview=true)
