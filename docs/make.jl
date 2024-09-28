@@ -8,14 +8,16 @@ ENV["DATADEPS_ALWAYS_ACCEPT"] = true
 
 include("pages.jl")
 
-makedocs(; sitename="NeuralOperators.jl",
+makedocs(;
+    sitename="NeuralOperators.jl",
     clean=true,
     doctest=false,
     linkcheck=true,
-    warnonly=[:docs_block, :missing_docs],
     modules=[NeuralOperators],
-    format=Documenter.HTML(; assets=["assets/favicon.ico"],
-        canonical="https://lux.csail.mit.edu/NeuralOperators.jl/stable/"),
-    pages=pages)
+    format=Documenter.HTML(;
+        assets=["assets/favicon.ico"],
+        canonical="https://luxdl.github.io/NeuralOperators.jl/"),
+    pages
+)
 
 deploydocs(; repo="github.com/LuxDL/NeuralOperators.jl.git", push_preview=true)
