@@ -16,3 +16,9 @@ SpectralConv
 OperatorKernel
 SpectralKernel
 ```
+
+## Transform API
+
+```@docs
+NeuralOperators.AbstractTransform
+```
