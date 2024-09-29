@@ -3,7 +3,7 @@ module NeuralOperators
 using ArgCheck: @argcheck
 using ChainRulesCore: @non_differentiable
 using ConcreteStructs: @concrete
-using FFTW: FFTW, irfft, rfft
+using FFTW: FFTW, plan_rfft, plan_irfft
 using Random: Random, AbstractRNG
 using Static: StaticBool, False, True, known, static
 

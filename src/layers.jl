@@ -48,6 +48,14 @@ function LuxCore.initialparameters(rng::AbstractRNG, layer::OperatorConv)
             rng, eltype(layer.tform), out_chs, in_chs, layer.prod_modes))
 end
 
+function LuxCore.initialstates(::AbstractRNG, layer::OperatorConv)
+    fake_x = zeros(Float32, ntuple(Returns(1), ndims(layer.tform))..., 1)
+    plan_tform = plan_transform(layer.tform, fake_x, nothing)
+    x = transform(layer.tform, fake_x, plan_tform)
+    plan_inv_tform = plan_inverse(layer.tform, x, nothing, size(x))
+    return (; plan_tform, plan_inv_tform)
+end
+
 function LuxCore.parameterlength(layer::OperatorConv)
     return layer.prod_modes * layer.in_chs * layer.out_chs
 end
@@ -59,19 +67,21 @@ function OperatorConv(
 end
 
 function (conv::OperatorConv{True})(x::AbstractArray, ps, st)
-    return operator_conv(x, conv.tform, ps.weight), st
+    return operator_conv(x, conv.tform, ps.weight, st)
 end
 
 function (conv::OperatorConv{False})(x::AbstractArray, ps, st)
     N = ndims(conv.tform)
     xᵀ = permutedims(x, (ntuple(i -> i + 1, N)..., 1, N + 2))
-    yᵀ = operator_conv(xᵀ, conv.tform, ps.weight)
+    yᵀ, stₙ = operator_conv(xᵀ, conv.tform, ps.weight, st)
     y = permutedims(yᵀ, (N + 1, 1:N..., N + 2))
-    return y, st
+    return y, stₙ
 end
 
-function operator_conv(x, tform::AbstractTransform, weights)
-    x_t = transform(tform, x)
+function operator_conv(x, tform::AbstractTransform, weights, st)
+    plan_tform = plan_transform(tform, x, st.plan_tform)
+    x_t = transform(tform, x, plan_tform)
+
     x_tr = truncate_modes(tform, x_t)
     x_p = apply_pattern(x_tr, weights)
 
@@ -79,7 +89,8 @@ function operator_conv(x, tform::AbstractTransform, weights)
     x_padded = NNlib.pad_constant(x_p, expand_pad_dims(pad_dims), false;
         dims=ntuple(identity, ndims(x_p) - 2))::typeof(x_p)
 
-    return inverse(tform, x_padded, size(x))
+    plan_inv_tform = plan_inverse(tform, x_padded, st.plan_inv_tform, size(x))
+    return inverse(tform, x_padded, plan_inv_tform, size(x)), (; plan_tform, plan_inv_tform)
 end
 
 """
