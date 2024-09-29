@@ -2,7 +2,7 @@
 
 julia_version = "1.10.5"
 manifest_format = "2.0"
-project_hash = "08ae302fe0a9a31cabd8b43988e79f3e6d3e6281"
+project_hash = "a0283013f90c762265ed2bafff52ab84fdda7eb1"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "eea5d80188827b35333801ef97a40c2ed653b081"
@@ -171,9 +171,9 @@ version = "1.1.0"
 
 [[deps.CairoMakie]]
 deps = ["CRC32c", "Cairo", "Cairo_jll", "Colors", "FileIO", "FreeType", "GeometryBasics", "LinearAlgebra", "Makie", "PrecompileTools"]
-git-tree-sha1 = "4f827b38d3d9ffe6e3b01fbcf866c625fa259ca5"
+git-tree-sha1 = "0852b8edf4da66cc44861b12d7d6c69693fc620f"
 uuid = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
-version = "0.12.11"
+version = "0.12.12"
 
 [[deps.Cairo_jll]]
 deps = ["Artifacts", "Bzip2_jll", "CompilerSupportLibraries_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
@@ -318,9 +318,9 @@ uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 
 [[deps.DelaunayTriangulation]]
 deps = ["AdaptivePredicates", "EnumX", "ExactPredicates", "Random"]
-git-tree-sha1 = "2f35ec082320f511586c9b18ae4597fd609f7e79"
+git-tree-sha1 = "90fe18ca4b73bdd2320fbbccec727a75069455f6"
 uuid = "927a84f5-c5f4-47a5-9785-b46e178433df"
-version = "1.5.0"
+version = "1.5.1"
 
 [[deps.DiffResults]]
 deps = ["StaticArraysCore"]
@@ -394,9 +394,9 @@ uuid = "4e289a0a-7415-4d19-859d-a7e5c4648b56"
 version = "1.0.4"
 
 [[deps.EnzymeCore]]
-git-tree-sha1 = "ee11500b17d87b22bc638e9ed8c71a7478c53d61"
+git-tree-sha1 = "9c3a42611e525352e9ad5e4134ddca5c692ff209"
 uuid = "f151be2c-9106-41f4-ab19-57ee4f262869"
-version = "0.8.3"
+version = "0.8.4"
 weakdeps = ["Adapt"]
 
     [deps.EnzymeCore.extensions]
@@ -1139,9 +1139,9 @@ version = "0.5.13"
 
 [[deps.Makie]]
 deps = ["Animations", "Base64", "CRC32c", "ColorBrewer", "ColorSchemes", "ColorTypes", "Colors", "Contour", "Dates", "DelaunayTriangulation", "Distributions", "DocStringExtensions", "Downloads", "FFMPEG_jll", "FileIO", "FilePaths", "FixedPointNumbers", "Format", "FreeType", "FreeTypeAbstraction", "GeometryBasics", "GridLayoutBase", "ImageBase", "ImageIO", "InteractiveUtils", "Interpolations", "IntervalSets", "Isoband", "KernelDensity", "LaTeXStrings", "LinearAlgebra", "MacroTools", "MakieCore", "Markdown", "MathTeXEngine", "Observables", "OffsetArrays", "Packing", "PlotUtils", "PolygonOps", "PrecompileTools", "Printf", "REPL", "Random", "RelocatableFolders", "Scratch", "ShaderAbstractions", "Showoff", "SignedDistanceFields", "SparseArrays", "Statistics", "StatsBase", "StatsFuns", "StructArrays", "TriplotBase", "UnicodeFun", "Unitful"]
-git-tree-sha1 = "2281aaf0685e5e8a559982d32f17d617a949b9cd"
+git-tree-sha1 = "e08a87ca672b6f26a6f7237000554d2a093d3495"
 uuid = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
-version = "0.21.11"
+version = "0.21.12"
 
 [[deps.MakieCore]]
 deps = ["ColorTypes", "GeometryBasics", "IntervalSets", "Observables"]
@@ -1241,7 +1241,7 @@ version = "1.2.0"
 deps = ["ArgCheck", "ChainRulesCore", "ConcreteStructs", "FFTW", "Lux", "LuxCore", "LuxLib", "NNlib", "Random", "Static", "WeightInitializers"]
 path = "/home/runner/work/NeuralOperators.jl/NeuralOperators.jl"
 uuid = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
-version = "1.0.0"
+version = "0.5.0"
 
 [[deps.Observables]]
 git-tree-sha1 = "7438a59546cf62428fc9d1bc94729146d37a7225"
