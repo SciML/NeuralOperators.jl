@@ -3,13 +3,13 @@
         σ=gelu; chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128, 1), modes::Dims{M}=(16,),
         permuted::Val{perm}=False, kwargs...) where {C, M, perm}
 
-Fourier neural operator is a operator learning model that uses Fourier kernel to perform
-spectral convolutions. It is a promising way for surrogate methods, and can be regarded as
+The Fourier neural operator is a operator learning model that uses a Fourier kernel to perform
+spectral convolutions. It is a promising operator for surrogate methods, and can be regarded as
 a physics operator.
 
-The model is comprised of a `Dense` layer to lift (d + 1)-dimensional vector field to
-n-dimensional vector field, and an integral kernel operator which consists of four Fourier
-kernels, and two `Dense` layers to project data back to the scalar field of interest space.
+The model is composed of a `Dense` layer to lift a `(d + 1)`-dimensional vector field to an
+`n`-dimensional vector field, an integral kernel operator which consists of four Fourier
+kernels, and two `Dense` layers to project data back to the scalar field of the space of interest.
 
 ## Arguments
 
@@ -17,9 +17,10 @@ kernels, and two `Dense` layers to project data back to the scalar field of inte
 
 ## Keyword Arguments
 
-  - `chs`: A `Tuple` or `Vector` of the 8 channel size.
+  - `chs`: A `Tuple` or `Vector` of the size of each of the 8 channels.
   - `modes`: The modes to be preserved. A tuple of length `d`, where `d` is the dimension
-    of data.
+    of data.  For example, one-dimensional data would have a 1-element tuple, and two-dimensional data
+    would have a 2-element tuple.
   - `permuted`: Whether the dim is permuted. If `permuted = Val(false)`, the layer accepts
     data in the order of `(ch, x_1, ... , x_d , batch)`. Otherwise the order is
     `(x_1, ... , x_d, ch, batch)`.
