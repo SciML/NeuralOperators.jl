@@ -112,13 +112,13 @@ rng = Random.default_rng()
 `data_size` is the number of observations.
 
 ````@example minimal_lux
-data_size = 512
+data_size = 128
 ````
 
 `m` is the length of a single observation, you can also interpret this as the size of the grid we're evaluating our function on.
 
 ````@example minimal_lux
-m = 64
+m = 32
 ````
 
 We instantiate the domain that the function operates on
