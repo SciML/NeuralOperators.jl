@@ -271,7 +271,7 @@ axislegend(a)
 # on a separate axis.
 absolute_error = v_data[:, 1, 1] .- dropdims(output_data; dims = (2, 3))
 a2, p2 = lines(f[2, 1], absolute_error; axis = (; ylabel = "Error"))
-rowsize!(fig.layout, 2, Aspect(1, 1/8))
+rowsize!(f.layout, 2, Aspect(1, 1/8))
 linkxaxes!(a, a2)
 f
 ````
