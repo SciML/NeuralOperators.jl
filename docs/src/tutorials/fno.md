@@ -218,7 +218,7 @@ function train!(model, ps, st, data; epochs=10)
     # Initialize a training state and an optimizer (Adam, in this case).
     tstate = Training.TrainState(model, ps, st, Adam(0.01f0))
     # Loop over epochs, then loop over each batch of training data, and step into the training:
-    @showprogress for _ in 1:epochs
+    for _ in 1:epochs
         for (x, y) in data
             _, loss, _, tstate = Training.single_train_step!(
                 AutoZygote(), MSELoss(), (x, y),
@@ -233,7 +233,7 @@ end
 Now we train our model!
 
 ````@example minimal_lux
-losses = train!(fno, ps, st, data; epochs=500)
+losses = @time train!(fno, ps, st, data; epochs=500)
 ````
 
 We can plot the losses - you can see that at some point, we hit diminishing returns.
