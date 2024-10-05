@@ -3,7 +3,10 @@
 (\Kappa_{\theta}u)(x) 
 &amp;= \int_D \kappa_{\theta}(x - y) dy  \quad \forall x \in D\\
 &amp;= \mathcal{F}^{-1}(\mathcal{F}(\kappa_{\theta}) \mathcal{F}(u))(x) \quad \forall x \in D
-\end{align*}\]</p><p>where <span>$\mathcal{F}$</span> denotes the fourier transform. Usually, not all the modes in the frequency domain are used with the higher modes often being truncated.</p><h2 id="Usage"><a class="docs-heading-anchor" href="#Usage">Usage</a><a id="Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Usage" title="Permalink"></a></h2><p>Let&#39;s try to learn the anti-derivative operator for</p><p class="math-container">\[u(x) = sin(\alpha x)\]</p><p>That is, we want to learn</p><p class="math-container">\[\mathcal{G} : u \rightarrow v \\\]</p><p>such that</p><p class="math-container">\[v(x) = \frac{du}{dx} \quad \forall \; x \in [0, 2\pi], \; \alpha \in [0.5, 1]\]</p><h3 id="Copy-pastable-code"><a class="docs-heading-anchor" href="#Copy-pastable-code">Copy-pastable code</a><a id="Copy-pastable-code-1"></a><a class="docs-heading-anchor-permalink" href="#Copy-pastable-code" title="Permalink"></a></h3><pre><code class="language-julia hljs">using NeuralOperators, Lux, Random, Optimisers, Zygote, CairoMakie
+\end{align*}\]</p><p>where <span>$\mathcal{F}$</span> denotes the fourier transform. Usually, not all the modes in the frequency domain are used with the higher modes often being truncated.</p><h2 id="Usage"><a class="docs-heading-anchor" href="#Usage">Usage</a><a id="Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Usage" title="Permalink"></a></h2><p>Let&#39;s try to learn the anti-derivative operator for</p><p class="math-container">\[u(x) = sin(\alpha x)\]</p><p>That is, we want to learn</p><p class="math-container">\[\mathcal{G} : u \rightarrow v \\\]</p><p>such that</p><p class="math-container">\[v(x) = \frac{du}{dx} \quad \forall \; x \in [0, 2\pi], \; \alpha \in [0.5, 1]\]</p><h3 id="Copy-pastable-code"><a class="docs-heading-anchor" href="#Copy-pastable-code">Copy-pastable code</a><a id="Copy-pastable-code-1"></a><a class="docs-heading-anchor-permalink" href="#Copy-pastable-code" title="Permalink"></a></h3><details>
+
+<summary> Click here to see copy-pastable code for this example! </summary>
+<pre><code class="language-julia hljs">using NeuralOperators, Lux, Random, Optimisers, Zygote, CairoMakie
 
 rng = Random.default_rng()
 
@@ -38,4 +41,118 @@ end
 
 losses = train!(fno, ps, st, data; epochs=100)
 
-lines(losses)</code></pre><img src="54a08af1.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« NeuralOperators.jl</a><a class="docs-footer-nextpage" href="../deeponet/">DeepONet »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Sunday 29 September 2024 02:16">Sunday 29 September 2024</span>. Using Julia version 1.10.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+lines(losses)</code></pre><img src="00c033cf.png" alt="Example block output"/></details><pre><code class="language-julia hljs">using NeuralOperators, Lux, Random, Optimisers, Zygote, CairoMakie</code></pre><h3 id="Constructing-training-data"><a class="docs-heading-anchor" href="#Constructing-training-data">Constructing training data</a><a id="Constructing-training-data-1"></a><a class="docs-heading-anchor-permalink" href="#Constructing-training-data" title="Permalink"></a></h3><p>First, we construct our training data.</p><pre><code class="language-julia hljs">rng = Random.default_rng()</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Random.TaskLocalRNG()</code></pre><p><code>data_size</code> is the number of observations.</p><pre><code class="language-julia hljs">data_size = 128</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">128</code></pre><p><code>m</code> is the length of a single observation, you can also interpret this as the size of the grid we&#39;re evaluating our function on.</p><pre><code class="language-julia hljs">m = 32</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32</code></pre><p>We instantiate the domain that the function operates on as a range from <code>0</code> to <code>2π</code>, whose length is the grid size.</p><pre><code class="language-julia hljs">xrange = range(0, 2π; length=m) .|&gt; Float32;</code></pre><p>Each value in the array here, <code>α</code>, will be the multiplicative factor on the input to the sine function.</p><pre><code class="language-julia hljs">α = 0.5f0 .+ 0.5f0 .* rand(Float32, data_size);</code></pre><p>Now, we create our data arrays.  We are storing all of the training data in a single array, in order to batch process them more efficiently.</p><pre><code class="language-julia hljs">u_data = zeros(Float32, m, 1, data_size);
+v_data = zeros(Float32, m, 1, data_size);</code></pre><p>and fill the data arrays with values. Here, <code>u_data</code> is</p><pre><code class="language-julia hljs">for i in 1:data_size
+    u_data[:, 1, i] .= sin.(α[i] .* xrange)
+    v_data[:, 1, i] .= -inv(α[i]) .* cos.(α[i] .* xrange)
+end</code></pre><h3 id="Creating-the-model"><a class="docs-heading-anchor" href="#Creating-the-model">Creating the model</a><a id="Creating-the-model-1"></a><a class="docs-heading-anchor-permalink" href="#Creating-the-model" title="Permalink"></a></h3><p>Finally, we get to the model itself.  We instantiate a <code>FourierNeuralOperator</code> and provide it several parameters.</p><p>The first argument is the &quot;activation function&quot; for each neuron.</p><p>The keyword arguments are:</p><ul><li><code>chs</code> is a tuple, representing the layer sizes for each layer.</li><li><code>modes</code> is a 1-tuple, where the number represents the number of Fourier modes that are preserved, and the size of the tuple represents the number of dimensions.</li><li><code>permuted</code> indicates that the order of the arguments is permuted such that each column of the array represents a single observation.  This is substantially faster than the usual row access pattern, since Julia stores arrays by concatenating columns. <code>Val(true)</code> is another way of expressing <code>true</code>, but in the type domain, so that the compiler can see the value and use the appropriate optimizations.</li></ul><pre><code class="language-julia hljs">fno = FourierNeuralOperator(
+    gelu;                    # activation function
+    chs=(1, 64, 64, 128, 1), # channel weights
+    modes=(16,),             # number of Fourier modes to retain
+    permuted=Val(true)       # structure of the data means that columns are observations
+)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">FourierNeuralOperator(
+    model = Chain(
+        layer_1 = Conv((1,), 1 =&gt; 64),  <span class="sgr90"># 128 parameters</span>
+        layer_2 = Chain(
+            layer_1 = OperatorKernel(
+                layer = Parallel(
+                    connection = Fix1(add_act, gelu),
+                    layer_1 = Conv((1,), 64 =&gt; 64),  <span class="sgr90"># 4_160 parameters</span>
+                    layer_2 = OperatorConv(64 =&gt; 64, (16,), FourierTransform{ComplexF32}; permuted = static(true)),  <span class="sgr90"># 65_536 parameters</span>
+                ),
+            ),
+        ),
+        layer_3 = Chain(
+            layer_1 = Conv((1,), 64 =&gt; 128, gelu),  <span class="sgr90"># 8_320 parameters</span>
+            layer_2 = Conv((1,), 128 =&gt; 1),  <span class="sgr90"># 129 parameters</span>
+        ),
+    ),
+) <span class="sgr90">        # Total: </span>78_273 parameters,
+<span class="sgr90">          #        plus </span>0 states.</code></pre><p>Now, we set up the model.  This function returns two things, a set of parameters and a set of states.  Since the operator is &quot;stateless&quot;, the states are empty and will remain so.  The parameters are the weights of the neural network, and we will be modifying them in the training loop.</p><pre><code class="language-julia hljs">ps, st = Lux.setup(rng, fno);</code></pre><p>We construct data as a vector of tuples (input, output).  These are pre-batched, but for example if we had a lot of training data, we could dynamically load it, or create multiple batches.</p><pre><code class="language-julia hljs">data = [(u_data, v_data)];</code></pre><h3 id="Training-the-model"><a class="docs-heading-anchor" href="#Training-the-model">Training the model</a><a id="Training-the-model-1"></a><a class="docs-heading-anchor-permalink" href="#Training-the-model" title="Permalink"></a></h3><p>Now, we create a function to train the model. An &quot;epoch&quot; is basically a run over all input data, and the more epochs we have, the better the neural network gets!</p><pre><code class="language-julia hljs">function train!(model, ps, st, data; epochs=10)
+    # The `losses` array is used only for visualization,
+    # you don&#39;t actually need it to train.
+    losses = []
+    # Initialize a training state and an optimizer (Adam, in this case).
+    tstate = Training.TrainState(model, ps, st, Adam(0.01f0))
+    # Loop over epochs, then loop over each batch of training data, and step into the training:
+    for _ in 1:epochs
+        for (x, y) in data
+            _, loss, _, tstate = Training.single_train_step!(
+                AutoZygote(), MSELoss(), (x, y),
+                tstate)
+            push!(losses, loss)
+        end
+    end
+    return losses
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">train! (generic function with 1 method)</code></pre><p>Now we train our model!</p><pre><code class="language-julia hljs">losses = @time train!(fno, ps, st, data; epochs=500)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">500-element Vector{Any}:
+ 1.0507407f0
+ 4.5746927f0
+ 0.87218666f0
+ 0.95775557f0
+ 0.5093128f0
+ 0.3287118f0
+ 0.28795862f0
+ 0.2905016f0
+ 0.20412293f0
+ 0.1723485f0
+ ⋮
+ 3.2542266f-5
+ 3.235984f-5
+ 3.2155393f-5
+ 3.1982127f-5
+ 3.1787014f-5
+ 3.1611802f-5
+ 3.14322f-5
+ 3.1253177f-5
+ 3.1085146f-5</code></pre><p>We can plot the losses - you can see that at some point, we hit diminishing returns.</p><pre><code class="language-julia hljs">lines(losses; axis=(; yscale=log10, ylabel=&quot;Loss&quot;, xlabel=&quot;Epoch&quot;))</code></pre><img src="35545814.png" alt="Example block output"/><h3 id="Applying-the-model"><a class="docs-heading-anchor" href="#Applying-the-model">Applying the model</a><a id="Applying-the-model-1"></a><a class="docs-heading-anchor-permalink" href="#Applying-the-model" title="Permalink"></a></h3><p>Let&#39;s try to actually apply this model using some input data.</p><pre><code class="language-julia hljs">input_data = u_data[:, 1, 1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32-element Vector{Float32}:
+  0.0
+  0.1982928
+  0.38871056
+  0.56369084
+  0.71628463
+  0.8404316
+  0.93120134
+  0.9849891
+  0.99965864
+  0.9746274
+  ⋮
+ -0.99266124
+ -0.99692905
+ -0.9616044
+ -0.8880903
+ -0.7793065
+ -0.63957274
+ -0.47443882
+ -0.2904628
+ -0.09495125</code></pre><p>This is our input data.  It&#39;s currently one-dimensional, but our neural network expects input in batched form, so we simply <code>reshape</code> it (a no-cost operation) to a 3d array with singleton dimensions.</p><pre><code class="language-julia hljs">reshaped_input = reshape(input_data, length(input_data), 1, 1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32×1×1 Array{Float32, 3}:
+[:, :, 1] =
+  0.0
+  0.1982928
+  0.38871056
+  0.56369084
+  0.71628463
+  0.8404316
+  0.93120134
+  0.9849891
+  0.99965864
+  0.9746274
+  ⋮
+ -0.99266124
+ -0.99692905
+ -0.9616044
+ -0.8880903
+ -0.7793065
+ -0.63957274
+ -0.47443882
+ -0.2904628
+ -0.09495125</code></pre><p>Now we can pass this to <code>Lux.apply</code>:</p><pre><code class="language-julia hljs">output_data, st = Lux.apply(fno, reshaped_input, ps, st)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(Float32[-1.0478722; -0.99091405; … ; -0.97341305; -1.0054247;;;], (layer_1 = NamedTuple(), layer_2 = (layer_1 = (layer_1 = NamedTuple(), layer_2 = NamedTuple()),), layer_3 = (layer_1 = NamedTuple(), layer_2 = NamedTuple())))</code></pre><p>and plot it:</p><pre><code class="language-julia hljs">f, a, p = lines(dropdims(reshaped_input; dims=(2, 3)); label=&quot;u&quot;)
+lines!(a, dropdims(output_data; dims=(2, 3)); label=&quot;Predicted&quot;)
+lines!(a, v_data[:, 1, 1]; label=&quot;Expected&quot;)
+axislegend(a)
+# Compute the absolute error and plot that too,
+# on a separate axis.
+absolute_error = v_data[:, 1, 1] .- dropdims(output_data; dims=(2, 3))
+a2, p2 = lines(f[2, 1], absolute_error; axis=(; ylabel=&quot;Error&quot;))
+rowsize!(f.layout, 2, Aspect(1, 1 / 8))
+linkxaxes!(a, a2)
+f</code></pre><img src="e4981616.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« NeuralOperators.jl</a><a class="docs-footer-nextpage" href="../deeponet/">DeepONet »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.7.0 on <span class="colophon-date" title="Saturday 5 October 2024 16:46">Saturday 5 October 2024</span>. Using Julia version 1.10.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
