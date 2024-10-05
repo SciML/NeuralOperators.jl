@@ -102,7 +102,9 @@ lines(losses)
 ````@example minimal_lux
 using NeuralOperators, Lux, Random, Optimisers, Zygote, CairoMakie
 ````
+
 ### Constructing training data
+
 First, we construct our training data.
 
 ````@example minimal_lux
@@ -164,14 +166,15 @@ Finally, we get to the model itself.  We instantiate a `FourierNeuralOperator` a
 The first argument is the "activation function" for each neuron.
 
 The keyword arguments are:
-- `chs` is a tuple, representing the layer sizes for each layer.
-- `modes` is a 1-tuple, where the number represents the number of Fourier modes that
-  are preserved, and the size of the tuple represents the number of dimensions.
-- `permuted` indicates that the order of the arguments is permuted such that each column
-  of the array represents a single observation.  This is substantially faster than the usual
-  row access pattern, since Julia stores arrays by concatenating columns.
-  `Val(true)` is another way of expressing `true`, but in the type domain, so that
-  the compiler can see the value and use the appropriate optimizations.
+
+  - `chs` is a tuple, representing the layer sizes for each layer.
+  - `modes` is a 1-tuple, where the number represents the number of Fourier modes that
+    are preserved, and the size of the tuple represents the number of dimensions.
+  - `permuted` indicates that the order of the arguments is permuted such that each column
+    of the array represents a single observation.  This is substantially faster than the usual
+    row access pattern, since Julia stores arrays by concatenating columns.
+    `Val(true)` is another way of expressing `true`, but in the type domain, so that
+    the compiler can see the value and use the appropriate optimizations.
 
 ````@example minimal_lux
 fno = FourierNeuralOperator(
@@ -216,11 +219,12 @@ function train!(model, ps, st, data; epochs=10)
     tstate = Training.TrainState(model, ps, st, Adam(0.01f0))
     # Loop over epochs, then loop over each batch of training data, and step into the training:
     @showprogress for _ in 1:epochs
-      for (x, y) in data
-          _, loss, _, tstate = Training.single_train_step!(AutoZygote(), MSELoss(), (x, y),
-              tstate)
-          push!(losses, loss)
-      end
+        for (x, y) in data
+            _, loss, _, tstate = Training.single_train_step!(
+                AutoZygote(), MSELoss(), (x, y),
+                tstate)
+            push!(losses, loss)
+        end
     end
     return losses
 end
@@ -235,7 +239,7 @@ losses = train!(fno, ps, st, data; epochs=500)
 We can plot the losses - you can see that at some point, we hit diminishing returns.
 
 ````@example minimal_lux
-lines(losses; axis = (; yscale = log10, ylabel = "Loss", xlabel = "Epoch"))
+lines(losses; axis=(; yscale=log10, ylabel="Loss", xlabel="Epoch"))
 ````
 
 ### Applying the model
@@ -263,17 +267,15 @@ output_data, st = Lux.apply(fno, reshaped_input, ps, st)
 and plot it:
 
 ````@example minimal_lux
-f, a, p = lines(dropdims(reshaped_input; dims = (2, 3)); label = "u")
-lines!(a, dropdims(output_data; dims = (2, 3)); label = "Predicted")
-lines!(a, v_data[:, 1, 1]; label = "Expected")
+f, a, p = lines(dropdims(reshaped_input; dims=(2, 3)); label="u")
+lines!(a, dropdims(output_data; dims=(2, 3)); label="Predicted")
+lines!(a, v_data[:, 1, 1]; label="Expected")
 axislegend(a)
 # Compute the absolute error and plot that too,
 # on a separate axis.
-absolute_error = v_data[:, 1, 1] .- dropdims(output_data; dims = (2, 3))
-a2, p2 = lines(f[2, 1], absolute_error; axis = (; ylabel = "Error"))
-rowsize!(f.layout, 2, Aspect(1, 1/8))
+absolute_error = v_data[:, 1, 1] .- dropdims(output_data; dims=(2, 3))
+a2, p2 = lines(f[2, 1], absolute_error; axis=(; ylabel="Error"))
+rowsize!(f.layout, 2, Aspect(1, 1 / 8))
 linkxaxes!(a, a2)
 f
 ````
-
-
