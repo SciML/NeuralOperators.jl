@@ -11,7 +11,7 @@ using Lux
 using LuxCore: LuxCore, AbstractLuxLayer, AbstractLuxContainerLayer, AbstractLuxWrapperLayer
 using LuxLib: batched_matmul
 using MLDataDevices: AbstractDevice, AbstractGPUDevice
-using NNlib: NNlib, batched_adjoint
+using NNlib: NNlib
 
 const BoolLike = Union{Bool, StaticBool, Val{true}, Val{false}}
 const CRC = ChainRulesCore

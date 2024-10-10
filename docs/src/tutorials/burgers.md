@@ -79,19 +79,23 @@ function loss_function(model, ps, st, ((v, y), u))
     return MAELoss()(û, u), stₙ, (;)
 end
 
-begin
-    train_state = Training.TrainState(deeponet, ps, st, Adam(0.0001f0))
-    for epoch in 1:5000
-        grads, loss, stats, train_state = Training.single_train_step!(
-            AutoZygote(), loss_function, ((x_data_dev, grid_dev), y_data_dev), train_state)
+function train_model!(model, ps, st, data; epochs=5000)
+    train_state = Training.TrainState(model, ps, st, Adam(0.0001f0))
 
-        if epoch % 25 == 1 || epoch == 400
+    for epoch in 1:epochs
+        _, loss, _, train_state = Training.single_train_step!(
+            AutoZygote(), loss_function, data, train_state)
+
+        if epoch % 25 == 1 || epoch == epochs
             @printf("Epoch %d: loss = %.6e\n", epoch, loss)
         end
     end
-    ps_trained = train_state.parameters
-    st_trained = train_state.states
+
+    return train_state.parameters, train_state.states
 end
+
+ps_trained, st_trained = train_model!(
+    deeponet, ps, st, ((x_data_dev, grid_dev), y_data_dev))
 ```
 
 ## Plotting
