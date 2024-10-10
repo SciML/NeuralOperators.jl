@@ -4,3 +4,5 @@ Manifest-v*.toml
 wip
 examples
 docs/build
+
+.CondaPkg

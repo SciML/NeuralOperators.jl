@@ -29,3 +29,25 @@ function expand_pad_dims(pad_dims::Dims{N}) where {N}
 end
 
 @non_differentiable expand_pad_dims(::Any)
+
+# Handling Wrapper Types are hard. Make sure to not construct a ReshapedArray of
+# BatchedAdjoint
+safe_batched_adjoint(x::AbstractArray) = NNlib.batched_adjoint(x)
+
+function CRC.rrule(::typeof(safe_batched_adjoint), x::AbstractArray)
+    return safe_batched_adjoint(x), ∇safe_batched_adjoint
+end
+
+∇safe_batched_adjoint(Δ) = NoTangent(), safe_batched_adjoint(Δ)
+function ∇safe_batched_adjoint(Δ::AbstractArray{T, 3}) where {T}
+    return ∇safe_batched_adjoint(get_device_type(Δ), Δ)
+end
+
+function ∇safe_batched_adjoint(::Type{<:AbstractDevice}, Δ::AbstractArray{T, 3}) where {T}
+    return NoTangent(), safe_batched_adjoint(Δ)
+end
+
+function ∇safe_batched_adjoint(
+        ::Type{<:AbstractGPUDevice}, Δ::AbstractArray{T, 3}) where {T}
+    return NoTangent(), stack(adjoint, eachslice(Δ; dims=3))
+end

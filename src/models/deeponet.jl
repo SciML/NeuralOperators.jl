@@ -20,6 +20,17 @@ nets output should have the same first dimension.
 identifying differential equations based on the universal approximation theorem of
 operators", doi: https://arxiv.org/abs/1910.03193
 
+## Input Output Dimensions
+
+Consider a transient 1D advection problem ∂ₜu + u ⋅ ∇u = 0, with an IC u(x,0) = g(x).
+We are given several (b = 200) instances of the IC, discretized at 50 points each, and want
+to query the solution for 100 different locations and times [0;1].
+
+That makes the branch input of shape [50 x 200] and the trunk input of shape [2 x 100]. So,
+the input for the branch net is 50 and 100 for the trunk net. Note that the inputs must be
+batched so the branch input is of shape [50 x 200 x 1] and the trunk input is of shape
+[2 x 100 x 1].
+
 ## Example
 
 ```jldoctest
@@ -49,7 +60,7 @@ DeepONet(branch, trunk) = DeepONet(branch, trunk, NoOpLayer())
 
 """
     DeepONet(; branch = (64, 32, 32, 16), trunk = (1, 8, 8, 16),
-    	branch_activation = identity, trunk_activation = identity)
+        branch_activation = identity, trunk_activation = identity)
 
 Constructs a DeepONet composed of Dense layers. Make sure the last node of `branch` and
 `trunk` are same.
@@ -93,10 +104,12 @@ function DeepONet(;
                                        nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ won't \
                                        work."
 
-    branch_net = Chain([Dense(branch[i] => branch[i + 1], branch_activation)
+    branch_net = Chain([Dense(branch[i] => branch[i + 1],
+                            ifelse(i == length(branch) - 1, identity, branch_activation))
                         for i in 1:(length(branch) - 1)]...)
 
-    trunk_net = Chain([Dense(trunk[i] => trunk[i + 1], trunk_activation)
+    trunk_net = Chain([Dense(trunk[i] => trunk[i + 1],
+                           ifelse(i == length(trunk) - 1, identity, trunk_activation))
                        for i in 1:(length(trunk) - 1)]...)
 
     return DeepONet(branch_net, trunk_net, additional)
@@ -129,14 +142,14 @@ end
 function deeponet_project(
         b::AbstractArray{T1, 3}, t::AbstractArray{T2, 3}, ::Nothing) where {T1, T2}
     # b [p, u, nb], t [p, N, nb]
-    return batched_matmul(batched_adjoint(b), t) # [u, N, b]
+    return batched_matmul(safe_batched_adjoint(b), t) # [u, N, b]
 end
 
 function deeponet_project(
         b::AbstractArray{T1, N}, t::AbstractArray{T2, 3}, ::Nothing) where {T1, T2, N}
     # b [p, u_size..., nb], t [p, N, nb]
     bᵣ = reshape(b, size(b, 1), :, size(b, N))
-    return reshape(batched_matmul(batched_adjoint(bᵣ), t),
+    return reshape(batched_matmul(safe_batched_adjoint(bᵣ), t),
         size(b)[2:(N - 1)]..., size(t, 2), size(b, N))
 end
 

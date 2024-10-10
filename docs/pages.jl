@@ -6,7 +6,7 @@ pages = [
         "NOMAD" => "models/nomad.md"
     ],
     "Tutorials" => [
-        "Burgers Equation" => "tutorials/burgers.md",
+        "Burgers Equation" => "tutorials/burgers.md"
     ],
     "API Reference" => "api.md"
 ]
