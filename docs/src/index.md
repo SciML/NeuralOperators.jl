@@ -14,9 +14,9 @@ Pkg.add("NeuralOperators")
 
 Currently provided operator architectures are :
 
-  - [Fourier Neural Operators (FNOs)](tutorials/fno.md)
-  - [DeepONets](tutorials/deeponet.md)
-  - [Nonlinear Manifold Decoders for Operator Learning (NOMADs)](tutorials/nomad.md)
+  - [Fourier Neural Operators (FNOs)](models/fno.md)
+  - [DeepONets](models/deeponet.md)
+  - [Nonlinear Manifold Decoders for Operator Learning (NOMADs)](models/nomad.md)
 
 ## Reproducibility
 
