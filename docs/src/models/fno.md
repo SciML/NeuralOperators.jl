@@ -83,7 +83,9 @@ function train!(model, ps, st, data; epochs=10)
     losses = []
     tstate = Training.TrainState(model, ps, st, Adam(0.01f0))
     for _ in 1:epochs, (x, y) in data
-        _, loss, _, tstate = Training.single_train_step!(AutoZygote(), MSELoss(), (x, y),
+
+        _, loss,
+        _, tstate = Training.single_train_step!(AutoZygote(), MSELoss(), (x, y),
             tstate)
         push!(losses, loss)
     end
@@ -220,7 +222,8 @@ function train!(model, ps, st, data; epochs=10)
     # Loop over epochs, then loop over each batch of training data, and step into the training:
     for _ in 1:epochs
         for (x, y) in data
-            _, loss, _, tstate = Training.single_train_step!(
+            _, loss,
+            _, tstate = Training.single_train_step!(
                 AutoZygote(), MSELoss(), (x, y),
                 tstate)
             push!(losses, loss)

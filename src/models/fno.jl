@@ -42,7 +42,7 @@ julia> size(first(fno(u, ps, st)))
     model <: Chain
 end
 
-function FourierNeuralOperator(σ=gelu; chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128, 1),
+function FourierNeuralOperator(; σ=gelu, chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128, 1),
         modes::Dims{M}=(16,), permuted::BoolLike=False(), kwargs...) where {C, M}
     @argcheck length(chs) ≥ 5
 
@@ -58,7 +58,7 @@ function FourierNeuralOperator(σ=gelu; chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128
               Chain(Dense(map₂, σ), Dense(map₃))
 
     mapping = Chain([SpectralKernel(chs[i] => chs[i + 1], modes, σ; permuted, kwargs...)
-                     for i in 2:(C - 3)]...)
+                     for i in 2:(C-3)]...)
 
     return FourierNeuralOperator(Chain(lifting, mapping, project))
 end

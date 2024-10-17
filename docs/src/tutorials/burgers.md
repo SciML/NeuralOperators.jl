@@ -26,7 +26,8 @@ register(
     """,
     "https://drive.google.com/uc?id=16a8od4vidbiNR3WtaBPCSZ0T3moxjhYe",
     "9cbbe5070556c777b1ba3bacd49da5c36ea8ed138ba51b6ee76a24b971066ecd";
-    fetch_method=(url, local_dir) -> begin
+    fetch_method=(url,
+        local_dir) -> begin
         pyconvert(String, gdown.download(url, joinpath(local_dir, "Burgers_R10.zip")))
     end,
     post_fetch_method=unpack
@@ -83,7 +84,9 @@ function train_model!(model, ps, st, data; epochs=5000)
     train_state = Training.TrainState(model, ps, st, Adam(0.0001f0))
 
     for epoch in 1:epochs
-        _, loss, _, train_state = Training.single_train_step!(
+        _, loss,
+        _,
+        train_state = Training.single_train_step!(
             AutoZygote(), loss_function, data, train_state)
 
         if epoch % 25 == 1 || epoch == epochs
@@ -94,7 +97,8 @@ function train_model!(model, ps, st, data; epochs=5000)
     return train_state.parameters, train_state.states
 end
 
-ps_trained, st_trained = train_model!(
+ps_trained,
+st_trained = train_model!(
     deeponet, ps, st, ((x_data_dev, grid_dev), y_data_dev))
 ```
 
@@ -110,6 +114,7 @@ begin
 
     axs = [Axis(fig[i, j]) for i in 1:4, j in 1:4]
     for i in 1:4, j in 1:4
+
         idx = i + (j - 1) * 4
         ax = axs[i, j]
         l1 = lines!(ax, vec(grid), pred[idx, :, 1])

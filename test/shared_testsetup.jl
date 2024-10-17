@@ -41,6 +41,7 @@ function train!(loss, backend, model, ps, st, data; epochs=10)
 
     tstate = Training.TrainState(model, ps, st, Adam(0.01f0))
     for _ in 1:epochs, (x, y) in data
+
         _, _, _, tstate = Training.single_train_step!(backend, loss, (x, y), tstate)
     end
 

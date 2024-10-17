@@ -106,11 +106,11 @@ function DeepONet(;
 
     branch_net = Chain([Dense(branch[i] => branch[i + 1],
                             ifelse(i == length(branch) - 1, identity, branch_activation))
-                        for i in 1:(length(branch) - 1)]...)
+                        for i in 1:(length(branch)-1)]...)
 
     trunk_net = Chain([Dense(trunk[i] => trunk[i + 1],
                            ifelse(i == length(trunk) - 1, identity, trunk_activation))
-                       for i in 1:(length(trunk) - 1)]...)
+                       for i in 1:(length(trunk)-1)]...)
 
     return DeepONet(branch_net, trunk_net, additional)
 end

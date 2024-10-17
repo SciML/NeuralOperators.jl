@@ -45,7 +45,7 @@ function LuxCore.initialparameters(rng::AbstractRNG, layer::OperatorConv)
     scale = real(one(eltype(layer.tform))) / (in_chs * out_chs)
     return (;
         weight=scale * layer.init_weight(
-            rng, eltype(layer.tform), out_chs, in_chs, layer.prod_modes))
+        rng, eltype(layer.tform), out_chs, in_chs, layer.prod_modes))
 end
 
 function LuxCore.parameterlength(layer::OperatorConv)
@@ -137,7 +137,7 @@ end
 OperatorKernel(lin, conv) = OperatorKernel(lin, conv, identity)
 
 function OperatorKernel(
-        ch::Pair{<:Integer, <:Integer}, modes::Dims{N}, transform::Type{TR}, act=identity;
+        ch::Pair{<:Integer, <:Integer}, modes::Dims{N}, transform::Type{TR}; act=identity,
         permuted::BoolLike=False(), kwargs...) where {N, TR <: AbstractTransform{<:Number}}
     lin = known(static(permuted)) ? Conv(ntuple(one, N), ch) : Dense(ch)
     conv = OperatorConv(ch, modes, transform; permuted, kwargs...)

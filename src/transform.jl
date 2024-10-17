@@ -25,7 +25,7 @@ Base.ndims(T::FourierTransform) = length(T.modes)
 transform(ft::FourierTransform, x::AbstractArray) = rfft(x, 1:ndims(ft))
 
 function low_pass(ft::FourierTransform, x_fft::AbstractArray)
-    return view(x_fft, map(d -> 1:d, ft.modes)..., :, :)
+    return view(x_fft,map(d -> 1:d, ft.modes)...,:,:)
 end
 
 truncate_modes(ft::FourierTransform, x_fft::AbstractArray) = low_pass(ft, x_fft)
