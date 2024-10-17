@@ -12,7 +12,8 @@
                 x_size=(22, 22, 1, 5), y_size=(22, 22, 64, 5))
         ]
 
-        @testset "$(op) $(length(setup.m))D: permuted = $(setup.permuted)" for setup in setups,
+        @testset "$(op) $(length(setup.m))D: permuted = $(setup.permuted)" for setup in
+                                                                               setups,
             op in opconv
 
             p = Lux.Utils.unwrap_val(setup.permuted)
