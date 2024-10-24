@@ -1,7 +1,7 @@
 # NeuralOperators.jl
 
 [![Join the chat at https://julialang.zulipchat.com #sciml-bridged](https://img.shields.io/static/v1?label=Zulip&message=chat&color=9558b2&labelColor=389826)](https://julialang.zulipchat.com/#narrow/stream/279055-sciml-bridged)
-[![Global Docs](https://img.shields.io/badge/docs-SciML-blue.svg)](https://docs.sciml.ai/NeuralOperators/stable/)
+[![Global Docs](https://img.shields.io/badge/docs-SciML-blue.svg)](https://sciml.github.io/NeuralOperators.jl/)
 
 [![codecov](https://codecov.io/gh/SciML/NeuralOperators.jl/branch/main/graph/badge.svg?token=wTS4cxrvB1)](https://codecov.io/gh/SciML/NeuralOperators.jl)
 [![Build Status](https://github.com/SciML/NeuralOperators.jl/workflows/CI/badge.svg)](https://github.com/SciML/NeuralOperators.jl/actions?query=workflow%3ACI)
@@ -12,7 +12,7 @@
 
 NeuralOperators.jl is a package written in Julia to provide the architectures for learning
 mapping between function spaces, and learning grid invariant solution of PDEs. Checkout the
-[documentation](https://docs.sciml.ai/NeuralOperators/stable/) for tutorials and API
+[documentation](https://sciml.github.io/NeuralOperators.jl/) for tutorials and API
 reference.
 
 ## Installation
