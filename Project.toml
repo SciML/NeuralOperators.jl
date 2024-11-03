@@ -1,7 +1,7 @@
 name = "NeuralOperators"
 uuid = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
 authors = ["Avik Pal <avikpal@mit.edu>"]
-version = "0.5.2"
+version = "0.5.3"
 
 [deps]
 ArgCheck = "dce04be8-c92d-5529-be00-80e4d2c0e197"
