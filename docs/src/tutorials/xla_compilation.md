@@ -12,7 +12,7 @@ if "gpu" in keys(Reactant.XLA.backends)
     Reactant.set_default_backend("gpu")
 end
 
-dev = xla_device()
+dev = reactant_device()
 ```
 
 ## Compiling DeepONet
