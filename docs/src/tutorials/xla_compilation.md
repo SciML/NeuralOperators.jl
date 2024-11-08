@@ -8,10 +8,6 @@ function sumabs2first(model, ps, st, (u, y))
     return sum(abs2, z)
 end
 
-if "gpu" in keys(Reactant.XLA.backends)
-    Reactant.set_default_backend("gpu")
-end
-
 dev = reactant_device()
 ```
 
