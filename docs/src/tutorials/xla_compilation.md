@@ -3,8 +3,8 @@
 ```@example xla_compilation
 using NeuralOperators, Lux, Random, Enzyme, Reactant
 
-function sumabs2first(model, ps, st, (u, y))
-    z, _ = model((u, y), ps, st)
+function sumabs2first(model, ps, st, x)
+    z, _ = model(x, ps, st)
     return sum(abs2, z)
 end
 
@@ -15,14 +15,14 @@ dev = reactant_device()
 
 ```@example xla_compilation
 deeponet = DeepONet()
-ps, st = Lux.setup(Random.default_rng(), deeponet) |> dev
+ps, st = Lux.setup(Random.default_rng(), deeponet) |> dev;
 
-u = rand(Float32, 64, 1024) |> dev
-y = rand(Float32, 1, 128, 1024) |> dev
+u = rand(Float32, 64, 1024) |> dev;
+y = rand(Float32, 1, 128, 1024) |> dev;
 nothing # hide
 
 deeponet_compiled = @compile deeponet((u, y), ps, st)
-deeponet_compiled((u, y), ps, st)
+deeponet_compiled((u, y), ps, st)[1]
 ```
 
 Computing the gradient of the DeepONet model.
@@ -49,12 +49,12 @@ end
 
 ```@example xla_compilation
 fno = FourierNeuralOperator()
-ps, st = Lux.setup(Random.default_rng(), fno) |> dev
+ps, st = Lux.setup(Random.default_rng(), fno) |> dev;
 
-x = rand(Float32, 2, 1024, 5) |> dev
+x = rand(Float32, 2, 1024, 5) |> dev;
 
 fno_compiled = @compile fno(x, ps, st)
-fno_compiled(x, ps, st)
+fno_compiled(x, ps, st)[1]
 ```
 
 Computing the gradient of the FourierNeuralOperator model.
