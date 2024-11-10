@@ -1,6 +1,6 @@
 # Compiling NeuralOperators.jl using Reactant.jl
 
-```@example xla_compilation
+```@example reactant
 using NeuralOperators, Lux, Random, Enzyme, Reactant
 
 function sumabs2first(model, ps, st, x)
@@ -13,12 +13,12 @@ dev = reactant_device()
 
 ## Compiling DeepONet
 
-```@example xla_compilation
+```@example reactant
 deeponet = DeepONet()
 ps, st = Lux.setup(Random.default_rng(), deeponet) |> dev;
 
-u = rand(Float32, 64, 1024) |> dev;
-y = rand(Float32, 1, 128, 1024) |> dev;
+u = rand(Float32, 64, 32) |> dev;
+y = rand(Float32, 1, 128, 32) |> dev;
 nothing # hide
 
 deeponet_compiled = @compile deeponet((u, y), ps, st)
@@ -27,18 +27,11 @@ deeponet_compiled((u, y), ps, st)[1]
 
 Computing the gradient of the DeepONet model.
 
-```@example xla_compilation
+```@example reactant
 function ∇deeponet(model, ps, st, (u, y))
-    dps = Enzyme.make_zero(ps)
-    Enzyme.autodiff(
-        Enzyme.Reverse,
-        sumabs2first,
-        Const(model),
-        Duplicated(ps, dps),
-        Const(st),
-        Const((u, y))
+    return Enzyme.gradient(
+        Enzyme.Reverse, Const(sumabs2first), Const(model), ps, Const(st), Const((u, y))
     )
-    return dps
 end
 
 ∇deeponet_compiled = @compile ∇deeponet(deeponet, ps, st, (u, y))
@@ -47,11 +40,11 @@ end
 
 ## Compiling FourierNeuralOperator
 
-```@example xla_compilation
+```@example reactant
 fno = FourierNeuralOperator()
 ps, st = Lux.setup(Random.default_rng(), fno) |> dev;
 
-x = rand(Float32, 2, 1024, 5) |> dev;
+x = rand(Float32, 2, 32, 5) |> dev;
 
 fno_compiled = @compile fno(x, ps, st)
 fno_compiled(x, ps, st)[1]
@@ -59,18 +52,11 @@ fno_compiled(x, ps, st)[1]
 
 Computing the gradient of the FourierNeuralOperator model.
 
-```@example xla_compilation
+```@example reactant
 function ∇fno(model, ps, st, x)
-    dps = Enzyme.make_zero(ps)
-    Enzyme.autodiff(
-        Enzyme.Reverse,
-        sumabs2first,
-        Const(model),
-        Duplicated(ps, dps),
-        Const(st),
-        Const(x)
+    return Enzyme.gradient(
+        Enzyme.Reverse, Const(sumabs2first), Const(model), ps, Const(st), Const(x)
     )
-    return dps
 end
 
 ∇fno_compiled = @compile ∇fno(fno, ps, st, x)
