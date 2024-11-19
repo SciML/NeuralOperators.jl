@@ -21,8 +21,7 @@ u = rand(Float32, 64, 32) |> dev;
 y = rand(Float32, 1, 128, 32) |> dev;
 nothing # hide
 
-deeponet_compiled = @compile deeponet((u, y), ps, st)
-deeponet_compiled((u, y), ps, st)[1]
+@jit deeponet((u, y), ps, st)
 ```
 
 Computing the gradient of the DeepONet model.
@@ -34,8 +33,7 @@ function ∇deeponet(model, ps, st, (u, y))
     )
 end
 
-∇deeponet_compiled = @compile ∇deeponet(deeponet, ps, st, (u, y))
-∇deeponet_compiled(deeponet, ps, st, (u, y))
+@jit ∇deeponet(deeponet, ps, st, (u, y))
 ```
 
 ## Compiling FourierNeuralOperator
@@ -46,8 +44,7 @@ ps, st = Lux.setup(Random.default_rng(), fno) |> dev;
 
 x = rand(Float32, 2, 32, 5) |> dev;
 
-fno_compiled = @compile fno(x, ps, st)
-fno_compiled(x, ps, st)[1]
+@jit fno(x, ps, st)
 ```
 
 Computing the gradient of the FourierNeuralOperator model.
@@ -59,6 +56,5 @@ function ∇fno(model, ps, st, x)
     )
 end
 
-∇fno_compiled = @compile ∇fno(fno, ps, st, x)
-∇fno_compiled(fno, ps, st, x)
+@jit ∇fno(fno, ps, st, x)
 ```

@@ -77,7 +77,7 @@ function operator_conv(x, tform::AbstractTransform, weights)
 
     pad_dims = size(x_t)[1:(end - 2)] .- size(x_p)[1:(end - 2)]
     x_padded = NNlib.pad_zeros(x_p, expand_pad_dims(pad_dims);
-        dims=ntuple(identity, ndims(x_p) - 2))::typeof(x_p)
+        dims=ntuple(identity, ndims(x_p) - 2))
 
     return inverse(tform, x_padded, size(x))
 end
