@@ -5,6 +5,9 @@ steps:
           version: "1.10"
       - JuliaCI/julia-coverage#v1:
           codecov: true
+          dirs:
+            - src
+            - ext
     command: |
       julia --project -e '
         println("--- :julia: Instantiating project")
