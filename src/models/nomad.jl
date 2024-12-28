@@ -41,9 +41,9 @@ julia> size(first(nomad((u, y), ps, st)))
 ```
 """
 @concrete struct NOMAD <: AbstractLuxContainerLayer{(:approximator, :decoder)}
-  approximator
-  decoder
-  concatenate <: Function
+    approximator
+    decoder
+    concatenate <: Function
 end
 
 """
@@ -104,7 +104,9 @@ function (nomad::NOMAD)(x, ps, st::NamedTuple)
     return out, (approximator=st_a, decoder=st_d)
 end
 
-NOMAD(approximator_net, decoder_net; concatenate=nomad_concatenate) = NOMAD(approximator_net, decoder_net, concatenate)
+function NOMAD(approximator_net, decoder_net; concatenate=nomad_concatenate)
+    NOMAD(approximator_net, decoder_net, concatenate)
+end
 
 batch_vectorize(x::AbstractArray) = reshape(x, :, size(x, ndims(x)))
 
