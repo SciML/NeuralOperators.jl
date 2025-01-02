@@ -51,3 +51,8 @@ function ∇safe_batched_adjoint(
         ::Type{<:AbstractGPUDevice}, Δ::AbstractArray{T, 3}) where {T}
     return NoTangent(), stack(adjoint, eachslice(Δ; dims=3))
 end
+
+function fast_pad_zeros(x, pad_dims)::typeof(x)
+    return NNlib.pad_zeros(
+        x, expand_pad_dims(pad_dims); dims=ntuple(identity, ndims(x) - 2))
+end
