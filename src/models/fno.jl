@@ -42,23 +42,54 @@ julia> size(first(fno(u, ps, st)))
     model <: Chain
 end
 
-function FourierNeuralOperator(σ=gelu; chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128, 1),
-        modes::Dims{M}=(16,), permuted::BoolLike=False(), kwargs...) where {C, M}
-    @argcheck length(chs) ≥ 5
-
-    map₁ = chs[1] => chs[2]
-    map₂ = chs[C - 2] => chs[C - 1]
-    map₃ = chs[C - 1] => chs[C]
-
-    kernel_size = map(Returns(1), modes)
-
-    lifting = known(static(permuted)) ? Conv(kernel_size, map₁) : Dense(map₁)
-    project = known(static(permuted)) ?
-              Chain(Conv(kernel_size, map₂, σ), Conv(kernel_size, map₃)) :
-              Chain(Dense(map₂, σ), Dense(map₃))
-
-    mapping = Chain([SpectralKernel(chs[i] => chs[i + 1], modes, σ; permuted, kwargs...)
-                     for i in 2:(C - 3)]...)
-
-    return FourierNeuralOperator(Chain(lifting, mapping, project))
+function FourierNeuralOperator(
+        ;
+        activation=gelu,
+        in_channels,
+        out_channels,
+        hidden_channels,
+        n_modes=(16, 16),
+        n_layers=4,
+        lifting_channel_ratio::Int=2,
+        projection_channel_ratio::Int=2,
+)
+    lifting = Chain(
+        Conv((1, 1), in_channels => lifting_channel_ratio * hidden_channels, activation),
+        Conv((1, 1), lifting_channel_ratio * hidden_channels => hidden_channels, activation),
+    )
+    projection = Chain(
+        Conv((1, 1), hidden_channels => projection_channel_ratio * hidden_channels, activation),
+        Conv((1, 1), projection_channel_ratio * hidden_channels => out_channels, activation),
+    )
+    mapping = Chain(
+        [SpectralKernel(hidden_channels => hidden_channels, n_modes, activation; permuted=True())
+         for i in 1:n_layers]...
+    )
+    return FourierNeuralOperator(Chain(lifting, mapping, projection))
 end
+
+# function FourierNeuralOperator(
+#         σ=gelu;
+#         chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128, 1),
+#         modes::Dims{M}=(16,),
+#         permuted::BoolLike=False(),
+#         kwargs...,
+# ) where {C, M}
+#     @argcheck length(chs) ≥ 5
+
+#     map₁ = chs[1] => chs[2]
+#     map₂ = chs[C - 2] => chs[C - 1]
+#     map₃ = chs[C - 1] => chs[C]
+
+#     kernel_size = map(Returns(1), modes)
+
+#     lifting = known(static(permuted)) ? Conv(kernel_size, map₁) : Dense(map₁)
+#     project = known(static(permuted)) ?
+#               Chain(Conv(kernel_size, map₂, σ), Conv(kernel_size, map₃)) :
+#               Chain(Dense(map₂, σ), Dense(map₃))
+
+#     mapping = Chain([SpectralKernel(chs[i] => chs[i + 1], modes, σ; permuted, kwargs...)
+#                      for i in 2:(C - 3)]...)
+
+#     return FourierNeuralOperator(Chain(lifting, mapping, project))
+# end
