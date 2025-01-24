@@ -42,30 +42,57 @@ julia> size(first(fno(u, ps, st)))
     model <: Chain
 end
 
+struct SoftGating <: AbstractExplicitLayer
+  channels::Int
+end
+
+function initialparameters(::AbstractRNG, l::SoftGating)
+  return (weight = ones(Float32, 1, 1, l.channels, 1),)
+end
+
+Lux.initialstates(::AbstractRNG, ::SoftGating) = NamedTuple()
+
+function (l::SoftGating)(x, ps, st)
+  return ps.weight .* x, st
+end
+
+function ChannelMLP(channels; expansion_factor=0.5, activation=gelu)
+  mlp = Chain(
+      Conv((1, 1), channels => Int(expansion_factor * channels), activation),
+      Conv((1, 1), Int(expansion_factor * channels) => channels)
+  )
+  return Parallel(+; channel_mlp = mlp, channel_mlp_skip = SoftGating(channels))
+end
+
 function FourierNeuralOperator(
-        ;
-        activation=gelu,
-        in_channels,
-        out_channels,
-        hidden_channels,
-        n_modes=(16, 16),
-        n_layers=4,
-        lifting_channel_ratio::Int=2,
-        projection_channel_ratio::Int=2,
+  ;
+  activation=gelu,
+  in_channels,
+  out_channels,
+  hidden_channels,
+  n_modes=(16, 16),
+  n_layers=4,
+  lifting_channel_ratio=2,
+  projection_channel_ratio=2,
+  channel_mlp_expansion=0.5,
 )
-    lifting = Chain(
-        Conv((1, 1), in_channels => lifting_channel_ratio * hidden_channels, activation),
-        Conv((1, 1), lifting_channel_ratio * hidden_channels => hidden_channels, activation),
-    )
-    projection = Chain(
-        Conv((1, 1), hidden_channels => projection_channel_ratio * hidden_channels, activation),
-        Conv((1, 1), projection_channel_ratio * hidden_channels => out_channels, activation),
-    )
-    mapping = Chain(
-        [SpectralKernel(hidden_channels => hidden_channels, n_modes, activation; permuted=True())
-         for i in 1:n_layers]...
-    )
-    return FourierNeuralOperator(Chain(lifting, mapping, projection))
+  lifting = Chain(
+      Conv((1, 1), in_channels => lifting_channel_ratio * hidden_channels, activation),
+      Conv((1, 1), lifting_channel_ratio * hidden_channels => hidden_channels, activation),
+  )
+  projection = Chain(
+      Conv((1, 1), hidden_channels => projection_channel_ratio * hidden_channels, activation),
+      Conv((1, 1), projection_channel_ratio * hidden_channels => out_channels, activation),
+  )
+  fno_blocks = Chain([
+      Chain(
+          SpectralKernel(hidden_channels => hidden_channels, n_modes, activation; permuted=true),
+          ChannelMLP(hidden_channels; expansion_factor=channel_mlp_expansion, activation=activation),
+          activation
+      ) for i in 1:n_layers
+  ]...)
+  
+  return FourierNeuralOperator(Chain(; lifting, fno_blocks, projection))
 end
 
 # function FourierNeuralOperator(
