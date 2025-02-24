@@ -4,7 +4,7 @@
 
 ```@example burgers
 using DataDeps, MAT, MLUtils
-using PythonCall, CondaPkg # For `gdown`
+using PythonCall # For `gdown`
 using Printf
 
 const gdown = pyimport("gdown")
@@ -16,7 +16,7 @@ register(
     Burgers' equation dataset from
     [fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
 
-    mapping between initial conditions to the solutions at the last point of time \
+    mapping between initial conditions to the solutions at the last point of time
     evolution in some function space.
 
     u(x,0) -> u(x, time_end):
@@ -40,10 +40,9 @@ const Δsamples = 2^3
 const grid_size = div(2^13, Δsamples)
 const T = Float32
 
-file = matopen(filepath)
-x_data = reshape(T.(collect(read(file, "a")[1:N, 1:Δsamples:end])), N, :, 1)
-y_data = reshape(T.(collect(read(file, "u")[1:N, 1:Δsamples:end])), N, :, 1)
-close(file)
+full_data = matread(filepath)
+x_data = reshape(T.(collect(full_data["a"][1:N, 1:Δsamples:end])), N, :, 1)
+y_data = reshape(T.(collect(full_data["u"][1:N, 1:Δsamples:end])), N, :, 1)
 
 x_data = permutedims(x_data, (2, 1, 3))
 grid = reshape(T.(collect(range(0, 1; length=grid_size)')), :, grid_size, 1)
@@ -52,11 +51,10 @@ grid = reshape(T.(collect(range(0, 1; length=grid_size)')), :, grid_size, 1)
 ## Model
 
 ```@example burgers
-using Lux, NeuralOperators, Optimisers, Zygote, Random
-using LuxCUDA
+using Lux, NeuralOperators, Optimisers, Random, Reactant, Enzyme
 
 const cdev = cpu_device()
-const gdev = gpu_device()
+const xdev = reactant_device()
 
 deeponet = DeepONet(;
     branch=(size(x_data, 1), ntuple(Returns(32), 5)...),
@@ -64,15 +62,15 @@ deeponet = DeepONet(;
     branch_activation=tanh,
     trunk_activation=tanh
 )
-ps, st = Lux.setup(Random.default_rng(), deeponet) |> gdev;
+ps, st = Lux.setup(Random.default_rng(), deeponet) |> xdev;
 ```
 
 ## Training
 
 ```@example burgers
-x_data_dev = x_data |> gdev
-y_data_dev = y_data |> gdev
-grid_dev = grid |> gdev
+x_data_dev = x_data |> xdev
+y_data_dev = y_data |> xdev
+grid_dev = grid |> xdev
 
 function loss_function(model, ps, st, ((v, y), u))
     û, stₙ = model((v, y), ps, st)
@@ -83,8 +81,8 @@ function train_model!(model, ps, st, data; epochs=5000)
     train_state = Training.TrainState(model, ps, st, Adam(0.0001f0))
 
     for epoch in 1:epochs
-        _, loss, _, train_state = Training.single_train_step!(
-            AutoZygote(), loss_function, data, train_state)
+        _, loss, _, train_state = Training.single_train_step(
+            AutoEnzyme(), loss_function, data, train_state)
 
         if epoch % 25 == 1 || epoch == epochs
             @printf("Epoch %d: loss = %.6e\n", epoch, loss)
@@ -103,7 +101,8 @@ ps_trained, st_trained = train_model!(
 ```@example burgers
 using CairoMakie
 
-pred = first(deeponet((x_data_dev, grid_dev), ps_trained, st_trained)) |> cdev
+pred = @jit deeponet((x_data_dev, grid_dev), ps_trained, st_trained)
+pred = first(pred) |> cdev
 
 begin
     fig = Figure(; size=(1024, 1024))

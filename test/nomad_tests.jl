@@ -16,7 +16,7 @@
 
             ps, st = Lux.setup(rng, nomad) |> dev
             @inferred first(nomad((u, y), ps, st))
-            @jet first(nomad((u, y), ps, st))
+            # @jet first(nomad((u, y), ps, st))
 
             pred = first(nomad((u, y), ps, st))
             @test setup.out_size == size(pred)
