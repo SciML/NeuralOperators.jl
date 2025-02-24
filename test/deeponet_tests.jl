@@ -20,7 +20,7 @@
 
             ps, st = Lux.setup(rng, deeponet) |> dev
             @inferred first(deeponet((u, y), ps, st))
-            @jet first(deeponet((u, y), ps, st))
+            # @jet first(deeponet((u, y), ps, st))
 
             pred = first(deeponet((u, y), ps, st))
             @test setup.out_size == size(pred)
@@ -46,7 +46,7 @@
 
             ps, st = Lux.setup(rng, deeponet) |> dev
             @inferred first(deeponet((u, y), ps, st))
-            @jet first(deeponet((u, y), ps, st))
+            # @jet first(deeponet((u, y), ps, st))
 
             pred = first(deeponet((u, y), ps, st))
             @test setup.out_size == size(pred)

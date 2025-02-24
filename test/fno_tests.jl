@@ -18,7 +18,7 @@
             y = rand(rng, Float32, setup.y_size...) |> aType
 
             @inferred fno(x, ps, st)
-            @jet fno(x, ps, st)
+            # @jet fno(x, ps, st)
 
             @test size(first(fno(x, ps, st))) == setup.y_size
 

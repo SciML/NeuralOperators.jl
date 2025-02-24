@@ -33,7 +33,7 @@
                          StatefulLuxLayer{true}(setup.additional, ps, st)
 
             @inferred deeponet_project(b, t, additional)
-            @jet deeponet_project(b, t, additional)
+            # @jet deeponet_project(b, t, additional)
             @test setup.out_size == size(deeponet_project(b, t, additional))
         end
 

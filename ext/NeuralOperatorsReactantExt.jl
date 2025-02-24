@@ -5,6 +5,11 @@ using NeuralOperators: NeuralOperators, FourierTransform
 using NNlib: NNlib
 using Reactant: Reactant, TracedRArray, AnyTracedRArray
 
+function NeuralOperators.safe_batched_adjoint(x::AnyTracedRArray)
+    @show 1
+    return NNlib.batched_adjoint(Reactant.TracedUtils.materialize_traced_array(x))
+end
+
 # XXX: Reevaluate after https://github.com/EnzymeAD/Reactant.jl/issues/246 is fixed
 function NeuralOperators.transform(
         ft::FourierTransform, x::AnyTracedRArray{T, N}) where {T, N}

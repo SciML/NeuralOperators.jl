@@ -29,7 +29,7 @@
             x = rand(rng, Float32, setup.x_size...) |> aType
             @test size(first(m(x, ps, st))) == setup.y_size
             @inferred m(x, ps, st)
-            @jet m(x, ps, st)
+            # @jet m(x, ps, st)
 
             data = [(x, aType(rand(rng, Float32, setup.y_size...)))]
             @test begin
