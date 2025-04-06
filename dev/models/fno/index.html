@@ -32,7 +32,9 @@ function train!(model, ps, st, data; epochs=10)
     losses = []
     tstate = Training.TrainState(model, ps, st, Adam(0.01f0))
     for _ in 1:epochs, (x, y) in data
-        _, loss, _, tstate = Training.single_train_step!(AutoZygote(), MSELoss(), (x, y),
+
+        _, loss,
+        _, tstate = Training.single_train_step!(AutoZygote(), MSELoss(), (x, y),
             tstate)
         push!(losses, loss)
     end
@@ -41,7 +43,7 @@ end
 
 losses = train!(fno, ps, st, data; epochs=100)
 
-lines(losses)</code></pre><img src="d270da3f.png" alt="Example block output"/></details><pre><code class="language-julia hljs">using NeuralOperators, Lux, Random, Optimisers, Zygote, CairoMakie</code></pre><h3 id="Constructing-training-data"><a class="docs-heading-anchor" href="#Constructing-training-data">Constructing training data</a><a id="Constructing-training-data-1"></a><a class="docs-heading-anchor-permalink" href="#Constructing-training-data" title="Permalink"></a></h3><p>First, we construct our training data.</p><pre><code class="language-julia hljs">rng = Random.default_rng()</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Random.TaskLocalRNG()</code></pre><p><code>data_size</code> is the number of observations.</p><pre><code class="language-julia hljs">data_size = 128</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">128</code></pre><p><code>m</code> is the length of a single observation, you can also interpret this as the size of the grid we&#39;re evaluating our function on.</p><pre><code class="language-julia hljs">m = 32</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32</code></pre><p>We instantiate the domain that the function operates on as a range from <code>0</code> to <code>2π</code>, whose length is the grid size.</p><pre><code class="language-julia hljs">xrange = range(0, 2π; length=m) .|&gt; Float32;</code></pre><p>Each value in the array here, <code>α</code>, will be the multiplicative factor on the input to the sine function.</p><pre><code class="language-julia hljs">α = 0.5f0 .+ 0.5f0 .* rand(Float32, data_size);</code></pre><p>Now, we create our data arrays.  We are storing all of the training data in a single array, in order to batch process them more efficiently.</p><pre><code class="language-julia hljs">u_data = zeros(Float32, m, 1, data_size);
+lines(losses)</code></pre><img src="f4df2667.png" alt="Example block output"/></details><pre><code class="language-julia hljs">using NeuralOperators, Lux, Random, Optimisers, Zygote, CairoMakie</code></pre><h3 id="Constructing-training-data"><a class="docs-heading-anchor" href="#Constructing-training-data">Constructing training data</a><a id="Constructing-training-data-1"></a><a class="docs-heading-anchor-permalink" href="#Constructing-training-data" title="Permalink"></a></h3><p>First, we construct our training data.</p><pre><code class="language-julia hljs">rng = Random.default_rng()</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Random.TaskLocalRNG()</code></pre><p><code>data_size</code> is the number of observations.</p><pre><code class="language-julia hljs">data_size = 128</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">128</code></pre><p><code>m</code> is the length of a single observation, you can also interpret this as the size of the grid we&#39;re evaluating our function on.</p><pre><code class="language-julia hljs">m = 32</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32</code></pre><p>We instantiate the domain that the function operates on as a range from <code>0</code> to <code>2π</code>, whose length is the grid size.</p><pre><code class="language-julia hljs">xrange = range(0, 2π; length=m) .|&gt; Float32;</code></pre><p>Each value in the array here, <code>α</code>, will be the multiplicative factor on the input to the sine function.</p><pre><code class="language-julia hljs">α = 0.5f0 .+ 0.5f0 .* rand(Float32, data_size);</code></pre><p>Now, we create our data arrays.  We are storing all of the training data in a single array, in order to batch process them more efficiently.</p><pre><code class="language-julia hljs">u_data = zeros(Float32, m, 1, data_size);
 v_data = zeros(Float32, m, 1, data_size);</code></pre><p>and fill the data arrays with values. Here, <code>u_data</code> is</p><pre><code class="language-julia hljs">for i in 1:data_size
     u_data[:, 1, i] .= sin.(α[i] .* xrange)
     v_data[:, 1, i] .= -inv(α[i]) .* cos.(α[i] .* xrange)
@@ -56,14 +58,14 @@ end</code></pre><h3 id="Creating-the-model"><a class="docs-heading-anchor" href=
         layer_2 = Chain(
             layer_1 = OperatorKernel(
                 layer = Parallel(
-                    connection = Fix1(add_act, gelu),
+                    connection = Fix1(add_act, gelu_tanh),
                     layer_1 = Conv((1,), 64 =&gt; 64),  <span class="sgr90"># 4_160 parameters</span>
                     layer_2 = OperatorConv(64 =&gt; 64, (16,), FourierTransform{ComplexF32}; permuted = static(true)),  <span class="sgr90"># 65_536 parameters</span>
                 ),
             ),
         ),
         layer_3 = Chain(
-            layer_1 = Conv((1,), 64 =&gt; 128, gelu),  <span class="sgr90"># 8_320 parameters</span>
+            layer_1 = Conv((1,), 64 =&gt; 128, gelu_tanh),  <span class="sgr90"># 8_320 parameters</span>
             layer_2 = Conv((1,), 128 =&gt; 1),  <span class="sgr90"># 129 parameters</span>
         ),
     ),
@@ -77,7 +79,8 @@ end</code></pre><h3 id="Creating-the-model"><a class="docs-heading-anchor" href=
     # Loop over epochs, then loop over each batch of training data, and step into the training:
     for _ in 1:epochs
         for (x, y) in data
-            _, loss, _, tstate = Training.single_train_step!(
+            _, loss,
+            _, tstate = Training.single_train_step!(
                 AutoZygote(), MSELoss(), (x, y),
                 tstate)
             push!(losses, loss)
@@ -85,67 +88,67 @@ end</code></pre><h3 id="Creating-the-model"><a class="docs-heading-anchor" href=
     end
     return losses
 end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">train! (generic function with 1 method)</code></pre><p>Now we train our model!</p><pre><code class="language-julia hljs">losses = @time train!(fno, ps, st, data; epochs=500)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">500-element Vector{Any}:
- 1.0732654f0
- 5.2241216f0
- 0.5003662f0
- 0.7645925f0
- 0.3561983f0
- 0.4176476f0
- 0.26514658f0
- 0.1872372f0
- 0.22542156f0
- 0.17661202f0
+ 1.1714752f0
+ 2.9954028f0
+ 0.49652243f0
+ 0.81345904f0
+ 0.3263559f0
+ 0.30074352f0
+ 0.26759338f0
+ 0.19270512f0
+ 0.21774133f0
+ 0.109154254f0
  ⋮
- 7.5555654f-5
- 7.499155f-5
- 7.443409f-5
- 7.38839f-5
- 7.333977f-5
- 7.280232f-5
- 7.227102f-5
- 7.174596f-5
- 7.122757f-5</code></pre><p>We can plot the losses - you can see that at some point, we hit diminishing returns.</p><pre><code class="language-julia hljs">lines(losses; axis=(; yscale=log10, ylabel=&quot;Loss&quot;, xlabel=&quot;Epoch&quot;))</code></pre><img src="556e1482.png" alt="Example block output"/><h3 id="Applying-the-model"><a class="docs-heading-anchor" href="#Applying-the-model">Applying the model</a><a id="Applying-the-model-1"></a><a class="docs-heading-anchor-permalink" href="#Applying-the-model" title="Permalink"></a></h3><p>Let&#39;s try to actually apply this model using some input data.</p><pre><code class="language-julia hljs">input_data = u_data[:, 1, 1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32-element Vector{Float32}:
+ 7.602491f-5
+ 6.1258965f-5
+ 6.456682f-5
+ 6.718164f-5
+ 5.629482f-5
+ 6.642699f-5
+ 5.647914f-5
+ 5.9689137f-5
+ 5.9777776f-5</code></pre><p>We can plot the losses - you can see that at some point, we hit diminishing returns.</p><pre><code class="language-julia hljs">lines(losses; axis=(; yscale=log10, ylabel=&quot;Loss&quot;, xlabel=&quot;Epoch&quot;))</code></pre><img src="ba18a60e.png" alt="Example block output"/><h3 id="Applying-the-model"><a class="docs-heading-anchor" href="#Applying-the-model">Applying the model</a><a id="Applying-the-model-1"></a><a class="docs-heading-anchor-permalink" href="#Applying-the-model" title="Permalink"></a></h3><p>Let&#39;s try to actually apply this model using some input data.</p><pre><code class="language-julia hljs">input_data = u_data[:, 1, 1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32-element Vector{Float32}:
   0.0
-  0.10188729
-  0.20271413
-  0.3014311
-  0.39701074
-  0.48845828
-  0.5748218
-  0.6552026
-  0.728764
-  0.7947403
+  0.1632802
+  0.32217786
+  0.47242808
+  0.60999817
+  0.73119545
+  0.8327671
+  0.91198695
+  0.9667285
+  0.99552256
   ⋮
-  0.71324104
-  0.63811463
-  0.5563466
-  0.46878812
-  0.3763504
-  0.27999562
-  0.18072638
-  0.07957634
- -0.02240193</code></pre><p>This is our input data.  It&#39;s currently one-dimensional, but our neural network expects input in batched form, so we simply <code>reshape</code> it (a no-cost operation) to a 3d array with singleton dimensions.</p><pre><code class="language-julia hljs">reshaped_input = reshape(input_data, length(input_data), 1, 1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32×1×1 Array{Float32, 3}:
+ -0.58974445
+ -0.7136931
+ -0.81848615
+ -0.90131074
+ -0.9599434
+ -0.9928109
+ -0.9990307
+ -0.978436
+ -0.93157965</code></pre><p>This is our input data.  It&#39;s currently one-dimensional, but our neural network expects input in batched form, so we simply <code>reshape</code> it (a no-cost operation) to a 3d array with singleton dimensions.</p><pre><code class="language-julia hljs">reshaped_input = reshape(input_data, length(input_data), 1, 1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32×1×1 Array{Float32, 3}:
 [:, :, 1] =
   0.0
-  0.10188729
-  0.20271413
-  0.3014311
-  0.39701074
-  0.48845828
-  0.5748218
-  0.6552026
-  0.728764
-  0.7947403
+  0.1632802
+  0.32217786
+  0.47242808
+  0.60999817
+  0.73119545
+  0.8327671
+  0.91198695
+  0.9667285
+  0.99552256
   ⋮
-  0.71324104
-  0.63811463
-  0.5563466
-  0.46878812
-  0.3763504
-  0.27999562
-  0.18072638
-  0.07957634
- -0.02240193</code></pre><p>Now we can pass this to <code>Lux.apply</code>:</p><pre><code class="language-julia hljs">output_data, st = Lux.apply(fno, reshaped_input, ps, st)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(Float32[-1.7911228; -2.0363867; … ; 1.9467674; 1.9089487;;;], (layer_1 = NamedTuple(), layer_2 = (layer_1 = (layer_1 = NamedTuple(), layer_2 = NamedTuple()),), layer_3 = (layer_1 = NamedTuple(), layer_2 = NamedTuple())))</code></pre><p>and plot it:</p><pre><code class="language-julia hljs">f, a, p = lines(dropdims(reshaped_input; dims=(2, 3)); label=&quot;u&quot;)
+ -0.58974445
+ -0.7136931
+ -0.81848615
+ -0.90131074
+ -0.9599434
+ -0.9928109
+ -0.9990307
+ -0.978436
+ -0.93157965</code></pre><p>Now we can pass this to <code>Lux.apply</code>:</p><pre><code class="language-julia hljs">output_data, st = Lux.apply(fno, reshaped_input, ps, st)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(Float32[-1.2409009; -1.2193158; … ; -0.25589505; -0.4481719;;;], (layer_1 = NamedTuple(), layer_2 = (layer_1 = (layer_1 = NamedTuple(), layer_2 = NamedTuple()),), layer_3 = (layer_1 = NamedTuple(), layer_2 = NamedTuple())))</code></pre><p>and plot it:</p><pre><code class="language-julia hljs">f, a, p = lines(dropdims(reshaped_input; dims=(2, 3)); label=&quot;u&quot;)
 lines!(a, dropdims(output_data; dims=(2, 3)); label=&quot;Predicted&quot;)
 lines!(a, v_data[:, 1, 1]; label=&quot;Expected&quot;)
 axislegend(a)
@@ -155,4 +158,4 @@ absolute_error = v_data[:, 1, 1] .- dropdims(output_data; dims=(2, 3))
 a2, p2 = lines(f[2, 1], absolute_error; axis=(; ylabel=&quot;Error&quot;))
 rowsize!(f.layout, 2, Aspect(1, 1 / 8))
 linkxaxes!(a, a2)
-f</code></pre><img src="f42ad86b.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« NeuralOperators.jl</a><a class="docs-footer-nextpage" href="../deeponet/">DeepONet »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.8.0 on <span class="colophon-date" title="Sunday 29 December 2024 14:34">Sunday 29 December 2024</span>. Using Julia version 1.10.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+f</code></pre><img src="bbd7e4b0.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« NeuralOperators.jl</a><a class="docs-footer-nextpage" href="../deeponet/">DeepONet »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.10.1 on <span class="colophon-date" title="Sunday 6 April 2025 01:13">Sunday 6 April 2025</span>. Using Julia version 1.10.9.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
