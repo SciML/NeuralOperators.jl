@@ -45,7 +45,7 @@ function LuxCore.initialparameters(rng::AbstractRNG, layer::OperatorConv)
     scale = real(one(eltype(layer.tform))) / (in_chs * out_chs)
     return (;
         weight=scale * layer.init_weight(
-            rng, eltype(layer.tform), out_chs, in_chs, layer.prod_modes))
+        rng, eltype(layer.tform), out_chs, in_chs, layer.prod_modes))
 end
 
 function LuxCore.parameterlength(layer::OperatorConv)
