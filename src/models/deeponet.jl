@@ -52,7 +52,7 @@ function DeepONet(branch, trunk)
         Chain(
             Parallel(*; branch=Chain(branch, WrappedFunction(adjoint)), trunk=trunk),
             WrappedFunction(adjoint),
-        )
+        ),
     )
 end
 
