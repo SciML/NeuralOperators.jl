@@ -20,6 +20,8 @@
         ),
     ]
 
+    xdev = reactant_device()
+
     @testset "$(setup.name)" for setup in setups
         u = rand(Float32, setup.u_size...)
         y = rand(Float32, setup.y_size...)
@@ -30,8 +32,8 @@
         pred = first(deeponet((u, y), ps, st))
         @test setup.out_size == size(pred)
 
-        ps_ra, st_ra = reactant_device()(ps, st)
-        u_ra, y_ra = reactant_device()(u, y)
+        ps_ra, st_ra = (ps, st) |> xdev
+        u_ra, y_ra = (u, y) |> xdev
 
         @testset "check gradients" begin
             ∂u_zyg, ∂ps_zyg = zygote_gradient(deeponet, (u, y), ps, st)
