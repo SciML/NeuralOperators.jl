@@ -49,7 +49,10 @@ end
 
 function DeepONet(branch, trunk)
     return DeepONet(
-        Parallel(*; branch=Chain(branch, WrappedFunction(adjoint)), trunk=trunk)
+        Chain(
+            Parallel(*; branch=Chain(branch, WrappedFunction(adjoint)), trunk=trunk),
+            WrappedFunction(adjoint),
+        )
     )
 end
 
@@ -98,9 +101,9 @@ function DeepONet(;
 )
 
     # checks for last dimension size
-    @argcheck branch[end] == trunk[end] "Branch and Trunk net must share the same amount \
-                                         of nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ \
-                                         won't work."
+    @assert branch[end] == trunk[end] "Branch and Trunk net must share the same amount \
+                                       of nodes in the last layer. Otherwise Σᵢ bᵢⱼ tᵢₖ \
+                                       won't work."
 
     branch_net = Chain(
         [
