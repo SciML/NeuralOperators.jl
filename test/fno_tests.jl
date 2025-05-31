@@ -20,8 +20,8 @@
 
         @test size(first(fno(x, ps, st))) == setup.y_size
 
-        ps_ra, st_ra = reactant_device(ps, st)
-        x_ra, y_ra = reactant_device(x, y)
+        # ps_ra, st_ra = (ps, st) |> reactant_device()
+        # x_ra, y_ra = (x, y) |> reactant_device()
 
         # XXX: upstream fix is needed for the FFT adjoint to work correctly
         #      https://github.com/EnzymeAD/Reactant.jl/issues/246
