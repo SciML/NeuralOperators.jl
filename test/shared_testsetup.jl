@@ -1,7 +1,7 @@
 @testsetup module SharedTestSetup
 import Reexport: @reexport
 
-@reexport using Lux, Zygote, Optimisers, Random, StableRNGs, Reactant
+@reexport using Lux, Zygote, Optimisers, Random, StableRNGs, Reactant, Enzyme
 using LuxTestUtils: check_approx
 using FFTW
 

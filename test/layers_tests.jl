@@ -44,6 +44,7 @@
         #     ) do
         #         @jit enzyme_gradient(m, x_ra, ps_ra, st_ra)
         #     end
+        #     ∂x_ra, ∂ps_ra = (∂x_ra, ∂ps_ra) |> cpu_device()
 
         #     @test ∂x_zyg ≈ ∂x_ra atol = 1.0f-3 rtol = 1.0f-3
         #     @test check_approx(∂ps_zyg, ∂ps_ra; atol=1.0f-3, rtol=1.0f-3)

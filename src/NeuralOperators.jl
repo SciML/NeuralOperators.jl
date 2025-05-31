@@ -7,7 +7,7 @@ using Random: Random, AbstractRNG
 using Lux: Lux, Chain, Dense, Conv, Parallel, NoOpLayer
 using LuxCore: LuxCore, AbstractLuxLayer, AbstractLuxWrapperLayer
 using LuxLib: fast_activation!!
-using NNlib: batched_mul, pad_constant
+using NNlib: NNlib, batched_mul, pad_constant
 using WeightInitializers: glorot_uniform
 
 include("utils.jl")

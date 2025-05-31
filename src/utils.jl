@@ -11,7 +11,8 @@ function apply_pattern(
 end
 
 function add_act(act::F, x1, x2) where {F}
-    return fast_activation!!(NNlib.fast_act(act, y), x1 .+ x2)
+    y = x1 .+ x2
+    return fast_activation!!(NNlib.fast_act(act, y), y)
 end
 
 @concrete struct Fix1 <: Function

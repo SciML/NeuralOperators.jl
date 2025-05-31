@@ -42,8 +42,9 @@
                 dot_general_precision=PrecisionConfig.HIGH,
                 convolution_precision=PrecisionConfig.HIGH,
             ) do
-                enzyme_gradient(nomad, (u_ra, y_ra), ps_ra, st_ra)
+                @jit enzyme_gradient(nomad, (u_ra, y_ra), ps_ra, st_ra)
             end
+            ∂u_ra, ∂ps_ra = (∂u_ra, ∂ps_ra) |> cpu_device()
 
             @test ∂u_zyg[1] ≈ ∂u_ra[1] atol = 1.0f-3 rtol = 1.0f-3
             @test ∂u_zyg[2] ≈ ∂u_ra[2] atol = 1.0f-3 rtol = 1.0f-3

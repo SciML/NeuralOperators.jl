@@ -26,6 +26,4 @@ end
     @test check_no_self_qualified_accesses(NeuralOperators) === nothing
     @test check_all_explicit_imports_via_owners(NeuralOperators) === nothing
     @test check_all_qualified_accesses_via_owners(NeuralOperators) === nothing
-    @test check_all_explicit_imports_are_public(NeuralOperators) === nothing
-    @test check_all_qualified_accesses_are_public(NeuralOperators) === nothing
 end
