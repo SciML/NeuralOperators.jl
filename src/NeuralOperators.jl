@@ -4,8 +4,10 @@ using AbstractFFTs: rfft, irfft
 using ConcreteStructs: @concrete
 using Random: Random, AbstractRNG
 
-using Lux
-using LuxCore: LuxCore, AbstractLuxLayer, AbstractLuxContainerLayer, AbstractLuxWrapperLayer
+using Lux: Lux, Conv, Parallel
+using LuxCore: LuxCore, AbstractLuxLayer, AbstractLuxWrapperLayer
+using LuxLib: fast_activation!!
+using NNlib: batched_mul, pad_constant
 using WeightInitializers: glorot_uniform
 
 include("utils.jl")

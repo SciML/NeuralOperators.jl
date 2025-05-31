@@ -15,7 +15,7 @@
         ch = 64 => out_chs
 
         l1 = Conv(ntuple(_ -> 1, length(setup.m)), in_chs => first(ch))
-        m = Chain(l1, op(ch, setup.m; setup.permuted))
+        m = Chain(l1, op(ch, setup.m))
         display(m)
         ps, st = Lux.setup(rng, m)
 
@@ -27,7 +27,9 @@
         y_ra = rdev(rand(rng, Float32, setup.y_size...))
 
         @test begin
-            l2, l1 = train!(MSELoss(), AutoEnzyme(), m, ps, st, [(x, y)]; epochs=10)
+            l2, l1 = train!(
+                MSELoss(), AutoEnzyme(), m, ps_ra, st_ra, [(x_ra, y_ra)]; epochs=10
+            )
             l2 < l1
         end
 
