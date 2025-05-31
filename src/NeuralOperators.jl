@@ -1,20 +1,14 @@
 module NeuralOperators
 
-using ArgCheck: @argcheck
-using ChainRulesCore: ChainRulesCore, NoTangent, @non_differentiable
+using AbstractFFTs: rfft, irfft
 using ConcreteStructs: @concrete
-using FFTW: FFTW, irfft, rfft
 using Random: Random, AbstractRNG
-using Static: StaticBool, False, True, known, static
 
-using Lux
-using LuxCore: LuxCore, AbstractLuxLayer, AbstractLuxContainerLayer, AbstractLuxWrapperLayer
-using LuxLib: batched_matmul
-using MLDataDevices: AbstractDevice, AbstractGPUDevice
-using NNlib: NNlib
-
-const BoolLike = Union{Bool, StaticBool, Val{true}, Val{false}}
-const CRC = ChainRulesCore
+using Lux: Lux, Chain, Dense, Conv, Parallel, NoOpLayer, WrappedFunction
+using LuxCore: LuxCore, AbstractLuxLayer, AbstractLuxWrapperLayer
+using LuxLib: fast_activation!!
+using NNlib: NNlib, batched_mul, pad_constant, gelu
+using WeightInitializers: glorot_uniform
 
 include("utils.jl")
 
@@ -27,6 +21,7 @@ include("models/nomad.jl")
 
 export FourierTransform
 export SpectralConv, OperatorConv, SpectralKernel, OperatorKernel
+
 export FourierNeuralOperator
 export DeepONet
 export NOMAD
