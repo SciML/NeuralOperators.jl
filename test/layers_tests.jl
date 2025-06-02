@@ -26,28 +26,26 @@
         x_ra = rdev(x)
         y_ra = rdev(rand(rng, Float32, setup.y_size...))
 
-        # XXX: upstream fix is needed for the FFT adjoint to work correctly
-        #      https://github.com/EnzymeAD/Reactant.jl/issues/246
-        # @test begin
-        #     l2, l1 = train!(
-        #         MSELoss(), AutoEnzyme(), m, ps_ra, st_ra, [(x_ra, y_ra)]; epochs=10
-        #     )
-        #     l2 < l1
-        # end
+        @test begin
+            l2, l1 = train!(
+                MSELoss(), AutoEnzyme(), m, ps_ra, st_ra, [(x_ra, y_ra)]; epochs=10
+            )
+            l2 < l1
+        end
 
-        # @testset "check gradients" begin
-        #     ∂x_zyg, ∂ps_zyg = zygote_gradient(m, x, ps, st)
+        @testset "check gradients" begin
+            ∂x_zyg, ∂ps_zyg = zygote_gradient(m, x, ps, st)
 
-        #     ∂x_ra, ∂ps_ra = Reactant.with_config(;
-        #         dot_general_precision=PrecisionConfig.HIGH,
-        #         convolution_precision=PrecisionConfig.HIGH,
-        #     ) do
-        #         @jit enzyme_gradient(m, x_ra, ps_ra, st_ra)
-        #     end
-        #     ∂x_ra, ∂ps_ra = (∂x_ra, ∂ps_ra) |> cpu_device()
+            ∂x_ra, ∂ps_ra = Reactant.with_config(;
+                dot_general_precision=PrecisionConfig.HIGH,
+                convolution_precision=PrecisionConfig.HIGH,
+            ) do
+                @jit enzyme_gradient(m, x_ra, ps_ra, st_ra)
+            end
+            ∂x_ra, ∂ps_ra = (∂x_ra, ∂ps_ra) |> cpu_device()
 
-        #     @test ∂x_zyg ≈ ∂x_ra atol = 1.0f-3 rtol = 1.0f-3
-        #     @test check_approx(∂ps_zyg, ∂ps_ra; atol=1.0f-3, rtol=1.0f-3)
-        # end
+            @test ∂x_zyg ≈ ∂x_ra atol = 1.0f-3 rtol = 1.0f-3
+            @test check_approx(∂ps_zyg, ∂ps_ra; atol=1.0f-3, rtol=1.0f-3)
+        end
     end
 end
