@@ -25,7 +25,7 @@
 
         @test begin
             l2, l1 = train!(
-                MSELoss(), AutoEnzyme(), m, ps_ra, st_ra, [(x_ra, y_ra)]; epochs=10
+                MSELoss(), AutoEnzyme(), fno, ps_ra, st_ra, [(x_ra, y_ra)]; epochs=10
             )
             l2 < l1
         end

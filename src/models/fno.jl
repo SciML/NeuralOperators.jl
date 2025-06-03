@@ -33,10 +33,10 @@ julia> fno = FourierNeuralOperator(gelu; chs=(2, 64, 64, 128, 1), modes=(16,));
 
 julia> ps, st = Lux.setup(Xoshiro(), fno);
 
-julia> u = rand(Float32, 2, 1024, 5);
+julia> u = rand(Float32, 1024, 2, 5);
 
 julia> size(first(fno(u, ps, st)))
-(1, 1024, 5)
+(1024, 1, 5)
 ```
 """
 @concrete struct FourierNeuralOperator <: AbstractLuxWrapperLayer{:model}
