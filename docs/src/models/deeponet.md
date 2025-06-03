@@ -38,9 +38,15 @@ v(x) = \frac{du}{dx} \quad \forall \; x \in [0, 2\pi], \; \alpha \in [0.5, 1]
 ### Copy-pastable code
 
 ```@example deeponet_tutorial
-using NeuralOperators, Lux, Random, Optimisers, Reactant, CairoMakie
+using NeuralOperators, Lux, Random, Optimisers, Reactant
+
+using CairoMakie, AlgebraOfGraphics
+set_aog_theme!()
+const AoG = AlgebraOfGraphics
 
 rng = Random.default_rng()
+Random.seed!(rng, 1234)
+
 xdev = reactant_device()
 
 eval_points = 1
@@ -52,7 +58,7 @@ xrange = range(0, 2π; length=m) .|> Float32
 α = 0.5f0 .+ 0.5f0 .* rand(Float32, batch_size)
 
 u_data = zeros(Float32, m, batch_size)
-y_data = rand(Float32, 1, eval_points) .* 2π
+y_data = rand(rng, Float32, 1, eval_points) .* Float32(2π)
 v_data = zeros(Float32, eval_points, batch_size)
 
 for i in 1:batch_size
@@ -65,12 +71,12 @@ deeponet = DeepONet(
     Chain(Dense(1 => 4, σ), Dense(4 => 8, σ))
 )
 
-ps, st = Lux.setup(rng, deeponet) |> xdev
+ps, st = Lux.setup(rng, deeponet) |> xdev;
 
-u_data = u_data |> xdev
-y_data = y_data |> xdev
-v_data = v_data |> xdev
-data = [((u_data, y_data), v_data)]
+u_data = u_data |> xdev;
+y_data = y_data |> xdev;
+v_data = v_data |> xdev;
+data = [((u_data, y_data), v_data)];
 
 function train!(model, ps, st, data; epochs=10)
     losses = []
@@ -86,5 +92,11 @@ end
 
 losses = train!(deeponet, ps, st, data; epochs=1000)
 
-lines(losses)
+draw(
+    AoG.data((; losses, iteration=1:length(losses))) *
+    mapping(:iteration => "Iteration", :losses => "Loss (log10 scale)") *
+    visual(Lines);
+    axis=(; yscale=log10),
+    figure=(; title="Using DeepONet to learn the anti-derivative operator")
+)
 ```
