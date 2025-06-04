@@ -17,7 +17,7 @@ function train!(loss, backend, model, ps, st, data; epochs=10)
         _, _, _, tstate = Training.single_train_step!(backend, loss, (x, y), tstate)
     end
 
-    l2 = @jit loss(model, ps, st, first(data))
+    l2 = @jit loss(model, tstate.parameters, tstate.states, first(data))
 
     return l2, l1
 end
