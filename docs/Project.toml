@@ -15,7 +15,6 @@ Reactant = "3c362404-f566-11ee-1572-e11a4b42c853"
 
 [sources]
 NeuralOperators = {path = ".."}
-Reactant = { url = "https://github.com/EnzymeAD/Reactant.jl", rev = "ap/ignore_derivatives_julia" }
 
 [compat]
 AlgebraOfGraphics = "0.10.7"
@@ -30,4 +29,4 @@ NeuralOperators = "0.6"
 Optimisers = "0.4"
 Printf = "1.10"
 PythonCall = "0.9.23"
-Reactant = "0.2.126"
+Reactant = "0.2.127"

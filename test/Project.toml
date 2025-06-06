@@ -32,11 +32,8 @@ LuxTestUtils = "1.1.2"
 Optimisers = "0.4"
 Random = "1.10"
 ReTestItems = "1.24.0"
-Reactant = "0.2.126"
+Reactant = "0.2.127"
 Reexport = "1.2.2"
 StableRNGs = "1.0.2"
 Test = "1.10"
 Zygote = "0.7"
-
-[sources]
-Reactant = { url = "https://github.com/EnzymeAD/Reactant.jl", rev = "ap/ignore_derivatives_julia" }
