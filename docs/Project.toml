@@ -15,6 +15,7 @@ Reactant = "3c362404-f566-11ee-1572-e11a4b42c853"
 
 [sources]
 NeuralOperators = {path = ".."}
+Reactant = { url = "https://github.com/EnzymeAD/Reactant.jl", rev = "ap/ignore_derivatives_julia" }
 
 [compat]
 AlgebraOfGraphics = "0.10.7"

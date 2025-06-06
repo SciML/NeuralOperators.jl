@@ -37,3 +37,6 @@ Reexport = "1.2.2"
 StableRNGs = "1.0.2"
 Test = "1.10"
 Zygote = "0.7"
+
+[sources]
+Reactant = { url = "https://github.com/EnzymeAD/Reactant.jl", rev = "ap/ignore_derivatives_julia" }
