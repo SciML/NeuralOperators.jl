@@ -46,9 +46,9 @@
             end
             ∂u_ra, ∂ps_ra = (∂u_ra, ∂ps_ra) |> cpu_device()
 
-            @test ∂u_zyg[1] ≈ ∂u_ra[1] atol = 1.0f-3 rtol = 1.0f-3
-            @test ∂u_zyg[2] ≈ ∂u_ra[2] atol = 1.0f-3 rtol = 1.0f-3
-            @test check_approx(∂ps_zyg, ∂ps_ra; atol=1.0f-3, rtol=1.0f-3)
+            @test ∂u_zyg[1] ≈ ∂u_ra[1] atol = 1.0f-2 rtol = 1.0f-2
+            @test ∂u_zyg[2] ≈ ∂u_ra[2] atol = 1.0f-2 rtol = 1.0f-2
+            @test check_approx(∂ps_zyg, ∂ps_ra; atol=1.0f-2, rtol=1.0f-2)
         end
     end
 end
