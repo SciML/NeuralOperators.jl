@@ -1,5 +1,5 @@
 """
-    NOMAD(approximator, decoder, concatenate)
+    NOMAD(approximator, decoder)
 
 Constructs a NOMAD from `approximator` and `decoder` architectures. Make sure the output
 from `approximator` combined with the coordinate dimension has compatible size for input to
@@ -9,12 +9,6 @@ from `approximator` combined with the coordinate dimension has compatible size f
 
   - `approximator`: `Lux` network to be used as approximator net.
   - `decoder`: `Lux` network to be used as decoder net.
-
-## Keyword Arguments
-
-  - `concatenate`: function that defines the concatenation of output from `approximator` and
-    the coordinate dimension, defaults to concatenation along first dimension after
-    vectorizing the tensors
 
 ## References
 
@@ -40,15 +34,19 @@ julia> size(first(nomad((u, y), ps, st)))
 (8, 5)
 ```
 """
-@concrete struct NOMAD <: AbstractLuxContainerLayer{(:approximator, :decoder)}
-    approximator
-    decoder
-    concatenate <: Function
+@concrete struct NOMAD <: AbstractLuxWrapperLayer{:model}
+    model
+end
+
+function NOMAD(approximator, decoder)
+    return NOMAD(Chain(; approximator=Parallel(vcat, approximator, NoOpLayer()), decoder))
 end
 
 """
-    NOMAD(; approximator = (8, 32, 32, 16), decoder = (18, 16, 8, 8),
-        approximator_activation = identity, decoder_activation = identity)
+    NOMAD(;
+        approximator = (8, 32, 32, 16), decoder = (18, 16, 8, 8),
+        approximator_activation = identity, decoder_activation = identity
+    )
 
 Constructs a NOMAD composed of Dense layers. Make sure that last node of `approximator` +
 coordinate length = first node of `decoder`.
@@ -61,9 +59,6 @@ coordinate length = first node of `decoder`.
     net
   - `approximator_activation`: activation function for approximator net
   - `decoder_activation`: activation function for decoder net
-  - `concatenate`: function that defines the concatenation of output from `approximator` and
-    the coordinate dimension, defaults to concatenation along first dimension after
-    vectorizing the tensors
 
 ## References
 
@@ -85,32 +80,25 @@ julia> size(first(nomad((u, y), ps, st)))
 (8, 5)
 ```
 """
-function NOMAD(; approximator=(8, 32, 32, 16), decoder=(18, 16, 8, 8),
-        approximator_activation=identity,
-        decoder_activation=identity, concatenate=nomad_concatenate)
-    approximator_net = Chain([Dense(approximator[i] => approximator[i + 1],
-                                  approximator_activation)
-                              for i in 1:(length(approximator) - 1)]...)
+function NOMAD(;
+    approximator=(8, 32, 32, 16),
+    decoder=(18, 16, 8, 8),
+    approximator_activation=identity,
+    decoder_activation=identity,
+)
+    approximator_net = Chain(
+        [
+            Dense(approximator[i] => approximator[i + 1], approximator_activation) for
+            i in 1:(length(approximator) - 1)
+        ]...,
+    )
 
-    decoder_net = Chain([Dense(decoder[i] => decoder[i + 1], decoder_activation)
-                         for i in 1:(length(decoder) - 1)]...)
+    decoder_net = Chain(
+        [
+            Dense(decoder[i] => decoder[i + 1], decoder_activation) for
+            i in 1:(length(decoder) - 1)
+        ]...,
+    )
 
-    return NOMAD(approximator_net, decoder_net, concatenate)
-end
-
-function (nomad::NOMAD)(x, ps, st::NamedTuple)
-    a, st_a = nomad.approximator(x[1], ps.approximator, st.approximator)
-    out, st_d = nomad.decoder(nomad.concatenate(a, x[2]), ps.decoder, st.decoder)
-    return out, (approximator=st_a, decoder=st_d)
-end
-
-function NOMAD(approximator_net, decoder_net; concatenate=nomad_concatenate)
-    NOMAD(approximator_net, decoder_net, concatenate)
-end
-
-batch_vectorize(x::AbstractArray) = reshape(x, :, size(x, ndims(x)))
-
-nomad_concatenate(x::AbstractMatrix, y::AbstractMatrix) = cat(x, y; dims=1)
-function nomad_concatenate(x::AbstractArray, y::AbstractArray)
-    return nomad_concatenate(batch_vectorize(x), batch_vectorize(y))
+    return NOMAD(approximator_net, decoder_net)
 end

@@ -17,8 +17,9 @@ makedocs(;
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://docs.sciml.ai/NeuralOperators/stable/",
-        assets=["assets/favicon.ico"]),
-    pages
+        assets=["assets/favicon.ico"],
+    ),
+    pages,
 )
 
 deploydocs(; repo="github.com/SciML/NeuralOperators.jl.git", push_preview=true)

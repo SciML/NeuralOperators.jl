@@ -3,10 +3,13 @@ pages = [
     "Pre-built Models" => [
         "FNO" => "models/fno.md",
         "DeepONet" => "models/deeponet.md",
-        "NOMAD" => "models/nomad.md"
+        "NOMAD" => "models/nomad.md",
     ],
     "Tutorials" => [
-        "Burgers Equation" => "tutorials/burgers.md"
+        "Solving Burgers Equation" => [
+            "DeepONet" => "tutorials/burgers_deeponet.md",
+            "FNO" => "tutorials/burgers_fno.md",
+        ],
     ],
-    "API Reference" => "api.md"
+    "API Reference" => "api.md",
 ]
