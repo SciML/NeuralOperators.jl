@@ -5,6 +5,11 @@ pages = [
         "DeepONet" => "models/deeponet.md",
         "NOMAD" => "models/nomad.md",
     ],
-    "Tutorials" => ["Burgers Equation" => "tutorials/burgers_deeponet.md"],
+    "Tutorials" => [
+        "Solving Burgers Equation" => [
+            "DeepONet" => "tutorials/burgers_deeponet.md",
+            "FNO" => "tutorials/burgers_fno.md",
+        ],
+    ],
     "API Reference" => "api.md",
 ]
