@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>FNO · NeuralOperators.jl</title><meta name="title" content="FNO · NeuralOperators.jl"/><meta property="og:title" content="FNO · NeuralOperators.jl"/><meta property="twitter:title" content="FNO · NeuralOperators.jl"/><meta name="description" content="Documentation for NeuralOperators.jl."/><meta property="og:description" content="Documentation for NeuralOperators.jl."/><meta property="twitter:description" content="Documentation for NeuralOperators.jl."/><meta property="og:url" content="https://docs.sciml.ai/NeuralOperators/stable/tutorials/burgers_fno/"/><meta property="twitter:url" content="https://docs.sciml.ai/NeuralOperators/stable/tutorials/burgers_fno/"/><link rel="canonical" href="https://docs.sciml.ai/NeuralOperators/stable/tutorials/burgers_fno/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.png" alt="NeuralOperators.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">NeuralOperators.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">NeuralOperators.jl</a></li><li><span class="tocitem">Pre-built Models</span><ul><li><a class="tocitem" href="../../models/fno/">FNO</a></li><li><a class="tocitem" href="../../models/deeponet/">DeepONet</a></li><li><a class="tocitem" href="../../models/nomad/">NOMAD</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><input class="collapse-toggle" id="menuitem-3-1" type="checkbox" checked/><label class="tocitem" for="menuitem-3-1"><span class="docs-label">Solving Burgers Equation</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../burgers_deeponet/">DeepONet</a></li><li class="is-active"><a class="tocitem" href>FNO</a><ul class="internal"><li><a class="tocitem" href="#Data-Loading"><span>Data Loading</span></a></li><li><a class="tocitem" href="#Model"><span>Model</span></a></li><li><a class="tocitem" href="#Training"><span>Training</span></a></li><li><a class="tocitem" href="#Plotting"><span>Plotting</span></a></li></ul></li></ul></li></ul></li><li><a class="tocitem" href="../../api/">API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li><a class="is-disabled">Solving Burgers Equation</a></li><li class="is-active"><a href>FNO</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>FNO</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/SciML/NeuralOperators.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/SciML/NeuralOperators.jl/blob/main/docs/src/tutorials/burgers_fno.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Burgers-Equation-using-Fourier-Neural-Operator"><a class="docs-heading-anchor" href="#Burgers-Equation-using-Fourier-Neural-Operator">Burgers Equation using Fourier Neural Operator</a><a id="Burgers-Equation-using-Fourier-Neural-Operator-1"></a><a class="docs-heading-anchor-permalink" href="#Burgers-Equation-using-Fourier-Neural-Operator" title="Permalink"></a></h1><h2 id="Data-Loading"><a class="docs-heading-anchor" href="#Data-Loading">Data Loading</a><a id="Data-Loading-1"></a><a class="docs-heading-anchor-permalink" href="#Data-Loading" title="Permalink"></a></h2><pre><code class="language-julia hljs">using DataDeps, MAT, MLUtils
+using PythonCall, CondaPkg # For `gdown`
+using Printf
+
+const gdown = pyimport(&quot;gdown&quot;)
+
+register(
+    DataDep(
+    &quot;Burgers&quot;,
+    &quot;&quot;&quot;
+    Burgers&#39; equation dataset from
+    [fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
+
+    mapping between initial conditions to the solutions at the last point of time \
+    evolution in some function space.
+
+    u(x,0) -&gt; u(x, time_end):
+
+      * `a`: initial conditions u(x,0)
+      * `u`: solutions u(x,t_end)
+    &quot;&quot;&quot;,
+    &quot;https://drive.google.com/uc?id=16a8od4vidbiNR3WtaBPCSZ0T3moxjhYe&quot;,
+    &quot;9cbbe5070556c777b1ba3bacd49da5c36ea8ed138ba51b6ee76a24b971066ecd&quot;;
+    fetch_method=(url,
+        local_dir) -&gt; begin
+        pyconvert(String, gdown.download(url, joinpath(local_dir, &quot;Burgers_R10.zip&quot;)))
+    end,
+    post_fetch_method=unpack
+)
+)
+
+filepath = joinpath(datadep&quot;Burgers&quot;, &quot;burgers_data_R10.mat&quot;)
+
+const N = 2048
+const Δsamples = 2^3
+const grid_size = div(2^13, Δsamples)
+const T = Float32
+
+file = matopen(filepath)
+x_data = reshape(T.(collect(read(file, &quot;a&quot;)[1:N, 1:Δsamples:end])), N, :)
+y_data = reshape(T.(collect(read(file, &quot;u&quot;)[1:N, 1:Δsamples:end])), N, :)
+close(file)
+
+x_data = hcat(
+    repeat(reshape(collect(T, range(0, 1; length=grid_size)), :, 1, 1), 1, 1, N),
+    reshape(permutedims(x_data, (2, 1)), grid_size, 1, N)
+);
+y_data = reshape(permutedims(y_data, (2, 1)), grid_size, 1, N);</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">1024×1×2048 Array{Float32, 3}:
+[:, :, 1] =
+ 0.6834662
+ 0.6850582
+ 0.68663555
+ 0.68819803
+ 0.6897452
+ 0.6912767
+ 0.6927921
+ 0.6942911
+ 0.6957732
+ 0.697238
+ ⋮
+ 0.66854095
+ 0.6702484
+ 0.6719444
+ 0.6736285
+ 0.6753004
+ 0.6769599
+ 0.67860657
+ 0.68024004
+ 0.68186
+
+[:, :, 2] =
+ 0.7511075
+ 0.75031614
+ 0.74948686
+ 0.74862
+ 0.7477157
+ 0.7467743
+ 0.7457962
+ 0.7447817
+ 0.74373096
+ 0.7426446
+ ⋮
+ 0.75649047
+ 0.756049
+ 0.75556797
+ 0.7550476
+ 0.7544881
+ 0.75388944
+ 0.7532519
+ 0.75257564
+ 0.75186074
+
+[:, :, 3] =
+ -0.41533458
+ -0.4158413
+ -0.41631535
+ -0.416757
+ -0.4171665
+ -0.41754422
+ -0.41789043
+ -0.41820538
+ -0.4184894
+ -0.41874272
+  ⋮
+ -0.40924993
+ -0.4100654
+ -0.41084528
+ -0.4115898
+ -0.4122994
+ -0.41297436
+ -0.41361505
+ -0.41422176
+ -0.41479483
+
+;;; … 
+
+[:, :, 2046] =
+  0.016046494
+  0.008860671
+  0.0016381989
+ -0.005616474
+ -0.012898825
+ -0.020204268
+ -0.02752816
+ -0.034865808
+ -0.04221249
+ -0.04956345
+  ⋮
+  0.07838251
+  0.071710624
+  0.06496665
+  0.05815404
+  0.051276375
+  0.044337366
+  0.03734086
+  0.030290816
+  0.0231913
+
+[:, :, 2047] =
+ 0.36310026
+ 0.36462003
+ 0.36611378
+ 0.36758128
+ 0.36902225
+ 0.3704365
+ 0.37182376
+ 0.37318385
+ 0.37451655
+ 0.37582165
+ ⋮
+ 0.34829122
+ 0.35003418
+ 0.35175335
+ 0.3534485
+ 0.35511935
+ 0.35676563
+ 0.3583871
+ 0.35998356
+ 0.36155468
+
+[:, :, 2048] =
+ 1.0363716
+ 1.0398366
+ 1.0432957
+ 1.0467485
+ 1.0501951
+ 1.0536352
+ 1.0570688
+ 1.0604957
+ 1.0639158
+ 1.067329
+ ⋮
+ 1.0049305
+ 1.0084454
+ 1.0119551
+ 1.0154597
+ 1.0189589
+ 1.0224527
+ 1.025941
+ 1.0294236
+ 1.0329006</code></pre><h2 id="Model"><a class="docs-heading-anchor" href="#Model">Model</a><a id="Model-1"></a><a class="docs-heading-anchor-permalink" href="#Model" title="Permalink"></a></h2><pre><code class="language-julia hljs">using Lux, NeuralOperators, Optimisers,  Random, Reactant
+
+const cdev = cpu_device()
+const xdev = reactant_device(; force=true)
+
+fno = FourierNeuralOperator(
+    gelu;
+    chs = (2, 32, 32, 32, 1),
+    modes = (16,)
+)
+ps, st = Lux.setup(Random.default_rng(), fno) |&gt; xdev;</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">((layer_1 = (weight = Reactant.ConcretePJRTArray{Float32, 3, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[-0.45048642 0.8215421;;; -0.6469188 0.5172023;;; -0.50672746 -0.2251062;;; … ;;; 0.32661134 0.6829613;;; 0.56776494 -0.67940456;;; -0.32555076 0.66041964]), bias = Reactant.ConcretePJRTArray{Float32, 1, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[0.159703, -0.3509462, -0.10126159, 0.39295563, 0.6632423, -0.49430946, -0.21302897, 0.3522459, -0.08633116, -0.12322027  …  -0.645387, 0.45198408, 0.31946394, 0.6437974, -0.6391551, -0.59291124, 0.24596775, 0.23623613, 0.08163769, 0.7027147])), layer_2 = (layer_1 = (layer_1 = (weight = Reactant.ConcretePJRTArray{Float32, 3, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[0.1592321 0.09994179 … 0.045668192 -0.043369077;;; -0.04223319 0.15802586 … 0.2920941 0.23926833;;; -0.2262735 0.16398965 … 0.110363886 -0.2685145;;; … ;;; -0.11430142 -0.19571044 … 0.07444476 0.014765042;;; -0.2560931 0.17501983 … -0.26627886 -0.2982624;;; 0.019384805 -0.009488968 … -0.22348683 0.05007888]), bias = Reactant.ConcretePJRTArray{Float32, 1, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[-0.099463254, 0.099021554, 0.07570716, -0.12149139, -0.08468345, -0.14779498, 0.15397099, 0.12813418, 0.076885395, 0.04182451  …  -0.16394104, 0.07427706, -0.037356015, 0.052519947, 0.09949103, 0.15752755, 0.034493443, -0.07502603, 0.008916187, 0.056339525])), layer_2 = (weight = Reactant.ConcretePJRTArray{ComplexF32, 3, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(ComplexF32[-3.0935866f-5 + 7.427574f-5im 2.5712128f-5 + 0.00010859826f0im … 5.8279038f-5 + 3.1768133f-5im -5.7352918f-5 + 4.2948515f-5im; 7.817478f-6 + 9.6212876f-5im -2.053997f-5 + 2.6470807f-5im … 6.062367f-5 + 7.7212484f-5im 3.5994584f-5 + 7.188225f-5im; … ; -2.5089452f-5 + 3.5352736f-5im -2.0307445f-5 + 3.176226f-5im … 1.6763792f-5 + 1.671131f-5im -1.9072104f-5 + 9.588852f-5im; -8.867784f-6 + 6.740003f-5im -5.480225f-5 + 1.704361f-5im … 2.546257f-5 + 0.00011110144f0im 2.8924245f-5 + 6.480141f-5im;;; -4.6620116f-6 + 5.503907f-5im -3.1788673f-5 + 5.746715f-5im … -4.255245f-5 + 2.5514826f-5im -1.2163713f-5 + 0.0001084911f0im; -5.0325485f-5 + 6.0037324f-5im -1.9020823f-5 + 9.9439036f-5im … 2.8261406f-5 + 7.952551f-5im -3.0348187f-5 + 6.481816f-6im; … ; 3.390659f-5 + 8.479695f-5im 2.2994413f-5 + 8.7894216f-5im … -4.54321f-6 + 9.995889f-5im 4.836179f-5 + 9.914721f-5im; 1.7325983f-5 + 9.753192f-5im -2.3943227f-5 + 0.00011992434f0im … -1.573834f-5 + 3.1292897f-5im -4.0550367f-7 + 5.724511f-5im;;; -5.168056f-5 + 9.316314f-5im -2.7360904f-5 + 6.795297f-5im … -3.7739592f-6 + 9.46978f-5im 4.3808453f-5 + 8.446885f-5im; 1.558863f-5 + 7.3348245f-5im -1.5710735f-5 + 0.00011679788f0im … -4.6230525f-5 + 8.479441f-5im -1.6633872f-5 + 8.3185245f-5im; … ; -5.655668f-5 + 1.8663624f-5im 2.0574684f-5 + 1.9723811f-6im … -3.316757f-5 + 3.921982f-5im 2.0167427f-5 + 6.350323f-5im; 5.139286f-5 + 4.71659f-5im 4.8296773f-5 + 2.5602007f-5im … -3.573099f-5 + 7.116767f-5im 2.277203f-5 + 6.413757f-5im;;; … ;;; 3.9063932f-5 + 2.5451169f-5im 4.7108406f-5 + 6.701284f-5im … 6.082144f-5 + 3.0961382f-6im 4.3442735f-5 + 0.000112084796f0im; 4.8696995f-5 + 0.000118203745f0im 2.6181573f-5 + 6.9734975f-5im … 2.7750502f-6 + 0.00010467386f0im 2.7049879f-5 + 7.627361f-5im; … ; -3.8921287f-5 + 7.742296f-5im -5.0675357f-5 + 0.00011953137f0im … 3.2405158f-5 + 1.9503183f-5im 3.949208f-5 + 9.8994584f-5im; 4.7292706f-5 + 0.00011065268f0im 5.314187f-5 + 3.727965f-5im … 8.946663f-7 + 6.126948f-5im 3.7056452f-8 + 4.669484f-6im;;; 2.2937333f-5 + 0.000110391265f0im -1.3447301f-5 + 1.7915248f-5im … -3.7007114f-5 + 0.00010069169f0im 1.7135215f-5 + 3.2327218f-5im; -5.8903825f-5 + 0.00010564915f0im -3.4010664f-6 + 6.378869f-5im … -1.829888f-5 + 7.2804636f-5im 1.7353443f-5 + 9.304722f-5im; … ; 2.512637f-5 + 9.569451f-5im 1.0529853f-5 + 5.9852347f-5im … 5.349939f-5 + 0.000121510384f0im 2.7104768f-5 + 7.3398696f-5im; 3.9732753f-5 + 9.715026f-5im -4.1722065f-5 + 0.00010780814f0im … -5.9163518f-5 + 8.711785f-5im 3.840407f-5 + 7.278397f-5im;;; -3.0485535f-5 + 0.0001139166f0im -5.2329066f-5 + 7.9496596f-5im … 3.8996397f-5 + 1.2555924f-5im -5.7971374f-5 + 8.0581885f-5im; -4.6154906f-5 + 6.969101f-5im 5.394489f-5 + 4.3701853f-5im … -4.6388363f-5 + 2.5771784f-5im 1.3398676f-5 + 9.4362564f-5im; … ; 4.3971697f-5 + 7.320275f-5im -4.5487475f-5 + 3.6319514f-5im … 2.5356276f-6 + 8.446341f-5im 6.929724f-6 + 7.3499665f-5im; 1.8237944f-5 + 4.005417f-5im 3.1376003f-5 + 4.5666675f-6im … -1.7605249f-5 + 2.6312024f-5im -2.3840788f-5 + 9.8645105f-6im]),)),), layer_3 = (layer_1 = (weight = Reactant.ConcretePJRTArray{Float32, 3, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[0.21060213 0.059896532 … 0.19624831 -0.043392293;;; 0.014726169 -0.11724254 … -0.3039345 0.060003042;;; 0.046015456 0.040982544 … -0.28389025 0.2853877;;; … ;;; -0.10491239 -0.13312277 … 0.2663686 0.08861741;;; 0.04598983 -0.27310973 … -0.26096496 0.20156252;;; 0.10925899 -0.16013551 … 0.1184853 -0.029752407]), bias = Reactant.ConcretePJRTArray{Float32, 1, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[-0.1442807, -0.12811695, 0.13583218, 0.022238974, 0.17420095, -0.0434467, -0.15892778, 0.16444685, -0.13335733, -0.022785513  …  -0.095185265, -0.154987, 0.15307882, 0.023175161, 0.08121192, 0.053449873, -0.08707842, 0.15632051, -0.01462542, -0.10958008])), layer_2 = (weight = Reactant.ConcretePJRTArray{Float32, 3, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[0.14130248 -0.08462753 … -0.24829772 0.29430732;;;]), bias = Reactant.ConcretePJRTArray{Float32, 1, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[0.11649686])))), (layer_1 = NamedTuple(), layer_2 = (layer_1 = (layer_1 = NamedTuple(), layer_2 = NamedTuple()),), layer_3 = (layer_1 = NamedTuple(), layer_2 = NamedTuple())))</code></pre><h2 id="Training"><a class="docs-heading-anchor" href="#Training">Training</a><a id="Training-1"></a><a class="docs-heading-anchor-permalink" href="#Training" title="Permalink"></a></h2><pre><code class="language-julia hljs">dataloader = DataLoader((x_data, y_data); batchsize=128, shuffle=true) |&gt; xdev;
+
+function train_model!(model, ps, st, dataloader; epochs=5000)
+    train_state = Training.TrainState(model, ps, st, Adam(0.0001f0))
+
+    for epoch in 1:epochs, data in dataloader
+        (_, loss, _, train_state) = Training.single_train_step!(
+            AutoEnzyme(), MAELoss(), data, train_state
+        )
+
+        if epoch % 100 == 1 || epoch == epochs
+            @printf(&quot;Epoch %d: loss = %.6e\n&quot;, epoch, loss)
+        end
+    end
+
+    return train_state.parameters, train_state.states
+end
+
+(ps_trained, st_trained) = train_model!(fno, ps, st, dataloader)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Epoch 1: loss = 4.185350e-01
+Epoch 1: loss = 3.847725e-01
+Epoch 1: loss = 3.778820e-01
+Epoch 1: loss = 3.624156e-01
+Epoch 1: loss = 3.924140e-01
+Epoch 1: loss = 3.906739e-01
+Epoch 1: loss = 3.668878e-01
+Epoch 1: loss = 3.759272e-01
+Epoch 1: loss = 3.483790e-01
+Epoch 1: loss = 3.291903e-01
+Epoch 1: loss = 3.745310e-01
+Epoch 1: loss = 3.457499e-01
+Epoch 1: loss = 3.487280e-01
+Epoch 1: loss = 3.202255e-01
+Epoch 1: loss = 3.216422e-01
+Epoch 1: loss = 2.971081e-01
+Epoch 101: loss = 9.918654e-03
+Epoch 101: loss = 9.179628e-03
+Epoch 101: loss = 1.021265e-02
+Epoch 101: loss = 1.078914e-02
+Epoch 101: loss = 8.985608e-03
+Epoch 101: loss = 1.175510e-02
+Epoch 101: loss = 9.374226e-03
+Epoch 101: loss = 9.170572e-03
+Epoch 101: loss = 1.067523e-02
+Epoch 101: loss = 1.076843e-02
+Epoch 101: loss = 1.220992e-02
+Epoch 101: loss = 9.859813e-03
+Epoch 101: loss = 1.063595e-02
+Epoch 101: loss = 8.783117e-03
+Epoch 101: loss = 1.114009e-02
+Epoch 101: loss = 1.094247e-02
+Epoch 201: loss = 5.797615e-03
+Epoch 201: loss = 6.246175e-03
+Epoch 201: loss = 7.818565e-03
+Epoch 201: loss = 5.122833e-03
+Epoch 201: loss = 5.437945e-03
+Epoch 201: loss = 5.268497e-03
+Epoch 201: loss = 6.647998e-03
+Epoch 201: loss = 6.727608e-03
+Epoch 201: loss = 5.175096e-03
+Epoch 201: loss = 5.518770e-03
+Epoch 201: loss = 5.953196e-03
+Epoch 201: loss = 4.877315e-03
+Epoch 201: loss = 6.481624e-03
+Epoch 201: loss = 5.626818e-03
+Epoch 201: loss = 7.092874e-03
+Epoch 201: loss = 5.542811e-03
+Epoch 301: loss = 3.964269e-03
+Epoch 301: loss = 3.684664e-03
+Epoch 301: loss = 4.417047e-03
+Epoch 301: loss = 3.640006e-03
+Epoch 301: loss = 4.079170e-03
+Epoch 301: loss = 4.644454e-03
+Epoch 301: loss = 4.227137e-03
+Epoch 301: loss = 4.019939e-03
+Epoch 301: loss = 4.658245e-03
+Epoch 301: loss = 3.654405e-03
+Epoch 301: loss = 6.046321e-03
+Epoch 301: loss = 4.764201e-03
+Epoch 301: loss = 3.834801e-03
+Epoch 301: loss = 4.099743e-03
+Epoch 301: loss = 3.965552e-03
+Epoch 301: loss = 4.093057e-03
+Epoch 401: loss = 4.756018e-03
+Epoch 401: loss = 3.085082e-03
+Epoch 401: loss = 2.889583e-03
+Epoch 401: loss = 3.620599e-03
+Epoch 401: loss = 3.662912e-03
+Epoch 401: loss = 3.390217e-03
+Epoch 401: loss = 3.199351e-03
+Epoch 401: loss = 3.151230e-03
+Epoch 401: loss = 3.718620e-03
+Epoch 401: loss = 3.249320e-03
+Epoch 401: loss = 3.161604e-03
+Epoch 401: loss = 3.239267e-03
+Epoch 401: loss = 3.500443e-03
+Epoch 401: loss = 3.602185e-03
+Epoch 401: loss = 3.171630e-03
+Epoch 401: loss = 3.051611e-03
+Epoch 501: loss = 2.840561e-03
+Epoch 501: loss = 2.210875e-03
+Epoch 501: loss = 3.730107e-03
+Epoch 501: loss = 3.398804e-03
+Epoch 501: loss = 2.637262e-03
+Epoch 501: loss = 2.650168e-03
+Epoch 501: loss = 3.374517e-03
+Epoch 501: loss = 2.365209e-03
+Epoch 501: loss = 2.125893e-03
+Epoch 501: loss = 2.862513e-03
+Epoch 501: loss = 2.637212e-03
+Epoch 501: loss = 2.471179e-03
+Epoch 501: loss = 3.183377e-03
+Epoch 501: loss = 3.227680e-03
+Epoch 501: loss = 2.752980e-03
+Epoch 501: loss = 4.156782e-03
+Epoch 601: loss = 2.367358e-03
+Epoch 601: loss = 2.369367e-03
+Epoch 601: loss = 2.486646e-03
+Epoch 601: loss = 3.141264e-03
+Epoch 601: loss = 2.446829e-03
+Epoch 601: loss = 2.554479e-03
+Epoch 601: loss = 2.229136e-03
+Epoch 601: loss = 2.590334e-03
+Epoch 601: loss = 2.488808e-03
+Epoch 601: loss = 2.138355e-03
+Epoch 601: loss = 2.732518e-03
+Epoch 601: loss = 2.520612e-03
+Epoch 601: loss = 2.503905e-03
+Epoch 601: loss = 2.821850e-03
+Epoch 601: loss = 2.820428e-03
+Epoch 601: loss = 2.823692e-03
+Epoch 701: loss = 2.518692e-03
+Epoch 701: loss = 2.111909e-03
+Epoch 701: loss = 2.327346e-03
+Epoch 701: loss = 2.131441e-03
+Epoch 701: loss = 1.846920e-03
+Epoch 701: loss = 2.302479e-03
+Epoch 701: loss = 2.790097e-03
+Epoch 701: loss = 2.302934e-03
+Epoch 701: loss = 2.169888e-03
+Epoch 701: loss = 2.266052e-03
+Epoch 701: loss = 2.380915e-03
+Epoch 701: loss = 2.466407e-03
+Epoch 701: loss = 2.662595e-03
+Epoch 701: loss = 2.011584e-03
+Epoch 701: loss = 2.750457e-03
+Epoch 701: loss = 3.122537e-03
+Epoch 801: loss = 2.260681e-03
+Epoch 801: loss = 2.115390e-03
+Epoch 801: loss = 3.277672e-03
+Epoch 801: loss = 2.366430e-03
+Epoch 801: loss = 1.736889e-03
+Epoch 801: loss = 2.059464e-03
+Epoch 801: loss = 1.885064e-03
+Epoch 801: loss = 2.113538e-03
+Epoch 801: loss = 2.293371e-03
+Epoch 801: loss = 1.830575e-03
+Epoch 801: loss = 2.836554e-03
+Epoch 801: loss = 1.916847e-03
+Epoch 801: loss = 2.062325e-03
+Epoch 801: loss = 1.988879e-03
+Epoch 801: loss = 1.962921e-03
+Epoch 801: loss = 2.324764e-03
+Epoch 901: loss = 1.961830e-03
+Epoch 901: loss = 2.436493e-03
+Epoch 901: loss = 2.015049e-03
+Epoch 901: loss = 2.303346e-03
+Epoch 901: loss = 1.621946e-03
+Epoch 901: loss = 1.764136e-03
+Epoch 901: loss = 2.136268e-03
+Epoch 901: loss = 1.979816e-03
+Epoch 901: loss = 1.740477e-03
+Epoch 901: loss = 1.893244e-03
+Epoch 901: loss = 1.785110e-03
+Epoch 901: loss = 1.953179e-03
+Epoch 901: loss = 2.290537e-03
+Epoch 901: loss = 2.028612e-03
+Epoch 901: loss = 1.819486e-03
+Epoch 901: loss = 2.718714e-03
+Epoch 1001: loss = 2.222953e-03
+Epoch 1001: loss = 1.884905e-03
+Epoch 1001: loss = 1.883059e-03
+Epoch 1001: loss = 2.771811e-03
+Epoch 1001: loss = 1.937208e-03
+Epoch 1001: loss = 1.531215e-03
+Epoch 1001: loss = 2.098165e-03
+Epoch 1001: loss = 1.756626e-03
+Epoch 1001: loss = 1.813607e-03
+Epoch 1001: loss = 1.613704e-03
+Epoch 1001: loss = 1.457875e-03
+Epoch 1001: loss = 1.984989e-03
+Epoch 1001: loss = 2.193851e-03
+Epoch 1001: loss = 1.630388e-03
+Epoch 1001: loss = 1.556436e-03
+Epoch 1001: loss = 1.633355e-03
+Epoch 1101: loss = 1.961242e-03
+Epoch 1101: loss = 1.422018e-03
+Epoch 1101: loss = 2.866362e-03
+Epoch 1101: loss = 1.274367e-03
+Epoch 1101: loss = 1.641897e-03
+Epoch 1101: loss = 1.563807e-03
+Epoch 1101: loss = 1.502604e-03
+Epoch 1101: loss = 1.642004e-03
+Epoch 1101: loss = 1.686253e-03
+Epoch 1101: loss = 1.781156e-03
+Epoch 1101: loss = 1.739132e-03
+Epoch 1101: loss = 1.988269e-03
+Epoch 1101: loss = 2.016642e-03
+Epoch 1101: loss = 1.840228e-03
+Epoch 1101: loss = 1.715400e-03
+Epoch 1101: loss = 1.643606e-03
+Epoch 1201: loss = 1.764451e-03
+Epoch 1201: loss = 2.199299e-03
+Epoch 1201: loss = 1.418509e-03
+Epoch 1201: loss = 1.496922e-03
+Epoch 1201: loss = 1.853065e-03
+Epoch 1201: loss = 1.584743e-03
+Epoch 1201: loss = 1.578339e-03
+Epoch 1201: loss = 1.501456e-03
+Epoch 1201: loss = 1.656987e-03
+Epoch 1201: loss = 1.503261e-03
+Epoch 1201: loss = 1.923166e-03
+Epoch 1201: loss = 1.750859e-03
+Epoch 1201: loss = 1.853948e-03
+Epoch 1201: loss = 1.792519e-03
+Epoch 1201: loss = 1.608866e-03
+Epoch 1201: loss = 1.276518e-03
+Epoch 1301: loss = 1.525929e-03
+Epoch 1301: loss = 1.787713e-03
+Epoch 1301: loss = 1.633993e-03
+Epoch 1301: loss = 1.389339e-03
+Epoch 1301: loss = 1.340419e-03
+Epoch 1301: loss = 1.392150e-03
+Epoch 1301: loss = 1.414414e-03
+Epoch 1301: loss = 1.658436e-03
+Epoch 1301: loss = 1.573066e-03
+Epoch 1301: loss = 1.417682e-03
+Epoch 1301: loss = 1.662203e-03
+Epoch 1301: loss = 1.426082e-03
+Epoch 1301: loss = 1.586663e-03
+Epoch 1301: loss = 1.755192e-03
+Epoch 1301: loss = 2.446572e-03
+Epoch 1301: loss = 1.561417e-03
+Epoch 1401: loss = 1.367218e-03
+Epoch 1401: loss = 1.766473e-03
+Epoch 1401: loss = 1.784505e-03
+Epoch 1401: loss = 1.248430e-03
+Epoch 1401: loss = 1.335145e-03
+Epoch 1401: loss = 1.278718e-03
+Epoch 1401: loss = 1.267751e-03
+Epoch 1401: loss = 1.519784e-03
+Epoch 1401: loss = 2.146068e-03
+Epoch 1401: loss = 1.201480e-03
+Epoch 1401: loss = 1.732209e-03
+Epoch 1401: loss = 1.476263e-03
+Epoch 1401: loss = 1.141418e-03
+Epoch 1401: loss = 1.917216e-03
+Epoch 1401: loss = 1.851773e-03
+Epoch 1401: loss = 1.462831e-03
+Epoch 1501: loss = 1.050315e-03
+Epoch 1501: loss = 1.238019e-03
+Epoch 1501: loss = 1.644311e-03
+Epoch 1501: loss = 1.439853e-03
+Epoch 1501: loss = 1.735718e-03
+Epoch 1501: loss = 1.215100e-03
+Epoch 1501: loss = 2.055905e-03
+Epoch 1501: loss = 1.531688e-03
+Epoch 1501: loss = 1.449041e-03
+Epoch 1501: loss = 1.384416e-03
+Epoch 1501: loss = 1.786532e-03
+Epoch 1501: loss = 1.412834e-03
+Epoch 1501: loss = 1.478859e-03
+Epoch 1501: loss = 1.389244e-03
+Epoch 1501: loss = 2.020357e-03
+Epoch 1501: loss = 1.458052e-03
+Epoch 1601: loss = 1.631844e-03
+Epoch 1601: loss = 1.469963e-03
+Epoch 1601: loss = 1.396920e-03
+Epoch 1601: loss = 1.587000e-03
+Epoch 1601: loss = 2.291600e-03
+Epoch 1601: loss = 1.345808e-03
+Epoch 1601: loss = 1.485053e-03
+Epoch 1601: loss = 1.440463e-03
+Epoch 1601: loss = 1.115535e-03
+Epoch 1601: loss = 1.310113e-03
+Epoch 1601: loss = 1.593319e-03
+Epoch 1601: loss = 1.365229e-03
+Epoch 1601: loss = 1.424821e-03
+Epoch 1601: loss = 1.286657e-03
+Epoch 1601: loss = 1.337786e-03
+Epoch 1601: loss = 1.100918e-03
+Epoch 1701: loss = 1.319891e-03
+Epoch 1701: loss = 1.410709e-03
+Epoch 1701: loss = 1.093586e-03
+Epoch 1701: loss = 1.506690e-03
+Epoch 1701: loss = 1.734574e-03
+Epoch 1701: loss = 1.616331e-03
+Epoch 1701: loss = 1.215950e-03
+Epoch 1701: loss = 1.130146e-03
+Epoch 1701: loss = 1.174798e-03
+Epoch 1701: loss = 1.282621e-03
+Epoch 1701: loss = 1.150451e-03
+Epoch 1701: loss = 1.185469e-03
+Epoch 1701: loss = 1.909117e-03
+Epoch 1701: loss = 1.444181e-03
+Epoch 1701: loss = 1.261556e-03
+Epoch 1701: loss = 1.612163e-03
+Epoch 1801: loss = 1.187839e-03
+Epoch 1801: loss = 1.596332e-03
+Epoch 1801: loss = 1.447691e-03
+Epoch 1801: loss = 1.391590e-03
+Epoch 1801: loss = 1.394074e-03
+Epoch 1801: loss = 1.796110e-03
+Epoch 1801: loss = 1.254957e-03
+Epoch 1801: loss = 1.206700e-03
+Epoch 1801: loss = 1.216755e-03
+Epoch 1801: loss = 1.303813e-03
+Epoch 1801: loss = 1.285436e-03
+Epoch 1801: loss = 1.182238e-03
+Epoch 1801: loss = 2.064025e-03
+Epoch 1801: loss = 1.640470e-03
+Epoch 1801: loss = 1.338622e-03
+Epoch 1801: loss = 1.549047e-03
+Epoch 1901: loss = 1.254068e-03
+Epoch 1901: loss = 1.449175e-03
+Epoch 1901: loss = 1.304789e-03
+Epoch 1901: loss = 1.032463e-03
+Epoch 1901: loss = 1.593748e-03
+Epoch 1901: loss = 1.268827e-03
+Epoch 1901: loss = 1.313223e-03
+Epoch 1901: loss = 1.273084e-03
+Epoch 1901: loss = 1.308929e-03
+Epoch 1901: loss = 1.090117e-03
+Epoch 1901: loss = 1.183596e-03
+Epoch 1901: loss = 1.348627e-03
+Epoch 1901: loss = 1.568846e-03
+Epoch 1901: loss = 1.201145e-03
+Epoch 1901: loss = 1.743122e-03
+Epoch 1901: loss = 1.486407e-03
+Epoch 2001: loss = 1.170754e-03
+Epoch 2001: loss = 1.022189e-03
+Epoch 2001: loss = 1.415185e-03
+Epoch 2001: loss = 1.325261e-03
+Epoch 2001: loss = 1.188027e-03
+Epoch 2001: loss = 1.184700e-03
+Epoch 2001: loss = 1.236271e-03
+Epoch 2001: loss = 1.465171e-03
+Epoch 2001: loss = 1.107559e-03
+Epoch 2001: loss = 1.139885e-03
+Epoch 2001: loss = 1.992237e-03
+Epoch 2001: loss = 1.289769e-03
+Epoch 2001: loss = 1.379977e-03
+Epoch 2001: loss = 1.352803e-03
+Epoch 2001: loss = 1.033568e-03
+Epoch 2001: loss = 1.167669e-03
+Epoch 2101: loss = 1.099344e-03
+Epoch 2101: loss = 1.163132e-03
+Epoch 2101: loss = 1.164081e-03
+Epoch 2101: loss = 9.503406e-04
+Epoch 2101: loss = 1.922397e-03
+Epoch 2101: loss = 1.103770e-03
+Epoch 2101: loss = 1.312957e-03
+Epoch 2101: loss = 1.035890e-03
+Epoch 2101: loss = 1.574319e-03
+Epoch 2101: loss = 1.159864e-03
+Epoch 2101: loss = 1.265531e-03
+Epoch 2101: loss = 9.948076e-04
+Epoch 2101: loss = 1.282003e-03
+Epoch 2101: loss = 1.319488e-03
+Epoch 2101: loss = 1.186143e-03
+Epoch 2101: loss = 9.943357e-04
+Epoch 2201: loss = 1.296964e-03
+Epoch 2201: loss = 1.002747e-03
+Epoch 2201: loss = 1.025340e-03
+Epoch 2201: loss = 1.143246e-03
+Epoch 2201: loss = 9.705616e-04
+Epoch 2201: loss = 1.019870e-03
+Epoch 2201: loss = 1.848247e-03
+Epoch 2201: loss = 1.395404e-03
+Epoch 2201: loss = 1.197142e-03
+Epoch 2201: loss = 1.305148e-03
+Epoch 2201: loss = 1.159864e-03
+Epoch 2201: loss = 1.125218e-03
+Epoch 2201: loss = 1.064726e-03
+Epoch 2201: loss = 1.304799e-03
+Epoch 2201: loss = 1.177998e-03
+Epoch 2201: loss = 1.414569e-03
+Epoch 2301: loss = 1.251710e-03
+Epoch 2301: loss = 1.453532e-03
+Epoch 2301: loss = 9.363067e-04
+Epoch 2301: loss = 1.166729e-03
+Epoch 2301: loss = 1.684877e-03
+Epoch 2301: loss = 1.417376e-03
+Epoch 2301: loss = 1.001425e-03
+Epoch 2301: loss = 1.130041e-03
+Epoch 2301: loss = 1.153554e-03
+Epoch 2301: loss = 1.104818e-03
+Epoch 2301: loss = 1.131330e-03
+Epoch 2301: loss = 1.279577e-03
+Epoch 2301: loss = 1.191238e-03
+Epoch 2301: loss = 1.035145e-03
+Epoch 2301: loss = 1.371264e-03
+Epoch 2301: loss = 1.155266e-03
+Epoch 2401: loss = 1.594888e-03
+Epoch 2401: loss = 1.417089e-03
+Epoch 2401: loss = 1.264772e-03
+Epoch 2401: loss = 1.192173e-03
+Epoch 2401: loss = 9.570236e-04
+Epoch 2401: loss = 9.009925e-04
+Epoch 2401: loss = 1.147617e-03
+Epoch 2401: loss = 1.115042e-03
+Epoch 2401: loss = 1.113047e-03
+Epoch 2401: loss = 1.059950e-03
+Epoch 2401: loss = 1.140642e-03
+Epoch 2401: loss = 9.745040e-04
+Epoch 2401: loss = 1.303795e-03
+Epoch 2401: loss = 1.069904e-03
+Epoch 2401: loss = 1.061287e-03
+Epoch 2401: loss = 1.334296e-03
+Epoch 2501: loss = 9.227033e-04
+Epoch 2501: loss = 8.301740e-04
+Epoch 2501: loss = 1.146553e-03
+Epoch 2501: loss = 1.137565e-03
+Epoch 2501: loss = 1.441757e-03
+Epoch 2501: loss = 1.026179e-03
+Epoch 2501: loss = 9.104557e-04
+Epoch 2501: loss = 1.084934e-03
+Epoch 2501: loss = 9.850679e-04
+Epoch 2501: loss = 1.333881e-03
+Epoch 2501: loss = 1.036361e-03
+Epoch 2501: loss = 1.195934e-03
+Epoch 2501: loss = 1.216578e-03
+Epoch 2501: loss = 1.663212e-03
+Epoch 2501: loss = 1.054864e-03
+Epoch 2501: loss = 1.167565e-03
+Epoch 2601: loss = 1.120103e-03
+Epoch 2601: loss = 1.052660e-03
+Epoch 2601: loss = 9.569749e-04
+Epoch 2601: loss = 1.088195e-03
+Epoch 2601: loss = 1.073627e-03
+Epoch 2601: loss = 1.092436e-03
+Epoch 2601: loss = 1.872980e-03
+Epoch 2601: loss = 1.018583e-03
+Epoch 2601: loss = 1.282457e-03
+Epoch 2601: loss = 1.334996e-03
+Epoch 2601: loss = 9.593650e-04
+Epoch 2601: loss = 1.071089e-03
+Epoch 2601: loss = 9.475035e-04
+Epoch 2601: loss = 9.617709e-04
+Epoch 2601: loss = 1.080541e-03
+Epoch 2601: loss = 9.980153e-04
+Epoch 2701: loss = 1.157133e-03
+Epoch 2701: loss = 8.431944e-04
+Epoch 2701: loss = 1.031833e-03
+Epoch 2701: loss = 1.332977e-03
+Epoch 2701: loss = 8.555952e-04
+Epoch 2701: loss = 1.015506e-03
+Epoch 2701: loss = 8.363338e-04
+Epoch 2701: loss = 1.135749e-03
+Epoch 2701: loss = 1.114355e-03
+Epoch 2701: loss = 1.018721e-03
+Epoch 2701: loss = 1.428586e-03
+Epoch 2701: loss = 1.029391e-03
+Epoch 2701: loss = 1.091382e-03
+Epoch 2701: loss = 1.080516e-03
+Epoch 2701: loss = 1.235104e-03
+Epoch 2701: loss = 1.214764e-03
+Epoch 2801: loss = 1.068595e-03
+Epoch 2801: loss = 7.466351e-04
+Epoch 2801: loss = 1.217449e-03
+Epoch 2801: loss = 9.159517e-04
+Epoch 2801: loss = 9.635281e-04
+Epoch 2801: loss = 1.081080e-03
+Epoch 2801: loss = 8.797135e-04
+Epoch 2801: loss = 1.074090e-03
+Epoch 2801: loss = 1.359283e-03
+Epoch 2801: loss = 1.149724e-03
+Epoch 2801: loss = 1.087276e-03
+Epoch 2801: loss = 1.107938e-03
+Epoch 2801: loss = 9.873258e-04
+Epoch 2801: loss = 1.026341e-03
+Epoch 2801: loss = 1.279843e-03
+Epoch 2801: loss = 1.331064e-03
+Epoch 2901: loss = 8.257061e-04
+Epoch 2901: loss = 1.076639e-03
+Epoch 2901: loss = 1.019762e-03
+Epoch 2901: loss = 8.389605e-04
+Epoch 2901: loss = 1.066953e-03
+Epoch 2901: loss = 9.912488e-04
+Epoch 2901: loss = 1.765936e-03
+Epoch 2901: loss = 1.039069e-03
+Epoch 2901: loss = 8.047069e-04
+Epoch 2901: loss = 1.115655e-03
+Epoch 2901: loss = 1.158746e-03
+Epoch 2901: loss = 9.608436e-04
+Epoch 2901: loss = 9.285152e-04
+Epoch 2901: loss = 1.188561e-03
+Epoch 2901: loss = 1.001368e-03
+Epoch 2901: loss = 1.093245e-03
+Epoch 3001: loss = 9.460544e-04
+Epoch 3001: loss = 1.084394e-03
+Epoch 3001: loss = 1.143744e-03
+Epoch 3001: loss = 1.049988e-03
+Epoch 3001: loss = 1.545497e-03
+Epoch 3001: loss = 1.073078e-03
+Epoch 3001: loss = 8.514556e-04
+Epoch 3001: loss = 1.211767e-03
+Epoch 3001: loss = 9.090034e-04
+Epoch 3001: loss = 1.017795e-03
+Epoch 3001: loss = 1.177558e-03
+Epoch 3001: loss = 1.058638e-03
+Epoch 3001: loss = 8.975000e-04
+Epoch 3001: loss = 9.823679e-04
+Epoch 3001: loss = 9.038755e-04
+Epoch 3001: loss = 1.050547e-03
+Epoch 3101: loss = 1.076934e-03
+Epoch 3101: loss = 1.195205e-03
+Epoch 3101: loss = 8.949868e-04
+Epoch 3101: loss = 9.113828e-04
+Epoch 3101: loss = 7.306597e-04
+Epoch 3101: loss = 9.819043e-04
+Epoch 3101: loss = 1.117346e-03
+Epoch 3101: loss = 8.691218e-04
+Epoch 3101: loss = 1.331365e-03
+Epoch 3101: loss = 1.090966e-03
+Epoch 3101: loss = 9.675457e-04
+Epoch 3101: loss = 1.459626e-03
+Epoch 3101: loss = 7.760664e-04
+Epoch 3101: loss = 1.083110e-03
+Epoch 3101: loss = 9.141271e-04
+Epoch 3101: loss = 8.569803e-04
+Epoch 3201: loss = 1.395413e-03
+Epoch 3201: loss = 9.826019e-04
+Epoch 3201: loss = 1.197045e-03
+Epoch 3201: loss = 1.079835e-03
+Epoch 3201: loss = 1.329678e-03
+Epoch 3201: loss = 1.149290e-03
+Epoch 3201: loss = 1.109366e-03
+Epoch 3201: loss = 1.074091e-03
+Epoch 3201: loss = 9.451557e-04
+Epoch 3201: loss = 8.205707e-04
+Epoch 3201: loss = 1.022948e-03
+Epoch 3201: loss = 7.993959e-04
+Epoch 3201: loss = 1.092965e-03
+Epoch 3201: loss = 1.470106e-03
+Epoch 3201: loss = 1.099616e-03
+Epoch 3201: loss = 1.112759e-03
+Epoch 3301: loss = 1.040619e-03
+Epoch 3301: loss = 9.631565e-04
+Epoch 3301: loss = 1.189143e-03
+Epoch 3301: loss = 7.973189e-04
+Epoch 3301: loss = 8.710293e-04
+Epoch 3301: loss = 8.906683e-04
+Epoch 3301: loss = 8.592468e-04
+Epoch 3301: loss = 1.109918e-03
+Epoch 3301: loss = 9.418937e-04
+Epoch 3301: loss = 7.580088e-04
+Epoch 3301: loss = 9.706742e-04
+Epoch 3301: loss = 8.905561e-04
+Epoch 3301: loss = 1.015498e-03
+Epoch 3301: loss = 1.409518e-03
+Epoch 3301: loss = 1.042650e-03
+Epoch 3301: loss = 9.324163e-04
+Epoch 3401: loss = 1.297930e-03
+Epoch 3401: loss = 1.116791e-03
+Epoch 3401: loss = 7.753682e-04
+Epoch 3401: loss = 1.073953e-03
+Epoch 3401: loss = 9.775700e-04
+Epoch 3401: loss = 1.409744e-03
+Epoch 3401: loss = 7.949992e-04
+Epoch 3401: loss = 9.300834e-04
+Epoch 3401: loss = 1.041182e-03
+Epoch 3401: loss = 9.216846e-04
+Epoch 3401: loss = 1.273895e-03
+Epoch 3401: loss = 1.062503e-03
+Epoch 3401: loss = 1.519656e-03
+Epoch 3401: loss = 7.715829e-04
+Epoch 3401: loss = 8.520408e-04
+Epoch 3401: loss = 1.080679e-03
+Epoch 3501: loss = 9.117493e-04
+Epoch 3501: loss = 9.255974e-04
+Epoch 3501: loss = 9.168201e-04
+Epoch 3501: loss = 1.062666e-03
+Epoch 3501: loss = 8.988531e-04
+Epoch 3501: loss = 8.547181e-04
+Epoch 3501: loss = 8.843467e-04
+Epoch 3501: loss = 1.271504e-03
+Epoch 3501: loss = 9.164257e-04
+Epoch 3501: loss = 8.775411e-04
+Epoch 3501: loss = 1.021106e-03
+Epoch 3501: loss = 1.036579e-03
+Epoch 3501: loss = 1.099577e-03
+Epoch 3501: loss = 7.750350e-04
+Epoch 3501: loss = 8.905313e-04
+Epoch 3501: loss = 9.896726e-04
+Epoch 3601: loss = 8.924973e-04
+Epoch 3601: loss = 1.172684e-03
+Epoch 3601: loss = 1.285109e-03
+Epoch 3601: loss = 8.226715e-04
+Epoch 3601: loss = 8.352675e-04
+Epoch 3601: loss = 1.372766e-03
+Epoch 3601: loss = 1.209013e-03
+Epoch 3601: loss = 9.371193e-04
+Epoch 3601: loss = 8.920899e-04
+Epoch 3601: loss = 9.001869e-04
+Epoch 3601: loss = 9.735099e-04
+Epoch 3601: loss = 8.737821e-04
+Epoch 3601: loss = 9.650789e-04
+Epoch 3601: loss = 9.434302e-04
+Epoch 3601: loss = 1.138562e-03
+Epoch 3601: loss = 8.975604e-04
+Epoch 3701: loss = 8.761702e-04
+Epoch 3701: loss = 9.032775e-04
+Epoch 3701: loss = 8.577402e-04
+Epoch 3701: loss = 1.104767e-03
+Epoch 3701: loss = 9.290762e-04
+Epoch 3701: loss = 8.847442e-04
+Epoch 3701: loss = 9.516515e-04
+Epoch 3701: loss = 9.566102e-04
+Epoch 3701: loss = 8.446190e-04
+Epoch 3701: loss = 9.065497e-04
+Epoch 3701: loss = 8.297493e-04
+Epoch 3701: loss = 9.997683e-04
+Epoch 3701: loss = 8.533311e-04
+Epoch 3701: loss = 1.349933e-03
+Epoch 3701: loss = 9.871039e-04
+Epoch 3701: loss = 8.802607e-04
+Epoch 3801: loss = 8.127573e-04
+Epoch 3801: loss = 6.958123e-04
+Epoch 3801: loss = 8.530900e-04
+Epoch 3801: loss = 1.457716e-03
+Epoch 3801: loss = 9.396632e-04
+Epoch 3801: loss = 9.937710e-04
+Epoch 3801: loss = 7.924800e-04
+Epoch 3801: loss = 1.069670e-03
+Epoch 3801: loss = 1.130636e-03
+Epoch 3801: loss = 8.606957e-04
+Epoch 3801: loss = 7.361866e-04
+Epoch 3801: loss = 9.067917e-04
+Epoch 3801: loss = 7.317356e-04
+Epoch 3801: loss = 8.885565e-04
+Epoch 3801: loss = 1.039577e-03
+Epoch 3801: loss = 9.263713e-04
+Epoch 3901: loss = 8.816994e-04
+Epoch 3901: loss = 8.025883e-04
+Epoch 3901: loss = 9.790561e-04
+Epoch 3901: loss = 9.377869e-04
+Epoch 3901: loss = 1.013612e-03
+Epoch 3901: loss = 8.492637e-04
+Epoch 3901: loss = 1.023117e-03
+Epoch 3901: loss = 1.388227e-03
+Epoch 3901: loss = 8.017882e-04
+Epoch 3901: loss = 1.032835e-03
+Epoch 3901: loss = 8.316289e-04
+Epoch 3901: loss = 8.614524e-04
+Epoch 3901: loss = 9.411381e-04
+Epoch 3901: loss = 9.395601e-04
+Epoch 3901: loss = 7.011486e-04
+Epoch 3901: loss = 9.614801e-04
+Epoch 4001: loss = 8.826152e-04
+Epoch 4001: loss = 9.519053e-04
+Epoch 4001: loss = 1.017905e-03
+Epoch 4001: loss = 1.015313e-03
+Epoch 4001: loss = 1.372103e-03
+Epoch 4001: loss = 9.129020e-04
+Epoch 4001: loss = 8.134178e-04
+Epoch 4001: loss = 8.539555e-04
+Epoch 4001: loss = 7.359362e-04
+Epoch 4001: loss = 1.056330e-03
+Epoch 4001: loss = 7.727459e-04
+Epoch 4001: loss = 8.032626e-04
+Epoch 4001: loss = 8.525474e-04
+Epoch 4001: loss = 8.273274e-04
+Epoch 4001: loss = 8.873855e-04
+Epoch 4001: loss = 8.203143e-04
+Epoch 4101: loss = 9.455592e-04
+Epoch 4101: loss = 7.682082e-04
+Epoch 4101: loss = 1.235830e-03
+Epoch 4101: loss = 7.270121e-04
+Epoch 4101: loss = 1.147984e-03
+Epoch 4101: loss = 7.098567e-04
+Epoch 4101: loss = 8.881650e-04
+Epoch 4101: loss = 1.018162e-03
+Epoch 4101: loss = 9.232454e-04
+Epoch 4101: loss = 9.355707e-04
+Epoch 4101: loss = 8.286041e-04
+Epoch 4101: loss = 9.954594e-04
+Epoch 4101: loss = 7.646336e-04
+Epoch 4101: loss = 8.727461e-04
+Epoch 4101: loss = 8.806732e-04
+Epoch 4101: loss = 9.350679e-04
+Epoch 4201: loss = 8.694413e-04
+Epoch 4201: loss = 1.002208e-03
+Epoch 4201: loss = 8.495651e-04
+Epoch 4201: loss = 1.118899e-03
+Epoch 4201: loss = 7.143334e-04
+Epoch 4201: loss = 9.405763e-04
+Epoch 4201: loss = 7.089269e-04
+Epoch 4201: loss = 1.143529e-03
+Epoch 4201: loss = 8.379907e-04
+Epoch 4201: loss = 8.733119e-04
+Epoch 4201: loss = 8.366334e-04
+Epoch 4201: loss = 8.778382e-04
+Epoch 4201: loss = 8.081889e-04
+Epoch 4201: loss = 1.054014e-03
+Epoch 4201: loss = 7.235911e-04
+Epoch 4201: loss = 8.174733e-04
+Epoch 4301: loss = 8.428619e-04
+Epoch 4301: loss = 8.336047e-04
+Epoch 4301: loss = 7.599549e-04
+Epoch 4301: loss = 6.613827e-04
+Epoch 4301: loss = 9.771576e-04
+Epoch 4301: loss = 9.291351e-04
+Epoch 4301: loss = 8.554714e-04
+Epoch 4301: loss = 1.238188e-03
+Epoch 4301: loss = 9.388425e-04
+Epoch 4301: loss = 9.407924e-04
+Epoch 4301: loss = 9.196287e-04
+Epoch 4301: loss = 7.315365e-04
+Epoch 4301: loss = 8.573503e-04
+Epoch 4301: loss = 7.354246e-04
+Epoch 4301: loss = 8.498384e-04
+Epoch 4301: loss = 8.466782e-04
+Epoch 4401: loss = 9.729450e-04
+Epoch 4401: loss = 7.727736e-04
+Epoch 4401: loss = 1.337296e-03
+Epoch 4401: loss = 8.675569e-04
+Epoch 4401: loss = 7.518893e-04
+Epoch 4401: loss = 8.269364e-04
+Epoch 4401: loss = 8.553261e-04
+Epoch 4401: loss = 1.059326e-03
+Epoch 4401: loss = 7.113150e-04
+Epoch 4401: loss = 6.251797e-04
+Epoch 4401: loss = 7.870794e-04
+Epoch 4401: loss = 8.202100e-04
+Epoch 4401: loss = 7.809318e-04
+Epoch 4401: loss = 8.980095e-04
+Epoch 4401: loss = 1.069736e-03
+Epoch 4401: loss = 6.919095e-04
+Epoch 4501: loss = 6.639555e-04
+Epoch 4501: loss = 7.676849e-04
+Epoch 4501: loss = 6.766033e-04
+Epoch 4501: loss = 8.429356e-04
+Epoch 4501: loss = 1.262508e-03
+Epoch 4501: loss = 8.546264e-04
+Epoch 4501: loss = 1.145611e-03
+Epoch 4501: loss = 7.597571e-04
+Epoch 4501: loss = 7.812632e-04
+Epoch 4501: loss = 9.897107e-04
+Epoch 4501: loss = 8.600623e-04
+Epoch 4501: loss = 8.732037e-04
+Epoch 4501: loss = 8.141497e-04
+Epoch 4501: loss = 8.359374e-04
+Epoch 4501: loss = 9.441656e-04
+Epoch 4501: loss = 6.723243e-04
+Epoch 4601: loss = 1.139509e-03
+Epoch 4601: loss = 7.800597e-04
+Epoch 4601: loss = 9.029490e-04
+Epoch 4601: loss = 6.646394e-04
+Epoch 4601: loss = 7.869153e-04
+Epoch 4601: loss = 7.662302e-04
+Epoch 4601: loss = 1.324066e-03
+Epoch 4601: loss = 8.487310e-04
+Epoch 4601: loss = 8.732511e-04
+Epoch 4601: loss = 8.864147e-04
+Epoch 4601: loss = 6.615586e-04
+Epoch 4601: loss = 9.262058e-04
+Epoch 4601: loss = 7.728271e-04
+Epoch 4601: loss = 8.262584e-04
+Epoch 4601: loss = 7.985326e-04
+Epoch 4601: loss = 8.154451e-04
+Epoch 4701: loss = 7.939275e-04
+Epoch 4701: loss = 7.554888e-04
+Epoch 4701: loss = 8.657645e-04
+Epoch 4701: loss = 8.358421e-04
+Epoch 4701: loss = 7.660062e-04
+Epoch 4701: loss = 9.645033e-04
+Epoch 4701: loss = 8.357635e-04
+Epoch 4701: loss = 8.656380e-04
+Epoch 4701: loss = 1.026531e-03
+Epoch 4701: loss = 8.985974e-04
+Epoch 4701: loss = 1.002797e-03
+Epoch 4701: loss = 1.320323e-03
+Epoch 4701: loss = 8.290937e-04
+Epoch 4701: loss = 7.879373e-04
+Epoch 4701: loss = 1.074833e-03
+Epoch 4701: loss = 9.091554e-04
+Epoch 4801: loss = 8.818082e-04
+Epoch 4801: loss = 9.222230e-04
+Epoch 4801: loss = 9.578214e-04
+Epoch 4801: loss = 7.271074e-04
+Epoch 4801: loss = 1.450283e-03
+Epoch 4801: loss = 9.631449e-04
+Epoch 4801: loss = 8.351278e-04
+Epoch 4801: loss = 7.957077e-04
+Epoch 4801: loss = 7.879115e-04
+Epoch 4801: loss = 8.510632e-04
+Epoch 4801: loss = 1.040235e-03
+Epoch 4801: loss = 8.077242e-04
+Epoch 4801: loss = 8.593125e-04
+Epoch 4801: loss = 8.652454e-04
+Epoch 4801: loss = 6.671445e-04
+Epoch 4801: loss = 6.917126e-04
+Epoch 4901: loss = 7.268611e-04
+Epoch 4901: loss = 8.778972e-04
+Epoch 4901: loss = 6.719271e-04
+Epoch 4901: loss = 1.245034e-03
+Epoch 4901: loss = 8.227780e-04
+Epoch 4901: loss = 7.193869e-04
+Epoch 4901: loss = 7.739547e-04
+Epoch 4901: loss = 1.061795e-03
+Epoch 4901: loss = 7.147680e-04
+Epoch 4901: loss = 7.874957e-04
+Epoch 4901: loss = 6.764391e-04
+Epoch 4901: loss = 8.729876e-04
+Epoch 4901: loss = 9.444691e-04
+Epoch 4901: loss = 8.525161e-04
+Epoch 4901: loss = 8.727140e-04
+Epoch 4901: loss = 7.903184e-04
+Epoch 5000: loss = 7.115696e-04
+Epoch 5000: loss = 7.116811e-04
+Epoch 5000: loss = 1.052692e-03
+Epoch 5000: loss = 1.359332e-03
+Epoch 5000: loss = 7.192636e-04
+Epoch 5000: loss = 6.526249e-04
+Epoch 5000: loss = 8.151421e-04
+Epoch 5000: loss = 9.319374e-04
+Epoch 5000: loss = 7.104473e-04
+Epoch 5000: loss = 9.785710e-04
+Epoch 5000: loss = 1.005503e-03
+Epoch 5000: loss = 7.149128e-04
+Epoch 5000: loss = 9.143157e-04
+Epoch 5000: loss = 7.467475e-04
+Epoch 5000: loss = 7.285600e-04
+Epoch 5000: loss = 8.865680e-04</code></pre><h2 id="Plotting"><a class="docs-heading-anchor" href="#Plotting">Plotting</a><a id="Plotting-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting" title="Permalink"></a></h2><pre><code class="language-julia hljs">using CairoMakie, AlgebraOfGraphics
+const AoG = AlgebraOfGraphics
+AoG.set_aog_theme!()
+
+x_data_dev = x_data |&gt; xdev;
+y_data_dev = y_data |&gt; xdev;
+
+grid = x_data[:, 1, :]
+pred = first(
+    Reactant.with_config(;
+        convolution_precision=PrecisionConfig.HIGH,
+        dot_general_precision=PrecisionConfig.HIGH,
+    ) do
+        @jit(fno(x_data_dev, ps_trained, st_trained))
+    end
+) |&gt; cdev
+
+data_sequence, sequence, repeated_grid, label = Float32[], Int[], Float32[], String[]
+for i in 1:16
+    append!(repeated_grid, vcat(grid[:, i], grid[:, i]))
+    append!(sequence, repeat([i], grid_size * 2))
+    append!(label, repeat([&quot;Ground Truth&quot;], grid_size))
+    append!(label, repeat([&quot;Predictions&quot;], grid_size))
+    append!(data_sequence, vec(y_data[:, 1, i]))
+    append!(data_sequence, vec(pred[:, 1, i]))
+end
+plot_data = (; data_sequence, sequence, repeated_grid, label)
+
+draw(
+    AoG.data(plot_data) *
+    mapping(
+        :repeated_grid =&gt; L&quot;x&quot;,
+        :data_sequence =&gt; L&quot;u(x)&quot;;
+        color=:label =&gt; &quot;&quot;,
+        layout=:sequence =&gt; nonnumeric,
+        linestyle=:label =&gt; &quot;&quot;,
+    ) *
+    visual(Lines; linewidth=4),
+    scales(; Color=(; palette=:tab10), LineStyle = (; palette = [:solid, :dash, :dot]));
+    figure=(;
+        size=(1024, 1024),
+        title=&quot;Using FNO to solve the Burgers equation&quot;,
+        titlesize=25,
+    ),
+    axis=(; xlabelsize=25, ylabelsize=25),
+    legend=(; label=L&quot;u(x)&quot;, position=:bottom, labelsize=20),
+)</code></pre><img src="fa4fc7c3.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../burgers_deeponet/">« DeepONet</a><a class="docs-footer-nextpage" href="../../api/">API Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.12.0 on <span class="colophon-date" title="Saturday 7 June 2025 16:22">Saturday 7 June 2025</span>. Using Julia version 1.11.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
