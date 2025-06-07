@@ -21,4 +21,5 @@ SpectralKernel
 
 ```@docs
 NeuralOperators.AbstractTransform
+NeuralOperators.FourierTransform
 ```
