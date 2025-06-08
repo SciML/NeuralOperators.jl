@@ -1,14 +1,12 @@
 @testitem "Fourier Neural Operator" setup = [SharedTestSetup] begin
     rng = StableRNG(12345)
 
-    setups = [
-        (
-            modes=(16,),
-            chs=(2, 64, 64, 64, 64, 64, 128, 1),
-            x_size=(1024, 2, 5),
-            y_size=(1024, 1, 5),
-        ),
-    ]
+    setups = [(
+        modes=(16,),
+        chs=(2, 64, 64, 64, 64, 64, 128, 1),
+        x_size=(1024, 2, 5),
+        y_size=(1024, 1, 5),
+    ),]
 
     @testset "$(length(setup.modes))D" for setup in setups
         fno = FourierNeuralOperator(; setup.chs, setup.modes)
