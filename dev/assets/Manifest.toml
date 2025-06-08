@@ -1969,9 +1969,9 @@ version = "0.2.128"
 
 [[deps.ReactantCore]]
 deps = ["ExpressionExplorer", "MacroTools"]
-git-tree-sha1 = "e0a05f45f3d78ac5c4b83c8b31e35b7d06ea2e66"
+git-tree-sha1 = "a010415328a22f602d177d6e708e9eedf18f3dbd"
 uuid = "a3311ec8-5e00-46d5-b541-4f83e724a433"
-version = "0.1.11"
+version = "0.1.12"
 
 [[deps.Reactant_jll]]
 deps = ["Artifacts", "CUDA_Driver_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "TOML"]
