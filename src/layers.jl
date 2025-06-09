@@ -146,3 +146,39 @@ julia> SpectralKernel(2 => 5, (16,));
 function SpectralKernel(ch::Pair{<:Integer,<:Integer}, modes::Dims, act=identity; kwargs...)
     return OperatorKernel(ch, modes, FourierTransform{ComplexF32}(modes), act; kwargs...)
 end
+
+"""
+    GridEmbedding(
+        grid_boundaries::Vector{<:Tuple{<:Real,<:Real}}, grid_lengths::Vector{<:Integer}
+    )
+
+Appends a uniform grid embedding to the input data along the penultimate dimension.
+"""
+@concrete struct GridEmbedding <: AbstractLuxLayer
+    grid_boundaries
+    grid_lengths
+
+    function GridEmbedding(
+        grid_boundaries::Vector{<:Tuple{<:Real,<:Real}}, grid_lengths::Vector{<:Integer}
+    )
+        @assert length(grid_boundaries) == length(grid_lengths)
+        return new{typeof(grid_boundaries),typeof(grid_lengths)}(
+            grid_boundaries, grid_lengths
+        )
+    end
+end
+
+function LuxCore.initialstates(::AbstractRNG, layer::GridEmbedding)
+    grid_values = map(layer.grid_boundaries, layer.grid_lengths) do (min, max), len
+        range(Float32(min), Float32(max); length=len)
+    end
+    return (; grid=meshgrid(grid_values...))
+end
+
+function (::GridEmbedding)(x::AbstractArray{T,N}, ps, st) where {T,N}
+    @assert size(x)[1:(end - 2)] == size(st.grid)[1:(end - 1)]
+    grid = repeat(
+        reshape(st.grid, size(st.grid)..., 1), ntuple(Returns(1), N - 1)..., size(x, N)
+    )
+    return cat(grid, x; dims=N - 1), st
+end

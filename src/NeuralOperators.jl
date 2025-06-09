@@ -21,6 +21,7 @@ include("models/nomad.jl")
 
 export FourierTransform
 export SpectralConv, OperatorConv, SpectralKernel, OperatorKernel
+export GridEmbedding
 
 export FourierNeuralOperator
 export DeepONet

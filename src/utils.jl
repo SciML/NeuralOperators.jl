@@ -27,3 +27,15 @@ Base.show(io::IO, f::Fix1) = print(io, "Fix1($(f.f), $(f.x))")
 function expand_pad_dims(pad_dims::Dims{N}) where {N}
     return ntuple(i -> isodd(i) ? 0 : pad_dims[i ÷ 2], 2N)
 end
+
+function meshgrid(args::AbstractVector...)
+    return let N = length(args)
+        stack(enumerate(args)) do (i, arg)
+            new_shape = ones(Int, N)
+            new_shape[i] = length(arg)
+            repeat_sizes = collect(Int, map(length, args))
+            repeat_sizes[i] = 1
+            return repeat(reshape(arg, new_shape...), repeat_sizes...)
+        end
+    end
+end

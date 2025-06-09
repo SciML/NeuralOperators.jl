@@ -15,6 +15,7 @@ OperatorConv
 SpectralConv
 OperatorKernel
 SpectralKernel
+GridEmbedding
 ```
 
 ## Transform API

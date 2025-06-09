@@ -6,3 +6,6 @@ examples
 docs/build
 
 .CondaPkg
+.venv
+.python-version
+uv.lock
