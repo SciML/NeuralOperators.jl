@@ -100,7 +100,7 @@ end
 
 # Testing and visualization
 begin
-    values = Float32[]
+    results = Float32[]
     labels = AbstractString[]
     abs_errors = Float32[]
     x_values = Float32[]
@@ -120,9 +120,9 @@ begin
 
         text = L"$ \alpha = %$(α) $ (Rel. Error: $ %$(round(rel_error, digits=2))% $)"
 
-        append!(values, vec(u_pred))
+        append!(results, vec(u_pred))
         append!(labels, repeat(["Predictions"], length(xrange)))
-        append!(values, vec(u_true))
+        append!(results, vec(u_true))
         append!(labels, repeat(["Ground Truth"], length(xrange)))
         append!(x_values, repeat(vec(xrange), 2))
         append!(alphas, repeat([text], length(xrange) * 2))
@@ -133,7 +133,7 @@ begin
     end
 end
 
-plot_data = (; values, abs_errors, x_values, alphas, labels, x_values2, alphas2)
+plot_data = (; results, abs_errors, x_values, alphas, labels, x_values2, alphas2)
 
 begin
     fig = Figure(;
@@ -151,7 +151,7 @@ begin
         AoG.data(plot_data) *
         mapping(
             :x_values => L"x",
-            :values => L"u(x)";
+            :results => L"u(x)";
             color=:labels => "",
             col=:alphas => "",
             linestyle=:labels => "",
