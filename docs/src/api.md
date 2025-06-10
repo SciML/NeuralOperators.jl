@@ -16,6 +16,7 @@ SpectralConv
 OperatorKernel
 SpectralKernel
 GridEmbedding
+ComplexDecomposedLayer
 ```
 
 ## Transform API

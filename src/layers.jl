@@ -54,20 +54,17 @@ function OperatorConv(
 end
 
 function (conv::OperatorConv)(x::AbstractArray{T,N}, ps, st) where {T,N}
-    return operator_conv(x, conv.tform, ps.weight), st
-end
-
-function operator_conv(x, tform::AbstractTransform, weights)
-    x_t = transform(tform, x)
-    x_tr = truncate_modes(tform, x_t)
-    x_p = apply_pattern(x_tr, weights)
+    x_t = transform(conv.tform, x)
+    x_tr = truncate_modes(conv.tform, x_t)
+    x_p = apply_pattern(x_tr, ps.weight)
 
     pad_dims = size(x_t)[1:(end - 2)] .- size(x_p)[1:(end - 2)]
     x_padded = pad_constant(
         x_p, expand_pad_dims(pad_dims), false; dims=ntuple(identity, ndims(x_p) - 2)
     )
+    out = inverse(conv.tform, x_padded, size(x))
 
-    return inverse(tform, x_padded, size(x))
+    return out, st
 end
 
 """
@@ -181,4 +178,42 @@ function (::GridEmbedding)(x::AbstractArray{T,N}, ps, st) where {T,N}
         reshape(st.grid, size(st.grid)..., 1), ntuple(Returns(1), N - 1)..., size(x, N)
     )
     return cat(grid, x; dims=N - 1), st
+end
+
+"""
+    ComplexDecomposedLayer(layer::AbstractLuxLayer)
+
+Decomposes complex activations into real and imaginary parts and applies the given layer to
+each component separately, and then recombines the real and imaginary parts.
+"""
+@concrete struct ComplexDecomposedLayer <: AbstractLuxLayer
+    layer <: AbstractLuxLayer
+end
+
+function LuxCore.initialparameters(rng::AbstractRNG, layer::ComplexDecomposedLayer)
+    return (;
+        real=LuxCore.initialparameters(rng, layer.layer),
+        imag=LuxCore.initialparameters(rng, layer.layer),
+    )
+end
+
+function LuxCore.initialstates(rng::AbstractRNG, layer::ComplexDecomposedLayer)
+    return (;
+        real=LuxCore.initialstates(rng, layer.layer),
+        imag=LuxCore.initialstates(rng, layer.layer),
+    )
+end
+
+function (layer::ComplexDecomposedLayer)(x::AbstractArray{T,N}, ps, st) where {T,N}
+    rx = real.(x)
+    ix = imag.(x)
+
+    rfn_rx, st_real = layer.layer(rx, ps.real, st.real)
+    rfn_ix, st_real = layer.layer(ix, ps.real, st_real)
+
+    ifn_rx, st_imag = layer.layer(rx, ps.imag, st.imag)
+    ifn_ix, st_imag = layer.layer(ix, ps.imag, st_imag)
+
+    out = Complex.(rfn_rx .- ifn_ix, rfn_ix .+ ifn_rx)
+    return out, (; real=st_real, imag=st_imag)
 end
