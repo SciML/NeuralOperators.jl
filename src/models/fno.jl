@@ -64,3 +64,22 @@ function FourierNeuralOperator(
         ),
     )
 end
+
+function FourierNeuralOperator(
+    modes::Dims,
+    in_channels::Integer,
+    out_channels::Integer,
+    hidden_channels::Integer;
+    num_layers::Integer=4,
+    lifting_channel_ratio::Integer=2,
+    projection_channel_ratio::Integer=2,
+    positional_embedding::Union{Symbol,AbstractLuxLayer}=:grid, # :grid | :none
+    activation=gelu,
+    use_channel_mlp::Bool=true,
+    channel_mlp_dropout_rate::Real=0.0,
+    channel_mlp_expansion::Real=0.5,
+    channel_mlp_skip::Symbol=:soft_gating,
+    fno_skip::Symbol=:linear,
+)
+    return nothing
+end

@@ -39,3 +39,18 @@ function meshgrid(args::AbstractVector...)
         end
     end
 end
+
+unwrapped_eltype(x) = eltype(x)
+
+function decomposed_activation(f::F, x::Number) where {F}
+    unwrapped_eltype(x) <: Complex && return Complex(f(real(x)), f(imag(x)))
+    return f(x)
+end
+
+apply_complex((rfn, ifn), x::Number) = apply_complex(rfn, ifn, x)
+function apply_complex(rfn, ifn, x::Number)
+    @assert unwrapped_eltype(x) <: Complex "Expected a complex number, got \
+                                            $(unwrapped_eltype(x))"
+    rl, img = real(x), imag(x)
+    return Complex(rfn(rl) - ifn(img), rfn(img) + ifn(rl))
+end
