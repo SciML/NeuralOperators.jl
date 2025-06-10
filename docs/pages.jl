@@ -10,6 +10,7 @@ pages = [
             "DeepONet" => "tutorials/burgers_deeponet.md",
             "FNO" => "tutorials/burgers_fno.md",
         ],
+        "Solving Poisson Equation" => "tutorials/poisson_equation.md",
     ],
     "API Reference" => "api.md",
 ]

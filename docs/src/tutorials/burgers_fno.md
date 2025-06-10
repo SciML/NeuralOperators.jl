@@ -79,7 +79,7 @@ function train_model!(model, ps, st, dataloader; epochs=5000)
 
     for epoch in 1:epochs, data in dataloader
         (_, loss, _, train_state) = Training.single_train_step!(
-            AutoEnzyme(), MAELoss(), data, train_state
+            AutoEnzyme(), MAELoss(), data, train_state; return_gradients=Val(false)
         )
 
         if epoch % 100 == 1 || epoch == epochs

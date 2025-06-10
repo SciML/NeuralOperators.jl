@@ -3,6 +3,7 @@
 ## Mathematical Formulation
 
 ### Problem Statement
+
 We consider the one-dimensional Poisson equation on the domain $\Omega = [0,1]$:
 
 $$-\frac{d^2u(x)}{dx^2} = f(x), \quad x \in [0,1]$$
@@ -17,43 +18,43 @@ $$f(x) = \alpha \sin(\pi x)$$
 
 ### Analytical Solution
 
-
 $$u(x) = \frac{\alpha}{\pi^2} \sin(\pi x)$$
 
-
-
 The DeepONet architecture consists of:
- - **Branch network**: Processes the discretized input function $f(x)$
--  **Trunk network**: Processes the spatial coordinates $x$
--  **Output**: $u(x) \approx \sum_{k=1}^p b_k(f) t_k(x)$, where $b_k$ are outputs from the branch network and $t_k$ are outputs from the trunk network
+
+- **Branch network**: Processes the discretized input function $f(x)$
+- **Trunk network**: Processes the spatial coordinates $x$
+- **Output**: $u(x) \approx \sum_{k=1}^p b_k(f) t_k(x)$, where $b_k$ are outputs from the
+  branch network and $t_k$ are outputs from the trunk network
 
 ## Implementation
 
-```julia
-using NeuralOperators, Lux, Random, Optimisers, Zygote
-using BSON, Plots, LinearAlgebra, Statistics
+```@example poisson_deeponet
+using NeuralOperators, Lux, Random, Optimisers, Reactant, Statistics
 
-Random.seed!(42)
+using CairoMakie, AlgebraOfGraphics
+const AoG = AlgebraOfGraphics
+AoG.set_aog_theme!()
+
+const cdev = cpu_device()
+const xdev = reactant_device(; force=true)
+
+rng = Random.default_rng()
+Random.seed!(rng, 42)
 
 # Problem setup
-m = 64                  
-data_size = 100        
+m = 64
+data_size = 128
 xrange = Float32.(range(0, 1; length=m))
 
-forcing_function(x, α) = α * sin.(π * x)
-poisson_solution(x, α) = (α / π^2) * sin.(π * x)
+forcing_function(x, α) = α * sinpi.(x)
+poisson_solution(x, α) = (α / Float32(π)^2) * sinpi.(x)
 
 # Generate training data
 α_train = 0.5f0 .+ 0.8f0 .* rand(Float32, data_size)  # α ∈ [0.5, 1.3]
-f_data = zeros(Float32, m, data_size)
-u_data = zeros(Float32, m, data_size)
-
-for i in 1:data_size
-    f_data[:, i] .= forcing_function(xrange, α_train[i])
-    u_data[:, i] .= poisson_solution(xrange, α_train[i])
-end
-
-x_data = repeat(reshape(xrange, 1, m, 1), 1, 1, data_size)
+f_data = stack(Base.Fix1(forcing_function, xrange), α_train)
+u_data = stack(Base.Fix1(poisson_solution, xrange), α_train)
+x_data = reshape(xrange, 1, m)
 max_u = maximum(abs.(u_data))
 u_data ./= max_u
 
@@ -63,77 +64,128 @@ deeponet = DeepONet(
     Chain(Dense(1 => 32, tanh), Dense(32 => 32, tanh))                          # Trunk
 )
 
-ps, st = Lux.setup(Random.default_rng(), deeponet)
+ps, st = Lux.setup(Random.default_rng(), deeponet) |> xdev;
 
 # Training
 function train_model!(model, ps, st, data; epochs=3000)
     train_state = Training.TrainState(model, ps, st, Adam(0.001f0))
     losses = Float32[]
-    
+
     for epoch in 1:epochs
         _, loss, _, train_state = Training.single_train_step!(
-            AutoZygote(), MSELoss(), data, train_state
+            AutoEnzyme(), MSELoss(), data, train_state; return_gradients=Val(false)
         )
         epoch % 500 == 0 && println("Epoch: $epoch, Loss: $loss")
         push!(losses, loss)
     end
-    
+
     return train_state.parameters, train_state.states, losses
 end
 
-println("Training DeepONet...")
+f_data = f_data |> xdev;
+x_data = x_data |> xdev;
+u_data = u_data |> xdev;
 data = ((f_data, x_data), u_data)
 ps_trained, st_trained, losses = train_model!(deeponet, ps, st, data)
 
 # Prediction function
 function predict(model, f_input, x_input, ps, st)
-    f_input = reshape(Float32.(f_input), :, 1)
-    x_input = reshape(Float32.(x_input), 1, :, 1)
     pred, _ = model((f_input, x_input), ps, st)
     return vec(pred .* max_u)
 end
 
-# Testing and visualization
-test_alphas = [0.6f0, 0.8f0, 1.2f0]
-plots_array = []
-
-for (i, α) in enumerate(test_alphas)
-    f_test = forcing_function(xrange, α)
-    u_pred = predict(deeponet, f_test, xrange, ps_trained, st_trained)
-    u_true = poisson_solution(xrange, α)
-    
-    l2_error = sqrt(mean((u_pred .- u_true).^2))
-    rel_error = l2_error / sqrt(mean(u_true.^2)) * 100
-    
-    # Solution comparison
-    plt1 = plot(xrange, u_true, label="Analytical", lw=2, color=:blue,
-                title="α = $α (Rel. Error: $(round(rel_error, digits=2))%)")
-    plot!(plt1, xrange, u_pred, label="DeepONet", lw=2, color=:red, ls=:dash)
-    
-    # Error plot
-    plt2 = plot(xrange, u_pred .- u_true, lw=2, color=:green, legend=false,
-                title="Absolute Error", xlabel="x")
-    
-    push!(plots_array, plot(plt1, plt2, layout=(2,1), size=(400,400)))
-    
-    println("α = $α: L2 Error = $(round(l2_error, digits=6)), Rel. Error = $(round(rel_error, digits=2))%")
+compiled_predict_fn = Reactant.with_config(; dot_general_precision=PrecisionConfig.HIGH) do
+    @compile predict(deeponet, f_data[:, 1:1], x_data, ps_trained, st_trained)
 end
 
-# Combined plot
-final_plot = plot(plots_array..., layout=(1,3), size=(1200,400),
-                 plot_title="DeepONet Results for 1D Poisson Equation")
-display(final_plot)
-savefig(final_plot, "deeponet_poisson_results.png")
+# Testing and visualization
+begin
+    values = Float32[]
+    labels = AbstractString[]
+    abs_errors = Float32[]
+    x_values = Float32[]
+    x_values2 = Float32[]
+    alphas = AbstractString[]
+    alphas2 = AbstractString[]
 
-# Training loss
-loss_plot = plot(losses, xlabel="Epoch", ylabel="Loss", title="Training Loss",
-                yscale=:log10, lw=2, legend=false, size=(600,400))
-display(loss_plot)
+    for (i, α) in enumerate([0.6f0, 0.8f0, 1.2f0])
+        f_test = reshape(forcing_function(xrange, α), :, 1)
+        u_pred = compiled_predict_fn(
+            deeponet, xdev(f_test), x_data, ps_trained, st_trained
+        ) |> cdev
+        u_true = reshape(poisson_solution(xrange, α), :, 1)
 
-# Save model
-BSON.@save "deeponet_poisson.bson" deeponet ps_trained st_trained max_u
+        l2_error = sqrt(mean(abs2, u_pred .- u_true))
+        rel_error = l2_error / sqrt(mean(abs2, u_true)) * 100
 
-println("Training completed! Model saved as 'deeponet_poisson.bson'")
+        text = L"$ \alpha = %$(α) $ (Rel. Error: $ %$(round(rel_error, digits=2))% $)"
+
+        append!(values, vec(u_pred))
+        append!(labels, repeat(["Predictions"], length(xrange)))
+        append!(values, vec(u_true))
+        append!(labels, repeat(["Ground Truth"], length(xrange)))
+        append!(x_values, repeat(vec(xrange), 2))
+        append!(alphas, repeat([text], length(xrange) * 2))
+
+        append!(abs_errors, vec(u_pred .- u_true))
+        append!(x_values2, vec(xrange))
+        append!(alphas2, repeat([text], length(xrange)))
+    end
+end
+
+plot_data = (; values, abs_errors, x_values, alphas, labels, x_values2, alphas2)
+
+begin
+    fig = Figure(;
+        size=(1024, 512),
+        title="DeepONet Results for 1D Poisson Equation",
+        titlesize=25
+    )
+
+    axis_common = (;
+        xlabelsize=20, ylabelsize=20, titlesize=20, xticklabelsize=20, yticklabelsize=20
+    )
+
+    axs1 = draw!(
+        fig[1, 1],
+        AoG.data(plot_data) *
+        mapping(
+            :x_values => L"x",
+            :values => L"u(x)";
+            color=:labels => "",
+            col=:alphas => "",
+            linestyle=:labels => "",
+        ) *
+        visual(Lines; linewidth=4),
+        scales(; Color=(; palette=[:orange, :blue]), LineStyle = (; palette = [:solid, :dash]));
+        axis=merge(axis_common, (; xlabel="")),
+    )
+    for ax in axs1
+        hidexdecorations!(ax; grid=false)
+    end
+
+    axislegend(
+        axs1[1, 1].axis,
+        [
+            LineElement(; linestyle=:solid, color=:orange),
+            LineElement(; linestyle=:dash, color=:blue),
+        ],
+        ["Ground Truth", "Predictions"],
+        labelsize=20,
+    )
+
+    axs2 = draw!(
+        fig[2, 1],
+        AoG.data(plot_data) *
+        mapping(
+            :x_values2 => L"x",
+            :abs_errors => L"|u(x) - u(x_{true})|";
+            col=:alphas2 => "",
+        ) *
+        visual(Lines; linewidth=4, color=:green);
+        axis=merge(axis_common, (; titlevisible=false)),
+    )
+
+    fig
+end
 ```
-
-
