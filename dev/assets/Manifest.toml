@@ -788,9 +788,9 @@ version = "0.2.0"
 
 [[deps.GPUCompiler]]
 deps = ["ExprTools", "InteractiveUtils", "LLVM", "Libdl", "Logging", "PrecompileTools", "Preferences", "Scratch", "Serialization", "TOML", "Tracy", "UUIDs"]
-git-tree-sha1 = "fd1f587ca5dd2d52d990fbd9ff0dded736b51f1d"
+git-tree-sha1 = "38e96dd44b8b1db92c81c6eb11ac39d207aa83d5"
 uuid = "61eb1bfa-7361-4325-ad38-22787b887f55"
-version = "1.5.1"
+version = "1.5.2"
 
 [[deps.GeoFormatTypes]]
 git-tree-sha1 = "8e233d5167e63d708d41f87597433f59a0f213fe"
@@ -1303,9 +1303,9 @@ version = "1.1.0"
 
 [[deps.Lux]]
 deps = ["ADTypes", "Adapt", "ArgCheck", "ArrayInterface", "ChainRulesCore", "Compat", "ConcreteStructs", "DiffResults", "DispatchDoctor", "EnzymeCore", "FastClosures", "ForwardDiff", "Functors", "GPUArraysCore", "LinearAlgebra", "LuxCore", "LuxLib", "MLDataDevices", "MacroTools", "Markdown", "NNlib", "Optimisers", "Preferences", "Random", "Reexport", "SIMDTypes", "Setfield", "Static", "StaticArraysCore", "Statistics", "WeightInitializers"]
-git-tree-sha1 = "bc06b534ec9a93815ccb86c233950c14619e5cf6"
+git-tree-sha1 = "4bf87816440bec8e64b610de8724c04a58e65928"
 uuid = "b2108857-7c20-44ae-9111-449ecde12c47"
-version = "1.13.3"
+version = "1.13.4"
 
     [deps.Lux.extensions]
     LuxComponentArraysExt = "ComponentArrays"
@@ -1931,9 +1931,9 @@ weakdeps = ["FixedPointNumbers"]
 
 [[deps.Reactant]]
 deps = ["Adapt", "CEnum", "Downloads", "EnumX", "Enzyme", "EnzymeCore", "Functors", "GPUArraysCore", "HTTP", "LLVMOpenMP_jll", "Libdl", "LinearAlgebra", "OrderedCollections", "PrecompileTools", "Preferences", "Random", "ReactantCore", "Reactant_jll", "ScopedValues", "Scratch", "Sockets"]
-git-tree-sha1 = "2ee596eff3a162a3ff65561fc0472ce6831c623e"
+git-tree-sha1 = "9bc1ce2215357d2af7013ae0f38a8db883ce6390"
 uuid = "3c362404-f566-11ee-1572-e11a4b42c853"
-version = "0.2.128"
+version = "0.2.129"
 
     [deps.Reactant.extensions]
     ReactantAbstractFFTsExt = "AbstractFFTs"
@@ -1969,9 +1969,9 @@ version = "0.2.128"
 
 [[deps.ReactantCore]]
 deps = ["ExpressionExplorer", "MacroTools"]
-git-tree-sha1 = "a010415328a22f602d177d6e708e9eedf18f3dbd"
+git-tree-sha1 = "23df866b6ef084b6a0ae1b99ef2be0754b4e14e2"
 uuid = "a3311ec8-5e00-46d5-b541-4f83e724a433"
-version = "0.1.12"
+version = "0.1.13"
 
 [[deps.Reactant_jll]]
 deps = ["Artifacts", "CUDA_Driver_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "TOML"]
@@ -2376,14 +2376,16 @@ version = "0.4.1"
 
 [[deps.Unitful]]
 deps = ["Dates", "LinearAlgebra", "Random"]
-git-tree-sha1 = "d62610ec45e4efeabf7032d67de2ffdea8344bed"
+git-tree-sha1 = "02c1ac8104c9cf941395db79c611483909c04c7d"
 uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
-version = "1.22.1"
-weakdeps = ["ConstructionBase", "InverseFunctions"]
+version = "1.23.0"
+weakdeps = ["ConstructionBase", "ForwardDiff", "InverseFunctions", "Printf"]
 
     [deps.Unitful.extensions]
     ConstructionBaseUnitfulExt = "ConstructionBase"
+    ForwardDiffExt = "ForwardDiff"
     InverseFunctionsUnitfulExt = "InverseFunctions"
+    PrintfExt = "Printf"
 
 [[deps.UnsafeAtomics]]
 git-tree-sha1 = "b13c4edda90890e5b04ba24e20a310fbe6f249ff"
