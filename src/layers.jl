@@ -62,7 +62,7 @@ function (conv::OperatorConv)(x::AbstractArray{T,N}, ps, st) where {T,N}
     x_padded = pad_constant(
         x_p, expand_pad_dims(pad_dims), false; dims=ntuple(identity, ndims(x_p) - 2)
     )
-    out = inverse(conv.tform, x_padded, size(x))
+    out = inverse(conv.tform, x_padded, x)
 
     return out, st
 end

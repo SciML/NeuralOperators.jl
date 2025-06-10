@@ -1,6 +1,6 @@
 module NeuralOperators
 
-using AbstractFFTs: rfft, irfft
+using AbstractFFTs: fft, rfft, ifft, irfft, fftshift
 using ConcreteStructs: @concrete
 using Random: Random, AbstractRNG
 
