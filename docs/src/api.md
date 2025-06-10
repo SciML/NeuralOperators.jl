@@ -17,6 +17,7 @@ OperatorKernel
 SpectralKernel
 GridEmbedding
 ComplexDecomposedLayer
+SoftGating
 ```
 
 ## Transform API

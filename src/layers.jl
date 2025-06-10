@@ -217,3 +217,17 @@ function (layer::ComplexDecomposedLayer)(x::AbstractArray{T,N}, ps, st) where {T
     out = Complex.(rfn_rx .- ifn_ix, rfn_ix .+ ifn_rx)
     return out, (; real=st_real, imag=st_imag)
 end
+
+"""
+    SoftGating(chs::Integer, ndims::Integer; kwargs...)
+
+Constructs a wrapper over `Scale` with `dims = (ntuple(Returns(1), ndims)..., chs)`. All
+keyword arguments are passed to the `Scale` constructor.
+"""
+@concrete struct SoftGating <: AbstractLuxWrapperLayer{:layer}
+    layer <: Scale
+end
+
+function SoftGating(chs::Integer, ndims::Integer; kwargs...)
+    return SoftGating(Scale(ntuple(Returns(1), ndims)..., chs; kwargs...))
+end
