@@ -127,7 +127,7 @@ begin
         append!(x_values, repeat(vec(xrange), 2))
         append!(alphas, repeat([text], length(xrange) * 2))
 
-        append!(abs_errors, vec(u_pred .- u_true))
+        append!(abs_errors, abs.(vec(u_pred .- u_true)))
         append!(x_values2, vec(xrange))
         append!(alphas2, repeat([text], length(xrange)))
     end
