@@ -65,6 +65,51 @@ function FourierNeuralOperator(
     )
 end
 
+"""
+    FourierNeuralOperator(
+        modes::Dims{N},
+        in_channels::Integer,
+        out_channels::Integer,
+        hidden_channels::Integer;
+        num_layers::Integer=4,
+        lifting_channel_ratio::Integer=2,
+        projection_channel_ratio::Integer=2,
+        positional_embedding::Union{Symbol,AbstractLuxLayer}=:grid, # :grid | :none
+        activation=gelu,
+        use_channel_mlp::Bool=true,
+        channel_mlp_expansion::Real=0.5,
+        channel_mlp_skip::Symbol=:soft_gating,
+        fno_skip::Symbol=:linear,
+        complex_data::Bool=false,
+        stabilizer=tanh,
+        shift::Bool=false,
+    ) where {N}
+
+Constructor for a Fourier neural operator (FNO) model.
+
+## Arguments
+
+  - `modes`: The modes to be preserved. A tuple of length `d`, where `d` is the dimension
+    of data.
+  - `in_channels`: Number of input channels.
+  - `out_channels`: Number of output channels.
+  - `hidden_channels`: Number of hidden channels.
+
+## Keyword Arguments
+
+  - `num_layers`: Number of layers in the FNO.
+  - `lifting_channel_ratio`: Ratio of the number of channels in the lifting layer.
+  - `projection_channel_ratio`: Ratio of the number of channels in the projection layer.
+  - `positional_embedding`: Positional embedding to be used. Either `:grid` or `:none`.
+  - `activation`: Activation function for all layers in the model.
+  - `use_channel_mlp`: Whether to use channel MLP.
+  - `channel_mlp_expansion`: Expansion factor for the channel MLP.
+  - `channel_mlp_skip`: Skip connection type for the channel MLP.
+  - `fno_skip`: Skip connection type for the FNO.
+  - `complex_data`: Whether the data is complex.
+  - `stabilizer`: Stabilizer function to be used.
+  - `shift`: Whether to apply `fftshift` before truncating the modes.
+"""
 function FourierNeuralOperator(
     modes::Dims{N},
     in_channels::Integer,

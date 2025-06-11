@@ -33,7 +33,6 @@ end
 function Base.show(io::IO, layer::OperatorConv)
     print(io, "OperatorConv(")
     print(io, layer.in_chs, " => ", layer.out_chs, ", ")
-    print(io, layer.prod_modes, " modes, ")
     print(io, layer.tform, ")")
     return nothing
 end
@@ -159,22 +158,23 @@ function OperatorKernel(
         )
         complex_data &&
             (channel_mlp_skip_layer = ComplexDecomposedLayer(channel_mlp_skip_layer))
-    else
-        channel_mlp_skip_layer = NoOpLayer()
-        channel_mlp = NoOpLayer()
+
+        return OperatorKernel(
+            Parallel(
+                Fix1(add_act, activation),
+                Chain(
+                    Parallel(
+                        Fix1(add_act, act), fno_skip_layer, Chain(; stabilizer, conv_layer)
+                    ),
+                    channel_mlp,
+                ),
+                channel_mlp_skip_layer,
+            ),
+        )
     end
 
     return OperatorKernel(
-        Parallel(
-            Fix1(add_act, activation),
-            Chain(
-                Parallel(
-                    Fix1(add_act, act), fno_skip_layer, Chain(; stabilizer, conv_layer)
-                ),
-                channel_mlp,
-            ),
-            channel_mlp_skip_layer,
-        ),
+        Parallel(Fix1(add_act, act), fno_skip_layer, Chain(; stabilizer, conv_layer)),
     )
 end
 
