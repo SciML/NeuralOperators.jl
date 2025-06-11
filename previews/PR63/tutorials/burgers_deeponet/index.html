@@ -79,56 +79,56 @@ end
 (ps_trained, st_trained) = train_model!(
     deeponet, ps, st, ((x_data_dev, grid_dev), y_data_dev)
 )</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Epoch 1: loss = 4.163805e-01
-Epoch 101: loss = 2.469466e-01
-Epoch 201: loss = 1.848267e-01
-Epoch 301: loss = 1.650136e-01
-Epoch 401: loss = 1.410832e-01
-Epoch 501: loss = 1.363822e-01
-Epoch 601: loss = 1.333670e-01
-Epoch 701: loss = 1.299565e-01
-Epoch 801: loss = 1.261782e-01
-Epoch 901: loss = 1.224061e-01
-Epoch 1001: loss = 1.183916e-01
-Epoch 1101: loss = 1.137941e-01
-Epoch 1201: loss = 1.084879e-01
-Epoch 1301: loss = 1.031500e-01
-Epoch 1401: loss = 9.785759e-02
-Epoch 1501: loss = 9.329545e-02
-Epoch 1601: loss = 8.908769e-02
-Epoch 1701: loss = 8.559816e-02
-Epoch 1801: loss = 8.259588e-02
-Epoch 1901: loss = 7.998835e-02
-Epoch 2001: loss = 7.759477e-02
-Epoch 2101: loss = 7.574840e-02
-Epoch 2201: loss = 7.407929e-02
-Epoch 2301: loss = 7.275157e-02
-Epoch 2401: loss = 7.138565e-02
-Epoch 2501: loss = 7.029082e-02
-Epoch 2601: loss = 6.906773e-02
-Epoch 2701: loss = 6.801128e-02
-Epoch 2801: loss = 6.695527e-02
-Epoch 2901: loss = 6.587783e-02
-Epoch 3001: loss = 6.484152e-02
-Epoch 3101: loss = 6.377415e-02
-Epoch 3201: loss = 6.273446e-02
-Epoch 3301: loss = 6.155761e-02
-Epoch 3401: loss = 6.044223e-02
-Epoch 3501: loss = 5.929683e-02
-Epoch 3601: loss = 5.824869e-02
-Epoch 3701: loss = 5.712920e-02
-Epoch 3801: loss = 5.615310e-02
-Epoch 3901: loss = 5.529051e-02
-Epoch 4001: loss = 5.443058e-02
-Epoch 4101: loss = 5.375347e-02
-Epoch 4201: loss = 5.312135e-02
-Epoch 4301: loss = 5.258584e-02
-Epoch 4401: loss = 5.210818e-02
-Epoch 4501: loss = 5.163378e-02
-Epoch 4601: loss = 5.129255e-02
-Epoch 4701: loss = 5.090995e-02
-Epoch 4801: loss = 5.054798e-02
-Epoch 4901: loss = 5.021311e-02
-Epoch 5000: loss = 4.994547e-02</code></pre><h2 id="Plotting"><a class="docs-heading-anchor" href="#Plotting">Plotting</a><a id="Plotting-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting" title="Permalink"></a></h2><pre><code class="language-julia hljs">using CairoMakie, AlgebraOfGraphics
+Epoch 101: loss = 2.469464e-01
+Epoch 201: loss = 1.848270e-01
+Epoch 301: loss = 1.649460e-01
+Epoch 401: loss = 1.411070e-01
+Epoch 501: loss = 1.363675e-01
+Epoch 601: loss = 1.333487e-01
+Epoch 701: loss = 1.299562e-01
+Epoch 801: loss = 1.262080e-01
+Epoch 901: loss = 1.223699e-01
+Epoch 1001: loss = 1.184665e-01
+Epoch 1101: loss = 1.138390e-01
+Epoch 1201: loss = 1.085800e-01
+Epoch 1301: loss = 1.031190e-01
+Epoch 1401: loss = 9.797822e-02
+Epoch 1501: loss = 9.337971e-02
+Epoch 1601: loss = 8.917586e-02
+Epoch 1701: loss = 8.566463e-02
+Epoch 1801: loss = 8.265619e-02
+Epoch 1901: loss = 8.001778e-02
+Epoch 2001: loss = 7.767843e-02
+Epoch 2101: loss = 7.577484e-02
+Epoch 2201: loss = 7.414064e-02
+Epoch 2301: loss = 7.268685e-02
+Epoch 2401: loss = 7.146394e-02
+Epoch 2501: loss = 7.021591e-02
+Epoch 2601: loss = 6.909315e-02
+Epoch 2701: loss = 6.805059e-02
+Epoch 2801: loss = 6.695438e-02
+Epoch 2901: loss = 6.594341e-02
+Epoch 3001: loss = 6.478998e-02
+Epoch 3101: loss = 6.370208e-02
+Epoch 3201: loss = 6.258920e-02
+Epoch 3301: loss = 6.150946e-02
+Epoch 3401: loss = 6.040179e-02
+Epoch 3501: loss = 5.935565e-02
+Epoch 3601: loss = 5.824711e-02
+Epoch 3701: loss = 5.723411e-02
+Epoch 3801: loss = 5.626910e-02
+Epoch 3901: loss = 5.540596e-02
+Epoch 4001: loss = 5.454604e-02
+Epoch 4101: loss = 5.383281e-02
+Epoch 4201: loss = 5.329804e-02
+Epoch 4301: loss = 5.268137e-02
+Epoch 4401: loss = 5.218053e-02
+Epoch 4501: loss = 5.172234e-02
+Epoch 4601: loss = 5.127240e-02
+Epoch 4701: loss = 5.089247e-02
+Epoch 4801: loss = 5.060831e-02
+Epoch 4901: loss = 5.028312e-02
+Epoch 5000: loss = 4.996336e-02</code></pre><h2 id="Plotting"><a class="docs-heading-anchor" href="#Plotting">Plotting</a><a id="Plotting-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting" title="Permalink"></a></h2><pre><code class="language-julia hljs">using CairoMakie, AlgebraOfGraphics
 const AoG = AlgebraOfGraphics
 AoG.set_aog_theme!()
 
@@ -159,9 +159,10 @@ draw(
         :data_sequence =&gt; L&quot;u(x)&quot;;
         color=:label =&gt; &quot;&quot;,
         layout=:sequence =&gt; nonnumeric,
+        linestyle=:label =&gt; &quot;&quot;,
     ) *
-    visual(Lines),
-    scales(; Color=(; palette=:tab10));
+    visual(Lines; linewidth=4),
+    scales(; Color=(; palette=:tab10), LineStyle = (; palette = [:solid, :dash]));
     figure=(;
         size=(1024, 1024),
         title=&quot;Using DeepONet to solve the Burgers equation&quot;,
@@ -169,4 +170,4 @@ draw(
     ),
     axis=(; xlabelsize=25, ylabelsize=25),
     legend=(; label=L&quot;u(x)&quot;, position=:bottom, labelsize=20),
-)</code></pre><img src="9ec4e340.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../models/nomad/">« NOMAD</a><a class="docs-footer-nextpage" href="../burgers_fno/">FNO »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.12.0 on <span class="colophon-date" title="Wednesday 11 June 2025 19:20">Wednesday 11 June 2025</span>. Using Julia version 1.11.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+)</code></pre><img src="4d9a602c.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../models/nomad/">« NOMAD</a><a class="docs-footer-nextpage" href="../burgers_fno/">FNO »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.12.0 on <span class="colophon-date" title="Wednesday 11 June 2025 21:34">Wednesday 11 June 2025</span>. Using Julia version 1.11.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
