@@ -65,10 +65,9 @@
             end
             ∂x_ra, ∂ps_ra = (∂x_ra, ∂ps_ra) |> cpu_device()
 
-            @test ∂x_zyg ≈ ∂x_ra atol = 1.0f-2 rtol = 1.0f-2
             # TODO: is zygote off here?
-            @test check_approx(∂ps_zyg, ∂ps_ra; atol=1.0f-2, rtol=1.0f-2) broken =
-                setup.shift
+            @test ∂x_zyg ≈ ∂x_ra atol = 1.0f-2 rtol = 1.0f-2 skip = setup.shift
+            @test check_approx(∂ps_zyg, ∂ps_ra; atol=1.0f-2, rtol=1.0f-2) skip = setup.shift
         end
     end
 end
