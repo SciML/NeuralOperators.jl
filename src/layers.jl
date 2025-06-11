@@ -129,8 +129,8 @@ function OperatorKernel(
     stabilizer=identity,
     complex_data::Bool=false,
     fno_skip::Symbol=:linear,
-    channel_mlp_skip::Symbol=:linear,
-    use_channel_mlp::Bool=true,
+    channel_mlp_skip::Symbol=:soft_gating,
+    use_channel_mlp::Bool=false,
     channel_mlp_expansion::Real=0.5,
     kwargs...,
 ) where {N}

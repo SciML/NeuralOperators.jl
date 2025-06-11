@@ -22,6 +22,8 @@ function inverse end
     FourierTransform{T}(modes, shift::Bool=false)
 
 A concrete implementation of `AbstractTransform` for Fourier transforms.
+
+If `shift` is `true`, we apply a `fftshift` before truncating the modes.
 """
 struct FourierTransform{T,M} <: AbstractTransform{T}
     modes::M

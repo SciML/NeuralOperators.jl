@@ -46,10 +46,7 @@ x_data = reshape(T.(collect(read(file, "a")[1:N, 1:Δsamples:end])), N, :)
 y_data = reshape(T.(collect(read(file, "u")[1:N, 1:Δsamples:end])), N, :)
 close(file)
 
-x_data = hcat(
-    repeat(reshape(collect(T, range(0, 1; length=grid_size)), :, 1, 1), 1, 1, N),
-    reshape(permutedims(x_data, (2, 1)), grid_size, 1, N)
-);
+x_data = reshape(permutedims(x_data, (2, 1)), grid_size, 1, N);
 y_data = reshape(permutedims(y_data, (2, 1)), grid_size, 1, N);
 ```
 
@@ -62,9 +59,7 @@ const cdev = cpu_device()
 const xdev = reactant_device(; force=true)
 
 fno = FourierNeuralOperator(
-    gelu;
-    chs = (2, 32, 32, 32, 1),
-    modes = (16,)
+    (16,), 2, 1, 32; activation=gelu, stabilizer=tanh, shift=true
 )
 ps, st = Lux.setup(Random.default_rng(), fno) |> xdev;
 ```
@@ -74,13 +69,16 @@ ps, st = Lux.setup(Random.default_rng(), fno) |> xdev;
 ```@example burgers_fno
 dataloader = DataLoader((x_data, y_data); batchsize=128, shuffle=true) |> xdev;
 
-function train_model!(model, ps, st, dataloader; epochs=5000)
+function train_model!(model, ps, st, dataloader; epochs=1000)
     train_state = Training.TrainState(model, ps, st, Adam(0.0001f0))
 
-    for epoch in 1:epochs, data in dataloader
-        (_, loss, _, train_state) = Training.single_train_step!(
-            AutoEnzyme(), MAELoss(), data, train_state; return_gradients=Val(false)
-        )
+    for epoch in 1:epochs
+        loss = -Inf
+        for data in dataloader
+            (_, loss, _, train_state) = Training.single_train_step!(
+                AutoEnzyme(), MAELoss(), data, train_state; return_gradients=Val(false)
+            )
+        end
 
         if epoch % 100 == 1 || epoch == epochs
             @printf("Epoch %d: loss = %.6e\n", epoch, loss)
@@ -90,7 +88,7 @@ function train_model!(model, ps, st, dataloader; epochs=5000)
     return train_state.parameters, train_state.states
 end
 
-(ps_trained, st_trained) = train_model!(fno, ps, st, dataloader)
+ps_trained, st_trained = train_model!(fno, ps, st, dataloader)
 nothing #hide
 ```
 
@@ -104,7 +102,7 @@ AoG.set_aog_theme!()
 x_data_dev = x_data |> xdev;
 y_data_dev = y_data |> xdev;
 
-grid = x_data[:, 1, :]
+grid = range(0, 1; length=grid_size)
 pred = first(
     Reactant.with_config(;
         convolution_precision=PrecisionConfig.HIGH,
@@ -116,7 +114,7 @@ pred = first(
 
 data_sequence, sequence, repeated_grid, label = Float32[], Int[], Float32[], String[]
 for i in 1:16
-    append!(repeated_grid, vcat(grid[:, i], grid[:, i]))
+    append!(repeated_grid, repeat(grid, 2))
     append!(sequence, repeat([i], grid_size * 2))
     append!(label, repeat(["Ground Truth"], grid_size))
     append!(label, repeat(["Predictions"], grid_size))
@@ -135,7 +133,7 @@ draw(
         linestyle=:label => "",
     ) *
     visual(Lines; linewidth=4),
-    scales(; Color=(; palette=:tab10), LineStyle = (; palette = [:solid, :dash, :dot]));
+    scales(; Color=(; palette=:tab10), LineStyle = (; palette = [:solid, :dash]));
     figure=(;
         size=(1024, 1024),
         title="Using FNO to solve the Burgers equation",
