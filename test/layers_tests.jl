@@ -3,19 +3,22 @@
 
     opconv = [SpectralConv, SpectralKernel]
     setups = [
-        (; m=(16,), x_size=(1024, 2, 5), y_size=(1024, 16, 5)),
-        (; m=(10, 10), x_size=(22, 22, 1, 5), y_size=(22, 22, 16, 5)),
+        (; m=(16,), x_size=(1024, 2, 5), y_size=(1024, 16, 5), shift=false),
+        (; m=(10, 10), x_size=(22, 22, 1, 5), y_size=(22, 22, 16, 5), shift=false),
+        (; m=(10, 10), x_size=(22, 22, 1, 5), y_size=(22, 22, 16, 5), shift=true),
     ]
 
     rdev = reactant_device()
 
-    @testset "$(op) $(length(setup.m))D" for setup in setups, op in opconv
+    @testset "$(op) $(length(setup.m))D | shift=$(setup.shift)" for op in opconv,
+        setup in setups
+
         in_chs = setup.x_size[end - 1]
         out_chs = setup.y_size[end - 1]
         ch = 4 => out_chs
 
         l1 = Conv(ntuple(_ -> 1, length(setup.m)), in_chs => first(ch))
-        m = Chain(l1, op(ch, setup.m))
+        m = Chain(l1, op(ch, setup.m; setup.shift))
         display(m)
         ps, st = Lux.setup(rng, m)
 

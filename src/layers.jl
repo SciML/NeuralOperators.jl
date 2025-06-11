@@ -88,8 +88,10 @@ julia> SpectralConv(2 => 5, (16,));
 
 ```
 """
-function SpectralConv(ch::Pair{<:Integer,<:Integer}, modes::Dims; kwargs...)
-    return OperatorConv(ch, modes, FourierTransform{ComplexF32}(modes); kwargs...)
+function SpectralConv(
+    ch::Pair{<:Integer,<:Integer}, modes::Dims; shift::Bool=false, kwargs...
+)
+    return OperatorConv(ch, modes, FourierTransform{ComplexF32}(modes, shift); kwargs...)
 end
 
 """
@@ -148,8 +150,12 @@ julia> SpectralKernel(2 => 5, (16,));
 
 ```
 """
-function SpectralKernel(ch::Pair{<:Integer,<:Integer}, modes::Dims, act=identity; kwargs...)
-    return OperatorKernel(ch, modes, FourierTransform{ComplexF32}(modes), act; kwargs...)
+function SpectralKernel(
+    ch::Pair{<:Integer,<:Integer}, modes::Dims, act=identity; shift::Bool=false, kwargs...
+)
+    return OperatorKernel(
+        ch, modes, FourierTransform{ComplexF32}(modes, shift), act; kwargs...
+    )
 end
 
 """

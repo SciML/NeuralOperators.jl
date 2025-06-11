@@ -7,17 +7,26 @@
             chs=(2, 64, 64, 64, 64, 64, 128, 1),
             x_size=(1024, 2, 5),
             y_size=(1024, 1, 5),
+            shift=false,
         ),
         (
             modes=(16, 16),
             chs=(2, 64, 64, 64, 64, 64, 128, 4),
             x_size=(32, 32, 2, 5),
             y_size=(32, 32, 4, 5),
+            shift=false,
+        ),
+        (
+            modes=(16, 16),
+            chs=(2, 64, 64, 64, 64, 64, 128, 4),
+            x_size=(32, 32, 2, 5),
+            y_size=(32, 32, 4, 5),
+            shift=true,
         ),
     ]
 
-    @testset "$(length(setup.modes))D" for setup in setups
-        fno = FourierNeuralOperator(; setup.chs, setup.modes)
+    @testset "$(length(setup.modes))D | shift=$(setup.shift)" for setup in setups
+        fno = FourierNeuralOperator(; setup.chs, setup.modes, setup.shift)
         display(fno)
         ps, st = Lux.setup(rng, fno)
 
