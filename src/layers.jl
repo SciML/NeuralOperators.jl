@@ -30,6 +30,14 @@ julia> OperatorConv(2 => 5, (16,), FourierTransform{ComplexF32}((16,)));
     init_weight
 end
 
+function Base.show(io::IO, layer::OperatorConv)
+    print(io, "OperatorConv(")
+    print(io, layer.in_chs, " => ", layer.out_chs, ", ")
+    print(io, layer.prod_modes, " modes, ")
+    print(io, layer.tform, ")")
+    return nothing
+end
+
 function LuxCore.initialparameters(rng::AbstractRNG, layer::OperatorConv)
     in_chs, out_chs = layer.in_chs, layer.out_chs
     scale = real(one(eltype(layer.tform))) / (in_chs * out_chs)

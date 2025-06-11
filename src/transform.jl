@@ -27,6 +27,12 @@ A concrete implementation of `AbstractTransform` for Fourier transforms.
     modes
 end
 
+function Base.show(io::IO, ft::FourierTransform)
+    print(io, "FourierTransform{", eltype(ft), "}(")
+    print(io, ft.modes, ")")
+    return nothing
+end
+
 Base.ndims(T::FourierTransform) = length(T.modes)
 
 function transform(ft::FourierTransform, x::AbstractArray)
