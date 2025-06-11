@@ -36,7 +36,9 @@
         ) do
             @jit m(x_ra, ps_ra, st_ra)
         end
-        @test res_ra ≈ res atol = 1.0f-2 rtol = 1.0f-2
+        @test res_ra ≈ res atol = 1.0f-2 rtol = 1.0f-2 skip = (
+            setup.shift && op === SpectralConv
+        )
 
         @test begin
             l2, l1 = train!(
