@@ -126,15 +126,67 @@ function OperatorKernel(
     modes::Dims{N},
     transform::AbstractTransform,
     act=identity;
+    stabilizer=identity,
+    complex_data::Bool=false,
+    fno_skip::Symbol=:linear,
+    channel_mlp_skip::Symbol=:linear,
+    use_channel_mlp::Bool=true,
+    channel_mlp_expansion::Real=0.5,
     kwargs...,
 ) where {N}
+    in_chs, out_chs = ch
+
+    complex_data && (stabilizer = Base.Fix1(decomposed_activation, stabilizer))
+    stabilizer = WrappedFunction(Base.BroadcastFunction(stabilizer))
+
+    activation = complex_data ? Base.Fix1(decomposed_activation, act) : act
+
+    conv_layer = OperatorConv(ch, modes, transform; kwargs...)
+
+    fno_skip_layer = __fno_skip_connection(in_chs, out_chs, N, false, fno_skip)
+    complex_data && (fno_skip_layer = ComplexDecomposedLayer(fno_skip_layer))
+
+    if use_channel_mlp
+        channel_mlp = Conv(
+            ntuple(Returns(1), N), in_chs => round(Int, out_chs * channel_mlp_expansion)
+        )
+        complex_data && (channel_mlp = ComplexDecomposedLayer(channel_mlp))
+
+        channel_mlp_skip_layer = __fno_skip_connection(
+            in_chs, out_chs, N, false, channel_mlp_skip
+        )
+        complex_data &&
+            (channel_mlp_skip_layer = ComplexDecomposedLayer(channel_mlp_skip_layer))
+    else
+        channel_mlp_skip_layer = NoOpLayer()
+        channel_mlp = NoOpLayer()
+    end
+
     return OperatorKernel(
         Parallel(
-            Fix1(add_act, act),
-            Conv(ntuple(one, N), ch),
-            OperatorConv(ch, modes, transform; kwargs...),
+            Fix1(add_act, activation),
+            Chain(
+                Parallel(
+                    Fix1(add_act, act), fno_skip_layer, Chain(; stabilizer, conv_layer)
+                ),
+                channel_mlp,
+            ),
+            channel_mlp_skip_layer,
         ),
     )
+end
+
+function __fno_skip_connection(in_chs, out_chs, n_dims, use_bias, skip_type)
+    if skip_type == :linear
+        return Conv(ntuple(Returns(1), n_dims), in_chs => out_chs; use_bias)
+    elseif skip_type == :soft_gating
+        @assert in_chs == out_chs "For soft gating, in_chs must equal out_chs"
+        return SoftGating(out_chs, n_dims; use_bias)
+    elseif skip_type == :none
+        return NoOpLayer()
+    else
+        error("Invalid skip_type: $(skip_type)")
+    end
 end
 
 """
@@ -192,7 +244,7 @@ end
 Decomposes complex activations into real and imaginary parts and applies the given layer to
 each component separately, and then recombines the real and imaginary parts.
 """
-@concrete struct ComplexDecomposedLayer <: AbstractLuxLayer
+@concrete struct ComplexDecomposedLayer <: AbstractLuxWrapperLayer{:layer}
     layer <: AbstractLuxLayer
 end
 

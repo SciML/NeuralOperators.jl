@@ -23,13 +23,13 @@ function inverse end
 
 A concrete implementation of `AbstractTransform` for Fourier transforms.
 """
-struct FourierTransform{T, M} <: AbstractTransform{T}
+struct FourierTransform{T,M} <: AbstractTransform{T}
     modes::M
     shift::Bool
 end
 
 function FourierTransform{T}(modes::Dims, shift::Bool=false) where {T}
-    return FourierTransform{T}(modes, shift)
+    return FourierTransform{T,typeof(modes)}(modes, shift)
 end
 
 function Base.show(io::IO, ft::FourierTransform)

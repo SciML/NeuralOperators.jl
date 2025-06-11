@@ -76,11 +76,12 @@ function FourierNeuralOperator(
     positional_embedding::Union{Symbol,AbstractLuxLayer}=:grid, # :grid | :none
     activation=gelu,
     use_channel_mlp::Bool=true,
-    channel_mlp_dropout_rate::Real=0.0,
     channel_mlp_expansion::Real=0.5,
     channel_mlp_skip::Symbol=:soft_gating,
     fno_skip::Symbol=:linear,
-    complex_input::Bool=false,
+    complex_data::Bool=false,
+    stabilizer=tanh,
+    shift::Bool=false,
 ) where {N}
     lifting_channels = hidden_channels * lifting_channel_ratio
     projection_channels = out_channels * projection_channel_ratio
@@ -93,4 +94,37 @@ function FourierNeuralOperator(
             positional_embedding = NoOpLayer()
         end
     end
+
+    lifting = Chain(
+        Conv(map(Returns(1), modes), in_channels => lifting_channels, activation),
+        Conv(map(Returns(1), modes), lifting_channels => hidden_channels),
+    )
+    complex_data && (lifting = ComplexDecomposedLayer(lifting))
+
+    projection = Chain(
+        Conv(map(Returns(1), modes), hidden_channels => projection_channels, activation),
+        Conv(map(Returns(1), modes), projection_channels => out_channels),
+    )
+    complex_data && (projection = ComplexDecomposedLayer(projection))
+
+    fno_blocks = Chain(
+        [
+            SpectralKernel(
+                hidden_channels => hidden_channels,
+                modes,
+                activation;
+                stabilizer,
+                shift,
+                use_channel_mlp,
+                channel_mlp_expansion,
+                channel_mlp_skip,
+                fno_skip,
+                complex_data,
+            ) for _ in 1:num_layers
+        ]...,
+    )
+
+    return FourierNeuralOperator(
+        Chain(; positional_embedding, lifting, fno_blocks, projection)
+    )
 end
