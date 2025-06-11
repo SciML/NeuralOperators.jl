@@ -147,8 +147,10 @@ function OperatorKernel(
     complex_data && (fno_skip_layer = ComplexDecomposedLayer(fno_skip_layer))
 
     if use_channel_mlp
-        channel_mlp = Conv(
-            ntuple(Returns(1), N), in_chs => round(Int, out_chs * channel_mlp_expansion)
+        channel_mlp_hidden_channels = round(Int, out_chs * channel_mlp_expansion)
+        channel_mlp = Chain(
+            Conv(ntuple(Returns(1), N), out_chs => channel_mlp_hidden_channels),
+            Conv(ntuple(Returns(1), N), channel_mlp_hidden_channels => out_chs),
         )
         complex_data && (channel_mlp = ComplexDecomposedLayer(channel_mlp))
 
