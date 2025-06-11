@@ -174,7 +174,7 @@ function OperatorKernel(
     end
 
     return OperatorKernel(
-        Parallel(Fix1(add_act, act), fno_skip_layer, Chain(; stabilizer, conv_layer)),
+        Parallel(Fix1(add_act, act), fno_skip_layer, Chain(; stabilizer, conv_layer))
     )
 end
 
