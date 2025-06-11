@@ -1,0 +1,32 @@
+[deps]
+AlgebraOfGraphics = "cbdf2221-f076-402e-a563-3d30da359d67"
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+CondaPkg = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
+DataDeps = "124859b0-ceae-595e-8997-d05f6a7a8dfe"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Lux = "b2108857-7c20-44ae-9111-449ecde12c47"
+MAT = "23992714-dd62-5051-b70f-ba57cb901cac"
+MLUtils = "f1d291b0-491e-4a28-83b9-f70985020b54"
+NeuralOperators = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
+Optimisers = "3bd65402-5787-11e9-1adc-39752487f4e2"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
+Reactant = "3c362404-f566-11ee-1572-e11a4b42c853"
+
+[sources]
+NeuralOperators = {path = ".."}
+
+[compat]
+AlgebraOfGraphics = "0.10.7"
+CairoMakie = "0.13"
+CondaPkg = "0.2.23"
+DataDeps = "0.7.13"
+Documenter = "1.7.0"
+Lux = "1"
+MAT = "0.10.7"
+MLUtils = "0.4.4"
+NeuralOperators = "0.6"
+Optimisers = "0.4"
+Printf = "1.10"
+PythonCall = "0.9.23"
+Reactant = "0.2.130"
