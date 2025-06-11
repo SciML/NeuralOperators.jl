@@ -159,37 +159,29 @@ function SpectralKernel(
 end
 
 """
-    GridEmbedding(
-        grid_boundaries::Vector{<:Tuple{<:Real,<:Real}}, grid_lengths::Vector{<:Integer}
-    )
+    GridEmbedding(grid_boundaries::Vector{<:Tuple{<:Real,<:Real}})
 
 Appends a uniform grid embedding to the input data along the penultimate dimension.
 """
 @concrete struct GridEmbedding <: AbstractLuxLayer
-    grid_boundaries
-    grid_lengths
-
-    function GridEmbedding(
-        grid_boundaries::Vector{<:Tuple{<:Real,<:Real}}, grid_lengths::Vector{<:Integer}
-    )
-        @assert length(grid_boundaries) == length(grid_lengths)
-        return new{typeof(grid_boundaries),typeof(grid_lengths)}(
-            grid_boundaries, grid_lengths
-        )
-    end
+    grid_boundaries <: Vector{<:Tuple{<:Real,<:Real}}
 end
 
-function LuxCore.initialstates(::AbstractRNG, layer::GridEmbedding)
-    grid_values = map(layer.grid_boundaries, layer.grid_lengths) do (min, max), len
-        range(Float32(min), Float32(max); length=len)
-    end
-    return (; grid=meshgrid(grid_values...))
+function Base.show(io::IO, layer::GridEmbedding)
+    return print(io, "GridEmbedding(", join(layer.grid_boundaries, ", "), ")")
 end
 
-function (::GridEmbedding)(x::AbstractArray{T,N}, ps, st) where {T,N}
-    @assert size(x)[1:(end - 2)] == size(st.grid)[1:(end - 1)]
+function (layer::GridEmbedding)(x::AbstractArray{T,N}, ps, st) where {T,N}
+    @assert length(layer.grid_boundaries) == N - 2
+
+    grid = meshgrid(map(enumerate(layer.grid_boundaries)) do (i, (min, max))
+        range(T(min), T(max); length=size(x, i))
+    end...)
+
     grid = repeat(
-        reshape(st.grid, size(st.grid)..., 1), ntuple(Returns(1), N - 1)..., size(x, N)
+        Lux.Utils.contiguous(reshape(grid, size(grid)..., 1)),
+        ntuple(Returns(1), N - 1)...,
+        size(x, N),
     )
     return cat(grid, x; dims=N - 1), st
 end

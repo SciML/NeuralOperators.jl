@@ -13,12 +13,6 @@ NNlib = "872c559c-99b0-510c-b3b7-b6c96a88d5cd"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 WeightInitializers = "d49dbf32-c5c2-4618-8acc-27bb2598ef2d"
 
-[extensions]
-NeuralOperatorsReactantExt = "Reactant"
-
-[weakdeps]
-Reactant = "3c362404-f566-11ee-1572-e11a4b42c853"
-
 [compat]
 AbstractFFTs = "1.5.0"
 ConcreteStructs = "0.2.3"
@@ -27,6 +21,5 @@ LuxCore = "1.2"
 LuxLib = "1.8"
 NNlib = "0.9.30"
 Random = "1.10"
-Reactant = "0.2.130"
 WeightInitializers = "1"
 julia = "1.10"

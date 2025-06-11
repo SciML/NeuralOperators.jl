@@ -41,7 +41,7 @@ end
 Base.ndims(T::FourierTransform) = length(T.modes)
 
 function transform(ft::FourierTransform, x::AbstractArray)
-    res = unwrapped_eltype(x) <: Complex ? fft(x, 1:ndims(ft)) : rfft(x, 1:ndims(ft))
+    res = Lux.Utils.eltype(x) <: Complex ? fft(x, 1:ndims(ft)) : rfft(x, 1:ndims(ft))
     if ft.shift && ndims(ft) > 1
         res = fftshift(res, 1:ndims(ft))
     end
@@ -61,7 +61,7 @@ function inverse(
         x_fft = fftshift(x_fft, 1:ndims(ft))
     end
 
-    if unwrapped_eltype(x) <: Complex
+    if Lux.Utils.eltype(x) <: Complex
         return ifft(x_fft, 1:ndims(ft))
     else
         return real(irfft(x_fft, size(x, 1), 1:ndims(ft)))

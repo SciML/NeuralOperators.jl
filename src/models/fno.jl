@@ -66,7 +66,7 @@ function FourierNeuralOperator(
 end
 
 function FourierNeuralOperator(
-    modes::Dims,
+    modes::Dims{N},
     in_channels::Integer,
     out_channels::Integer,
     hidden_channels::Integer;
@@ -80,6 +80,17 @@ function FourierNeuralOperator(
     channel_mlp_expansion::Real=0.5,
     channel_mlp_skip::Symbol=:soft_gating,
     fno_skip::Symbol=:linear,
-)
-    return nothing
+    complex_input::Bool=false,
+) where {N}
+    lifting_channels = hidden_channels * lifting_channel_ratio
+    projection_channels = out_channels * projection_channel_ratio
+
+    if positional_embedding isa Symbol
+        @assert positional_embedding in (:grid, :none)
+        if positional_embedding == :grid
+            positional_embedding = GridEmbedding([(0.0f0, 1.0f0) for _ in 1:N])
+        else
+            positional_embedding = NoOpLayer()
+        end
+    end
 end
