@@ -1,10 +1,10 @@
 module NeuralOperators
 
-using AbstractFFTs: rfft, irfft
+using AbstractFFTs: fft, rfft, ifft, irfft, fftshift
 using ConcreteStructs: @concrete
 using Random: Random, AbstractRNG
 
-using Lux: Lux, Chain, Dense, Conv, Parallel, NoOpLayer, WrappedFunction
+using Lux: Lux, Chain, Dense, Conv, Parallel, NoOpLayer, WrappedFunction, Scale
 using LuxCore: LuxCore, AbstractLuxLayer, AbstractLuxWrapperLayer
 using LuxLib: fast_activation!!
 using NNlib: NNlib, batched_mul, pad_constant, gelu
@@ -21,6 +21,7 @@ include("models/nomad.jl")
 
 export FourierTransform
 export SpectralConv, OperatorConv, SpectralKernel, OperatorKernel
+export GridEmbedding, ComplexDecomposedLayer, SoftGating
 
 export FourierNeuralOperator
 export DeepONet

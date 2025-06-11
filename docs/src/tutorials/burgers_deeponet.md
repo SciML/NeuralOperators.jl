@@ -131,9 +131,10 @@ draw(
         :data_sequence => L"u(x)";
         color=:label => "",
         layout=:sequence => nonnumeric,
+        linestyle=:label => "",
     ) *
-    visual(Lines),
-    scales(; Color=(; palette=:tab10));
+    visual(Lines; linewidth=4),
+    scales(; Color=(; palette=:tab10), LineStyle = (; palette = [:solid, :dash]));
     figure=(;
         size=(1024, 1024),
         title="Using DeepONet to solve the Burgers equation",

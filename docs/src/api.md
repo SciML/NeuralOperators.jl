@@ -15,6 +15,9 @@ OperatorConv
 SpectralConv
 OperatorKernel
 SpectralKernel
+GridEmbedding
+ComplexDecomposedLayer
+SoftGating
 ```
 
 ## Transform API
