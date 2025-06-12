@@ -197,8 +197,6 @@ begin
     fig = Figure(; size=(512, 512))
     ax = Axis(
         fig[1, 1];
-        xlabel="x",
-        ylabel="y",
         title="Predicting the motion of the double pendulum",
         subtitle=@lift("t = $($(time))"),
     )

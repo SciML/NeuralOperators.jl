@@ -58,7 +58,7 @@ const cdev = cpu_device()
 const xdev = reactant_device(; force=true)
 
 fno = FourierNeuralOperator(
-    (16,), 2, 1, 32; activation=gelu, stabilizer=tanh, shift=true
+    (16,), 2, 1, 32; activation=gelu, stabilizer=tanh
 )
 ps, st = Lux.setup(Random.default_rng(), fno) |> xdev;
 ```
