@@ -11,6 +11,7 @@ pages = [
             "FNO" => "tutorials/burgers_fno.md",
         ],
         "Solving Poisson Equation" => "tutorials/poisson_equation.md",
+        "Double Pendulum" => "tutorials/double_pendulum.md",
     ],
     "API Reference" => "api.md",
 ]
