@@ -229,7 +229,7 @@ function (layer::GridEmbedding)(x::AbstractArray{T,N}, ps, st) where {T,N}
     @assert length(layer.grid_boundaries) == N - 2
 
     grid = meshgrid(map(enumerate(layer.grid_boundaries)) do (i, (min, max))
-        range(T(min), T(max); length=size(x, i))
+        return range(T(min), T(max); length=size(x, i))
     end...)
 
     grid = repeat(
