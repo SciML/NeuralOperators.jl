@@ -13,12 +13,12 @@ Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 Reactant = "3c362404-f566-11ee-1572-e11a4b42c853"
 
-[sources]
-NeuralOperators = {path = ".."}
+[sources.NeuralOperators]
+path = ".."
 
 [compat]
 AlgebraOfGraphics = "0.10.7"
-CairoMakie = "0.13"
+CairoMakie = "0.13, 0.14"
 CondaPkg = "0.2.23"
 DataDeps = "0.7.13"
 Documenter = "1.7.0"
