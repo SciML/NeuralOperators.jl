@@ -11,27 +11,26 @@ const gdown = pyimport("gdown")
 
 register(
     DataDep(
-    "Burgers",
-    """
-    Burgers' equation dataset from
-    [fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
+        "Burgers",
+        """
+        Burgers' equation dataset from
+        [fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
 
-    mapping between initial conditions to the solutions at the last point of time \
-    evolution in some function space.
+        mapping between initial conditions to the solutions at the last point of time \
+        evolution in some function space.
 
-    u(x,0) -> u(x, time_end):
+        u(x,0) -> u(x, time_end):
 
-      * `a`: initial conditions u(x,0)
-      * `u`: solutions u(x,t_end)
-    """,
-    "https://drive.google.com/uc?id=16a8od4vidbiNR3WtaBPCSZ0T3moxjhYe",
-    "9cbbe5070556c777b1ba3bacd49da5c36ea8ed138ba51b6ee76a24b971066ecd";
-    fetch_method=(url,
-        local_dir) -> begin
-        pyconvert(String, gdown.download(url, joinpath(local_dir, "Burgers_R10.zip")))
-    end,
-    post_fetch_method=unpack
-)
+          * `a`: initial conditions u(x,0)
+          * `u`: solutions u(x,t_end)
+        """,
+        "https://drive.google.com/uc?id=16a8od4vidbiNR3WtaBPCSZ0T3moxjhYe",
+        "9cbbe5070556c777b1ba3bacd49da5c36ea8ed138ba51b6ee76a24b971066ecd";
+        fetch_method=(url, local_dir) -> begin
+            pyconvert(String, gdown.download(url, joinpath(local_dir, "Burgers_R10.zip")))
+        end,
+        post_fetch_method=unpack,
+    ),
 )
 
 filepath = joinpath(datadep"Burgers", "burgers_data_R10.mat")
