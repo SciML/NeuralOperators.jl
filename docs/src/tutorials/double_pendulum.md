@@ -58,7 +58,7 @@ function preprocess(x; Δt=1, nx=30, ny=30)
     x = cat(x[:, :, 1:(end - 1)], ∇x; dims=1)
 
     # with info of first nx steps to inference next ny steps
-    n = size(x)[end] - (nx + ny) + 1
+    n = size(x, ndims(x)) - (nx + ny) + 1
     xs = Array{Float32}(undef, size(x)[1:2]..., nx, n)
     ys = Array{Float32}(undef, size(x)[1:2]..., ny, n)
     for i in 1:n
@@ -66,11 +66,11 @@ function preprocess(x; Δt=1, nx=30, ny=30)
         ys[:, :, :, i] .= x[:, :, (i + nx):(i + nx + ny - 1)]
     end
 
-    return permutedims(xs, (2, 3, 1, 4)), permutedims(ys, (2, 3, 1, 4))
+    return permutedims(xs, (3, 2, 1, 4)), permutedims(ys, (3, 2, 1, 4))
 end
 
 function get_dataloader(; n_file=20, Δt=1, nx=30, ny=30, ratio=0.9, batchsize=128)
-    xs, ys = Array{Float32}(undef, 4, nx, 2, 0), Array{Float32}(undef, 4, ny, 2, 0)
+    xs, ys = Array{Float32}(undef, nx, 4, 2, 0), Array{Float32}(undef, ny, 4, 2, 0)
     for i in 1:n_file
         xs_i, ys_i = preprocess(get_data(; i=i - 1); Δt, nx, ny)
         xs, ys = cat(xs, xs_i; dims=4), cat(ys, ys_i; dims=4)
@@ -94,7 +94,7 @@ const cdev = cpu_device()
 const xdev = reactant_device(; force=true)
 
 fno = FourierNeuralOperator(
-    (3, 16), 2, 2, 64; num_layers=4, activation=gelu, positional_embedding=:none
+    (16, 4), 2, 2, 64; num_layers=6, activation=gelu, positional_embedding=:none
 )
 ps, st = Lux.setup(Random.default_rng(), fno) |> xdev;
 ```
@@ -210,7 +210,12 @@ begin
     lines!(ax, ix_data, iy_data; color=:gray, linewidth=2, linestyle=:dash)
     scatter!(ax, ix_data, iy_data; color=c, markersize=15, strokewidth=2)
 
-    record(fig, "double_pendulum.gif", 1:size(inferenced_data, 2); framerate=30) do t
+    record(
+        fig,
+        joinpath(@__DIR__, "double_pendulum.gif"),
+        1:size(inferenced_data, 2);
+        framerate=30
+    ) do t
         time[] = t
     end
 end
