@@ -1,7 +1,7 @@
 name = "NeuralOperators"
 uuid = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
 authors = ["Avik Pal <avikpal@mit.edu>"]
-version = "0.6.1"
+version = "0.6.2"
 
 [deps]
 AbstractFFTs = "621f4979-c628-5d54-868e-fcf4e3e8185c"
