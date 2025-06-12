@@ -109,7 +109,7 @@ function prediction_loss(model, x, ps, st, y)
 end
 
 function train_model!(model, ps, st, trainloader, testloader; epochs=20)
-    train_state = Training.TrainState(model, ps, st, AdamW(; eta=1.0f-3, lambda=1.0f-4))
+    train_state = Training.TrainState(model, ps, st, AdamW(; eta=3.0f-4, lambda=1.0f-5))
 
     (xtest, ytest) = first(testloader)
     prediction_loss_compiled = Reactant.with_config(;
@@ -159,9 +159,9 @@ const AoG = AlgebraOfGraphics
 AoG.set_aog_theme!()
 
 x_data, y_data = preprocess(get_data(; i=20));
-gt_data = cat([x_data[:, :, :, i] for i in 1:size(x_data, 2):size(x_data, 4)]...; dims=2)[
+gt_data = cat([x_data[:, :, :, i] for i in 1:size(x_data, 1):size(x_data, 4)]...; dims=1)[
     :, :, 1
-];
+]';
 
 n = 5
 inferenced_data = x_data[:, :, :, 1:1]
@@ -177,7 +177,7 @@ for i in 1:n
     )
     inferenced_data = cat(inferenced_data, cdev(prediction); dims=4)
 end
-inferenced_data = cat([inferenced_data[:, :, :, i] for i in 1:n]...; dims=2)[:, :, 1]
+inferenced_data = cat([inferenced_data[:, :, :, i] for i in 1:n]...; dims=1)[:, :, 1]'
 
 begin
     c = [
