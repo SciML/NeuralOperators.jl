@@ -20,6 +20,7 @@ path = ".."
 
 [compat]
 AlgebraOfGraphics = "0.10.7"
+CSV = "0.10"
 CairoMakie = "0.13, 0.14"
 CondaPkg = "0.2.23"
 DataDeps = "0.7.13"
