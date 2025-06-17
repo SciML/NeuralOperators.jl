@@ -19,7 +19,7 @@ Reactant = "3c362404-f566-11ee-1572-e11a4b42c853"
 path = ".."
 
 [compat]
-AlgebraOfGraphics = "0.10.7"
+AlgebraOfGraphics = "0.10.7, 0.11"
 CSV = "0.10"
 CairoMakie = "0.13, 0.14"
 CondaPkg = "0.2.23"
