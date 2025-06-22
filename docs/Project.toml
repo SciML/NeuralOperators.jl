@@ -21,7 +21,7 @@ path = ".."
 [compat]
 AlgebraOfGraphics = "0.10.7, 0.11"
 CSV = "0.10"
-CairoMakie = "0.13, 0.14"
+CairoMakie = "0.13, 0.14, 0.15"
 CondaPkg = "0.2.23"
 DataDeps = "0.7.13"
 DataFrames = "1"
