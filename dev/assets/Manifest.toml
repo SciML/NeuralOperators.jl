@@ -1991,9 +1991,9 @@ weakdeps = ["FixedPointNumbers"]
 
 [[deps.Reactant]]
 deps = ["Adapt", "CEnum", "Downloads", "EnumX", "Enzyme", "EnzymeCore", "Functors", "GPUArraysCore", "HTTP", "LLVMOpenMP_jll", "Libdl", "LinearAlgebra", "OrderedCollections", "PrecompileTools", "Preferences", "Random", "ReactantCore", "Reactant_jll", "ScopedValues", "Scratch", "Sockets", "unzip_jll"]
-git-tree-sha1 = "eabdb4bc52fc77f6fd790b2106edbd2c7c49ad6a"
+git-tree-sha1 = "4196b856c3ba52106a53a16e3e1386ea0d54af89"
 uuid = "3c362404-f566-11ee-1572-e11a4b42c853"
-version = "0.2.149"
+version = "0.2.150"
 
     [deps.Reactant.extensions]
     ReactantAbstractFFTsExt = "AbstractFFTs"
@@ -2039,9 +2039,9 @@ version = "0.1.15"
 
 [[deps.Reactant_jll]]
 deps = ["Artifacts", "CUDA_Driver_jll", "JLLWrappers", "LazyArtifacts", "Libdl", "TOML"]
-git-tree-sha1 = "7015300ce0c7cd63b8bc7fab1bec135c9f23f63b"
+git-tree-sha1 = "287f5ab958cb60c4a3b582311191f24c57cc828a"
 uuid = "0192cb87-2b54-54ad-80e0-3be72ad8a3c0"
-version = "0.0.223+0"
+version = "0.0.225+0"
 
 [[deps.Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
@@ -2644,9 +2644,9 @@ version = "1.6.0+0"
 
 [[deps.micromamba_jll]]
 deps = ["Artifacts", "JLLWrappers", "LazyArtifacts", "Libdl"]
-git-tree-sha1 = "b4a5a3943078f9fd11ae0b5ab1bdbf7718617945"
+git-tree-sha1 = "2ca2ac0b23a8e6b76752453e08428b3b4de28095"
 uuid = "f8abcde7-e9b7-5caa-b8af-a437887ae8e4"
-version = "1.5.8+0"
+version = "1.5.12+0"
 
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
