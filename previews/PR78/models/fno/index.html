@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>FNO · NeuralOperators.jl</title><meta name="title" content="FNO · NeuralOperators.jl"/><meta property="og:title" content="FNO · NeuralOperators.jl"/><meta property="twitter:title" content="FNO · NeuralOperators.jl"/><meta name="description" content="Documentation for NeuralOperators.jl."/><meta property="og:description" content="Documentation for NeuralOperators.jl."/><meta property="twitter:description" content="Documentation for NeuralOperators.jl."/><meta property="og:url" content="https://docs.sciml.ai/NeuralOperators/stable/models/fno/"/><meta property="twitter:url" content="https://docs.sciml.ai/NeuralOperators/stable/models/fno/"/><link rel="canonical" href="https://docs.sciml.ai/NeuralOperators/stable/models/fno/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.png" alt="NeuralOperators.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">NeuralOperators.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">NeuralOperators.jl</a></li><li><span class="tocitem">Pre-built Models</span><ul><li class="is-active"><a class="tocitem" href>FNO</a><ul class="internal"><li><a class="tocitem" href="#Usage"><span>Usage</span></a></li></ul></li><li><a class="tocitem" href="../deeponet/">DeepONet</a></li><li><a class="tocitem" href="../nomad/">NOMAD</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><input class="collapse-toggle" id="menuitem-3-1" type="checkbox"/><label class="tocitem" for="menuitem-3-1"><span class="docs-label">Solving Burgers Equation</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../tutorials/burgers_deeponet/">DeepONet</a></li><li><a class="tocitem" href="../../tutorials/burgers_fno/">FNO</a></li></ul></li><li><a class="tocitem" href="../../tutorials/poisson_equation/">Solving Poisson Equation</a></li><li><a class="tocitem" href="../../tutorials/double_pendulum/">Double Pendulum</a></li></ul></li><li><a class="tocitem" href="../../api/">API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Pre-built Models</a></li><li class="is-active"><a href>FNO</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>FNO</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/SciML/NeuralOperators.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/SciML/NeuralOperators.jl/blob/main/docs/src/models/fno.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Fourier-Neural-Operators-(FNOs)"><a class="docs-heading-anchor" href="#Fourier-Neural-Operators-(FNOs)">Fourier Neural Operators (FNOs)</a><a id="Fourier-Neural-Operators-(FNOs)-1"></a><a class="docs-heading-anchor-permalink" href="#Fourier-Neural-Operators-(FNOs)" title="Permalink"></a></h1><p>FNOs are a subclass of Neural Operators that learn the learn the kernel <span>$\Kappa_{\theta}$</span>, parameterized on <span>$\theta$</span> between function spaces:</p><p class="math-container">\[(\Kappa_{\theta}u)(x) = \int_D \kappa_{\theta}(a(x), a(y), x, y) dy  \quad \forall x \in D\]</p><p>The kernel makes up a block <span>$v_t(x)$</span> which passes the information to the next block as:</p><p class="math-container">\[v^{(t+1)}(x) = \sigma((W^{(t)}v^{(t)} + \Kappa^{(t)}v^{(t)})(x))\]</p><p>FNOs choose a specific kernel <span>$\kappa(x,y) = \kappa(x-y)$</span>, converting the kernel into a convolution operation, which can be efficiently computed in the fourier domain.</p><p class="math-container">\[\begin{align*}
+(\Kappa_{\theta}u)(x)
+&amp;= \int_D \kappa_{\theta}(x - y) dy  \quad \forall x \in D\\
+&amp;= \mathcal{F}^{-1}(\mathcal{F}(\kappa_{\theta}) \mathcal{F}(u))(x) \quad \forall x \in D
+\end{align*}\]</p><p>where <span>$\mathcal{F}$</span> denotes the fourier transform. Usually, not all the modes in the frequency domain are used with the higher modes often being truncated.</p><h2 id="Usage"><a class="docs-heading-anchor" href="#Usage">Usage</a><a id="Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Usage" title="Permalink"></a></h2><p>Let&#39;s try to learn the anti-derivative operator for</p><p class="math-container">\[u(x) = sin(\alpha x)\]</p><p>That is, we want to learn</p><p class="math-container">\[\mathcal{G} : u \rightarrow v \\\]</p><p>such that</p><p class="math-container">\[v(x) = \frac{du}{dx} \quad \forall \; x \in [0, 2\pi], \; \alpha \in [0.5, 1]\]</p><h3 id="Copy-pastable-code"><a class="docs-heading-anchor" href="#Copy-pastable-code">Copy-pastable code</a><a id="Copy-pastable-code-1"></a><a class="docs-heading-anchor-permalink" href="#Copy-pastable-code" title="Permalink"></a></h3><details>
+
+<summary> Click here to see copy-pastable code for this example! </summary>
+<pre><code class="language-julia hljs">using NeuralOperators, Lux, Random, Optimisers, Reactant
+
+using CairoMakie, AlgebraOfGraphics
+set_aog_theme!()
+const AoG = AlgebraOfGraphics
+
+rng = Random.default_rng()
+Random.seed!(rng, 1234)
+
+xdev = reactant_device()
+
+batch_size = 128
+m = 32
+
+xrange = range(0, 2π; length=m) .|&gt; Float32;
+u_data = zeros(Float32, m, 1, batch_size);
+α = 0.5f0 .+ 0.5f0 .* rand(Float32, batch_size);
+v_data = zeros(Float32, m, 1, batch_size);
+
+for i in 1:batch_size
+    u_data[:, 1, i] .= sin.(α[i] .* xrange)
+    v_data[:, 1, i] .= -inv(α[i]) .* cos.(α[i] .* xrange)
+end
+
+fno = FourierNeuralOperator(gelu; chs=(1, 64, 64, 128, 1), modes=(16,))
+
+ps, st = Lux.setup(rng, fno) |&gt; xdev;
+u_data = u_data |&gt; xdev;
+v_data = v_data |&gt; xdev;
+data = [(u_data, v_data)];
+
+function train!(model, ps, st, data; epochs=10)
+    losses = []
+    tstate = Training.TrainState(model, ps, st, Adam(0.003f0))
+    for _ in 1:epochs, (x, y) in data
+        (_, loss, _, tstate) = Training.single_train_step!(
+            AutoEnzyme(), MSELoss(), (x, y), tstate; return_gradients=Val(false)
+        )
+        push!(losses, Float32(loss))
+    end
+    return losses
+end
+
+losses = train!(fno, ps, st, data; epochs=1000)
+
+draw(
+    AoG.data((; losses, iteration=1:length(losses))) *
+    mapping(:iteration =&gt; &quot;Iteration&quot;, :losses =&gt; &quot;Loss (log10 scale)&quot;) *
+    visual(Lines);
+    axis=(; yscale=log10),
+    figure=(; title=&quot;Using Fourier Neural Operator to learn the anti-derivative operator&quot;)
+)</code></pre><img src="2c1bf623.png" alt="Example block output"/></details><pre><code class="language-julia hljs">using NeuralOperators, Lux, Random, Optimisers, Reactant</code></pre><p>We will use Reactant.jl to accelerate the training process.</p><pre><code class="language-julia hljs">xdev = reactant_device()</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(::MLDataDevices.ReactantDevice{Missing, Missing, Missing}) (generic function with 1 method)</code></pre><h3 id="Constructing-training-data"><a class="docs-heading-anchor" href="#Constructing-training-data">Constructing training data</a><a id="Constructing-training-data-1"></a><a class="docs-heading-anchor-permalink" href="#Constructing-training-data" title="Permalink"></a></h3><p>First, we construct our training data.</p><pre><code class="language-julia hljs">rng = Random.default_rng()</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">Random.TaskLocalRNG()</code></pre><p><code>batch_size</code> is the number of observations.</p><pre><code class="language-julia hljs">batch_size = 128</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">128</code></pre><p><code>m</code> is the length of a single observation, you can also interpret this as the size of the grid we&#39;re evaluating our function on.</p><pre><code class="language-julia hljs">m = 32</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32</code></pre><p>We instantiate the domain that the function operates on as a range from <code>0</code> to <code>2π</code>, whose length is the grid size.</p><pre><code class="language-julia hljs">xrange = range(0, 2π; length=m) .|&gt; Float32;</code></pre><p>Each value in the array here, <code>α</code>, will be the multiplicative factor on the input to the sine function.</p><pre><code class="language-julia hljs">α = 0.5f0 .+ 0.5f0 .* rand(Float32, batch_size);</code></pre><p>Now, we create our data arrays. We are storing all of the training data in a single array, in order to batch process them more efficiently.</p><pre><code class="language-julia hljs">u_data = zeros(Float32, m, 1, batch_size);
+v_data = zeros(Float32, m, 1, batch_size);</code></pre><p>and fill the data arrays with values. Here, <code>u_data</code> is</p><pre><code class="language-julia hljs">for i in 1:batch_size
+    u_data[:, 1, i] .= sin.(α[i] .* xrange)
+    v_data[:, 1, i] .= -inv(α[i]) .* cos.(α[i] .* xrange)
+end</code></pre><h3 id="Creating-the-model"><a class="docs-heading-anchor" href="#Creating-the-model">Creating the model</a><a id="Creating-the-model-1"></a><a class="docs-heading-anchor-permalink" href="#Creating-the-model" title="Permalink"></a></h3><p>Finally, we get to the model itself. We instantiate a <code>FourierNeuralOperator</code> and provide it several parameters.</p><p>The first argument is the &quot;activation function&quot; for each neuron.</p><p>The keyword arguments are:</p><ul><li><code>chs</code> is a tuple, representing the layer sizes for each layer.</li><li><code>modes</code> is a 1-tuple, where the number represents the number of Fourier modes that are preserved, and the size of the tuple represents the number of dimensions.</li></ul><pre><code class="language-julia hljs">fno = FourierNeuralOperator(
+    gelu;                    # activation function
+    chs=(1, 64, 64, 128, 1), # channel weights
+    modes=(16,),             # number of Fourier modes to retain
+)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">FourierNeuralOperator(
+    model = Chain(
+        layer_1 = Conv((1,), 1 =&gt; 64),            <span class="sgr90"># 128 parameters</span>
+        layer_2 = Chain(
+            layer_1 = OperatorKernel(
+                layer = Parallel(
+                    connection = Fix1(add_act, gelu_tanh),
+                    layer_1 = Conv((1,), 64 =&gt; 64, use_bias=false),  <span class="sgr90"># 4_096 parameters</span>
+                    layer_2 = Chain(
+                        stabilizer = WrappedFunction(Base.Broadcast.BroadcastFunction(identity)),
+                        conv_layer = OperatorConv(64 =&gt; 64, FourierTransform{ComplexF32}((16,), shift=false)),  <span class="sgr90"># 65_536 parameters</span>
+                    ),
+                ),
+            ),
+        ),
+        layer_3 = Chain(
+            layer_1 = Conv((1,), 64 =&gt; 128, gelu_tanh),  <span class="sgr90"># 8_320 parameters</span>
+            layer_2 = Conv((1,), 128 =&gt; 1),       <span class="sgr90"># 129 parameters</span>
+        ),
+    ),
+) <span class="sgr90">        # Total: </span>78_209 parameters,
+<span class="sgr90">          #        plus </span>0 states.</code></pre><p>Now, we set up the model. This function returns two things, a set of parameters and a set of states. Since the operator is &quot;stateless&quot;, the states are empty and will remain so. The parameters are the weights of the neural network, and we will be modifying them in the training loop.</p><pre><code class="language-julia hljs">ps, st = Lux.setup(rng, fno) |&gt; xdev;</code></pre><p>We construct data as a vector of tuples (input, output). These are pre-batched, but for example if we had a lot of training data, we could dynamically load it, or create multiple batches.</p><pre><code class="language-julia hljs">u_data = u_data |&gt; xdev;
+v_data = v_data |&gt; xdev;
+data = [(u_data, v_data)];</code></pre><h3 id="Training-the-model"><a class="docs-heading-anchor" href="#Training-the-model">Training the model</a><a id="Training-the-model-1"></a><a class="docs-heading-anchor-permalink" href="#Training-the-model" title="Permalink"></a></h3><p>Now, we create a function to train the model. An &quot;epoch&quot; is basically a run over all input data, and the more epochs we have, the better the neural network gets!</p><pre><code class="language-julia hljs">function train!(model, ps, st, data; epochs=10)
+    # The `losses` array is used only for visualization,
+    # you don&#39;t actually need it to train.
+    losses = []
+    # Initialize a training state and an optimizer (Adam, in this case).
+    tstate = Training.TrainState(model, ps, st, Adam(0.003f0))
+    # Loop over epochs, then loop over each batch of training data, and step into the
+    # training:
+    for _ in 1:epochs
+        for (x, y) in data
+            (_, loss, _, tstate) = Training.single_train_step!(
+                AutoEnzyme(), MSELoss(), (x, y), tstate; return_gradients=Val(false)
+            )
+            push!(losses, Float32(loss))
+        end
+    end
+    return losses, tstate.parameters, tstate.states
+end</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">train! (generic function with 1 method)</code></pre><p>Now we train our model!</p><pre><code class="language-julia hljs">losses, ps, st = @time train!(fno, ps, st, data; epochs=500)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(Any[1.1863647f0, 0.90195584f0, 0.60068166f0, 0.3649757f0, 0.26062423f0, 0.26029986f0, 0.31053582f0, 0.28200322f0, 0.19296643f0, 0.13651158f0  …  6.9231275f-5, 5.9957485f-5, 6.687431f-5, 6.94095f-5, 6.083483f-5, 6.003928f-5, 6.620985f-5, 6.341364f-5, 5.7575562f-5, 6.0006245f-5], (layer_1 = (weight = Reactant.ConcretePJRTArray{Float32, 3, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[-1.2873354;;; 1.7084397;;; -0.35891503;;; … ;;; -1.2045468;;; -1.0220531;;; 0.81357336]), bias = Reactant.ConcretePJRTArray{Float32, 1, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[0.39693373, -0.3076301, -0.18522544, -0.07663696, 0.52384603, -0.5594486, 0.7411238, -0.080676645, -0.29459256, 0.8679922  …  0.39473662, -0.78559375, -0.97434473, -0.26467165, 0.31120247, 0.32204926, 0.32905984, -0.03244205, -0.32427981, 0.04961261])), layer_2 = (layer_1 = (layer_1 = (weight = Reactant.ConcretePJRTArray{Float32, 3, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[-0.024811685 -0.15328944 … -0.098364204 0.076327406;;; 0.091742694 0.018422605 … -0.10290587 0.06925095;;; -0.19433017 0.052320752 … -0.17523308 0.05245709;;; … ;;; -0.2079759 0.18064366 … 0.024992391 -0.13192728;;; -0.14648782 0.14805904 … -0.1976162 0.10514522;;; -0.07225728 -0.11584713 … -0.109551765 -0.07358157]),), layer_2 = (stabilizer = NamedTuple(), conv_layer = (weight = Reactant.ConcretePJRTArray{ComplexF32, 3, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(ComplexF32[0.054807078f0 - 2.2461968f-6im -0.033569966f0 + 3.9314837f-6im … 0.006096048f0 - 5.0248073f-6im -0.012053027f0 - 8.790133f-6im; -0.04823189f0 - 4.201771f-6im 0.062283624f0 + 8.85416f-6im … -0.018436864f0 + 3.1175741f-6im 0.03790079f0 - 1.2627846f-5im; … ; 0.016490517f0 - 3.8321145f-6im -0.0094226375f0 + 2.9349221f-6im … -0.00034089605f0 + 1.1307859f-5im -0.0019969612f0 + 1.0262595f-5im; 0.013244524f0 - 1.1186244f-6im -0.029660176f0 + 9.711581f-6im … 0.006251923f0 + 1.9133972f-6im -0.011127702f0 - 5.2746245f-6im;;; -0.010619973f0 + 0.02517193f0im 0.010598178f0 - 0.025148332f0im … -0.0106361015f0 + 0.025166037f0im 0.01059207f0 - 0.025166528f0im; 0.0028185635f0 + 0.015107439f0im -0.0028849894f0 - 0.015104989f0im … 0.0028862087f0 + 0.015107791f0im -0.0029000754f0 - 0.015092823f0im; … ; 0.005519633f0 - 0.021952981f0im -0.0054946616f0 + 0.022012265f0im … 0.0054824203f0 - 0.022032091f0im -0.0055223107f0 + 0.021970198f0im; -0.001204036f0 - 0.017857686f0im 0.0012696543f0 + 0.017841788f0im … -0.0012424698f0 - 0.017824221f0im 0.001249102f0 + 0.017835047f0im;;; 0.033727705f0 + 0.011194856f0im -0.033664268f0 - 0.011147276f0im … 0.03364993f0 + 0.011159259f0im -0.033680264f0 - 0.011190236f0im; 0.005842868f0 + 0.04090609f0im -0.005885906f0 - 0.040921535f0im … 0.005916801f0 + 0.040937107f0im -0.0058754766f0 - 0.040920783f0im; … ; 0.0063280626f0 - 0.044790514f0im -0.0062579145f0 + 0.044781692f0im … 0.0062613515f0 - 0.04481981f0im -0.006254877f0 + 0.044801086f0im; -0.0099288635f0 - 0.029077692f0im 0.00993013f0 + 0.029052755f0im … -0.009972162f0 - 0.029118016f0im 0.009934052f0 + 0.02906943f0im;;; … ;;; 0.08723158f0 - 0.008483184f0im -0.087224595f0 + 0.008531114f0im … 0.0871094f0 - 0.008503458f0im -0.08710781f0 + 0.008538753f0im; 0.13226923f0 + 0.001071862f0im -0.13205793f0 - 0.0010665605f0im … 0.13204344f0 + 0.0010512287f0im -0.13214119f0 - 0.0010627515f0im; … ; -0.09896949f0 - 0.03206711f0im 0.09897143f0 + 0.032036044f0im … -0.09890677f0 - 0.03193169f0im 0.098889336f0 + 0.032015655f0im; -0.075762175f0 + 0.0046302504f0im 0.07559739f0 - 0.004601977f0im … -0.07566287f0 + 0.0045968303f0im 0.07566449f0 - 0.0046160873f0im;;; -0.023377763f0 - 0.078572996f0im 0.023393922f0 + 0.07853966f0im … -0.023363769f0 - 0.07840075f0im 0.02344328f0 + 0.078496285f0im; 0.13940871f0 - 0.009191951f0im -0.1392062f0 + 0.009158627f0im … 0.13918965f0 - 0.009167875f0im -0.13930309f0 + 0.009175885f0im; … ; -0.08490002f0 - 0.022106545f0im 0.08493211f0 + 0.022081302f0im … -0.0849547f0 - 0.022089362f0im 0.08488024f0 + 0.022062775f0im; -0.078297f0 + 0.014024563f0im 0.078137025f0 - 0.013999044f0im … -0.07820817f0 + 0.014019541f0im 0.0781611f0 - 0.014008212f0im;;; -0.061758403f0 + 0.13937567f0im 0.06168988f0 - 0.13932751f0im … -0.06154297f0 + 0.13912535f0im 0.061680112f0 - 0.13925087f0im; 0.13711247f0 - 0.07394589f0im -0.13697289f0 + 0.073876984f0im … 0.13689256f0 - 0.07384159f0im -0.13705628f0 + 0.07391844f0im; … ; -0.10532211f0 + 0.031071246f0im 0.10531181f0 - 0.03108114f0im … -0.10526411f0 + 0.03105959f0im 0.105237946f0 - 0.031084612f0im; -0.08063764f0 + 0.024002934f0im 0.08047711f0 - 0.023949828f0im … -0.08055655f0 + 0.023985898f0im 0.08051724f0 - 0.023956409f0im]),))),), layer_3 = (layer_1 = (weight = Reactant.ConcretePJRTArray{Float32, 3, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[-0.21160595 -0.04278312 … 0.13471365 -0.078664444;;; -0.16014746 -0.2176881 … 0.082730874 -0.01935444;;; 0.006708435 -0.059453234 … 0.13930778 -0.07013087;;; … ;;; 0.083102144 -0.19745064 … 0.10611875 0.20680326;;; 0.012125843 -0.081286624 … -0.1569191 0.039565798;;; 0.08455371 -0.056139197 … 0.1494841 0.10408125]), bias = Reactant.ConcretePJRTArray{Float32, 1, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[-0.10824896, -0.10925133, -0.09145914, -0.039297815, 0.07231802, 0.012982117, -0.08480397, 0.03579849, -0.010200078, -0.06013896  …  0.1101619, -0.086396635, -0.0935992, -0.03236846, -0.08756646, -0.025604289, -0.054200806, 0.0874611, -0.067289464, -0.010814976])), layer_2 = (weight = Reactant.ConcretePJRTArray{Float32, 3, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[0.15044229 -0.09553625 … -0.10055295 -0.1192448;;;]), bias = Reactant.ConcretePJRTArray{Float32, 1, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[0.039782215])))), (layer_1 = NamedTuple(), layer_2 = (layer_1 = (layer_1 = NamedTuple(), layer_2 = (stabilizer = NamedTuple(), conv_layer = NamedTuple())),), layer_3 = (layer_1 = NamedTuple(), layer_2 = NamedTuple())))</code></pre><h3 id="Applying-the-model"><a class="docs-heading-anchor" href="#Applying-the-model">Applying the model</a><a id="Applying-the-model-1"></a><a class="docs-heading-anchor-permalink" href="#Applying-the-model" title="Permalink"></a></h3><p>Let&#39;s try to actually apply this model using some input data.</p><pre><code class="language-julia hljs">input_data = u_data[:, 1, 1]</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32-element Reactant.ConcretePJRTArray{Float32,1}:
+  0.0
+  0.19665995
+  0.38563907
+  0.5595565
+  0.71161956
+  0.8358893
+  0.9275121
+  0.98290956
+  0.99991804
+  0.9778732
+  ⋮
+ -0.98730135
+ -0.9992622
+ -0.9721955
+ -0.9071582
+ -0.8066904
+ -0.67471606
+ -0.51639
+ -0.33789518
+ -0.14620335</code></pre><p>This is our input data. It&#39;s currently one-dimensional, but our neural network expects input in batched form, so we simply <code>reshape</code> it (a no-cost operation) to a 3d array with singleton dimensions.</p><pre><code class="language-julia hljs">reshaped_input = reshape(input_data, length(input_data), 1, 1)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">32×1×1 reshape(::Reactant.ConcretePJRTArray{Float32,1}, 32, 1, 1) with eltype Float32:
+[:, :, 1] =
+  0.0
+  0.19665995
+  0.38563907
+  0.5595565
+  0.71161956
+  0.8358893
+  0.9275121
+  0.98290956
+  0.99991804
+  0.9778732
+  ⋮
+ -0.98730135
+ -0.9992622
+ -0.9721955
+ -0.9071582
+ -0.8066904
+ -0.67471606
+ -0.51639
+ -0.33789518
+ -0.14620335</code></pre><p>Now we can pass this to <code>Lux.apply</code> (<code>@jit</code> is used to run the function with Reactant.jl):</p><pre><code class="language-julia hljs">output_data, st = @jit Lux.apply(fno, reshaped_input, ps, st)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">(Reactant.ConcretePJRTArray{Float32, 3, 1, Reactant.Sharding.ShardInfo{Reactant.Sharding.NoSharding, Nothing}}(Float32[-1.0225116; -1.0014374; … ; -0.9626767; -1.007424;;;]), (layer_1 = NamedTuple(), layer_2 = (layer_1 = (layer_1 = NamedTuple(), layer_2 = (stabilizer = NamedTuple(), conv_layer = NamedTuple())),), layer_3 = (layer_1 = NamedTuple(), layer_2 = NamedTuple())))</code></pre><p>and plot it:</p><pre><code class="language-julia hljs">using CairoMakie, AlgebraOfGraphics
+const AoG = AlgebraOfGraphics
+AoG.set_aog_theme!()
+
+f, a, p = lines(dropdims(Array(reshaped_input); dims=(2, 3)); label=&quot;u&quot;)
+lines!(a, dropdims(Array(output_data); dims=(2, 3)); label=&quot;Predicted&quot;)
+lines!(a, Array(v_data)[:, 1, 1]; label=&quot;Expected&quot;)
+axislegend(a)
+# Compute the absolute error and plot that too,
+# on a separate axis.
+absolute_error = Array(v_data)[:, 1, 1] .- dropdims(Array(output_data); dims=(2, 3))
+a2, p2 = lines(f[2, 1], absolute_error; axis=(; ylabel=&quot;Error&quot;))
+rowsize!(f.layout, 2, Aspect(1, 1 / 8))
+linkxaxes!(a, a2)
+f</code></pre><img src="f39c2467.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« NeuralOperators.jl</a><a class="docs-footer-nextpage" href="../deeponet/">DeepONet »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.14.1 on <span class="colophon-date" title="Saturday 6 September 2025 15:32">Saturday 6 September 2025</span>. Using Julia version 1.11.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
