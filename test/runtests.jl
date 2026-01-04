@@ -9,8 +9,8 @@ const RETESTITEMS_NWORKER_THREADS = parse(
 @testset "NeuralOperators.jl Tests" begin
     ReTestItems.runtests(
         NeuralOperators;
-        nworkers=1,
-        nworker_threads=RETESTITEMS_NWORKER_THREADS,
-        testitem_timeout=3600,
+        nworkers = 1,
+        nworker_threads = RETESTITEMS_NWORKER_THREADS,
+        testitem_timeout = 3600,
     )
 end

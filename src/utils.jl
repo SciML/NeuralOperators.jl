@@ -1,6 +1,6 @@
 function apply_pattern(
-    x_tr::AbstractArray{T1,N}, weights::AbstractArray{T2,3}
-) where {T1,T2,N}
+        x_tr::AbstractArray{T1, N}, weights::AbstractArray{T2, 3}
+    ) where {T1, T2, N}
     x_size = size(x_tr)
     x_flat = reshape(x_tr, :, x_size[N - 1], x_size[N])
 

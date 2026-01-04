@@ -41,9 +41,9 @@ function LuxCore.initialparameters(rng::AbstractRNG, layer::OperatorConv)
     in_chs, out_chs = layer.in_chs, layer.out_chs
     scale = real(one(eltype(layer.tform))) / (in_chs * out_chs)
     return (;
-        weight=scale * layer.init_weight(
+        weight = scale * layer.init_weight(
             rng, eltype(layer.tform), out_chs, in_chs, layer.prod_modes
-        )
+        ),
     )
 end
 
@@ -52,22 +52,22 @@ function LuxCore.parameterlength(layer::OperatorConv)
 end
 
 function OperatorConv(
-    ch::Pair{<:Integer,<:Integer},
-    modes::Dims,
-    tform::AbstractTransform;
-    init_weight=glorot_uniform,
-)
+        ch::Pair{<:Integer, <:Integer},
+        modes::Dims,
+        tform::AbstractTransform;
+        init_weight = glorot_uniform,
+    )
     return OperatorConv(ch..., prod(modes), tform, init_weight)
 end
 
-function (conv::OperatorConv)(x::AbstractArray{T,N}, ps, st) where {T,N}
+function (conv::OperatorConv)(x::AbstractArray{T, N}, ps, st) where {T, N}
     x_t = transform(conv.tform, x)
     x_tr = truncate_modes(conv.tform, x_t)
     x_p = apply_pattern(x_tr, ps.weight)
 
     pad_dims = size(x_t)[1:(end - 2)] .- size(x_p)[1:(end - 2)]
     x_padded = pad_constant(
-        x_p, expand_pad_dims(pad_dims), false; dims=ntuple(identity, ndims(x_p) - 2)
+        x_p, expand_pad_dims(pad_dims), false; dims = ntuple(identity, ndims(x_p) - 2)
     )
     out = inverse(conv.tform, x_padded, x)
 
@@ -88,8 +88,8 @@ julia> SpectralConv(2 => 5, (16,));
 ```
 """
 function SpectralConv(
-    ch::Pair{<:Integer,<:Integer}, modes::Dims; shift::Bool=false, kwargs...
-)
+        ch::Pair{<:Integer, <:Integer}, modes::Dims; shift::Bool = false, kwargs...
+    )
     return OperatorConv(ch, modes, FourierTransform{ComplexF32}(modes, shift); kwargs...)
 end
 
@@ -121,18 +121,18 @@ julia> OperatorKernel(2 => 5, (16,), FourierTransform{ComplexF64}((16,)));
 end
 
 function OperatorKernel(
-    ch::Pair{<:Integer,<:Integer},
-    modes::Dims{N},
-    transform::AbstractTransform,
-    act=identity;
-    stabilizer=identity,
-    complex_data::Bool=false,
-    fno_skip::Symbol=:linear,
-    channel_mlp_skip::Symbol=:soft_gating,
-    use_channel_mlp::Bool=false,
-    channel_mlp_expansion::Real=0.5,
-    kwargs...,
-) where {N}
+        ch::Pair{<:Integer, <:Integer},
+        modes::Dims{N},
+        transform::AbstractTransform,
+        act = identity;
+        stabilizer = identity,
+        complex_data::Bool = false,
+        fno_skip::Symbol = :linear,
+        channel_mlp_skip::Symbol = :soft_gating,
+        use_channel_mlp::Bool = false,
+        channel_mlp_expansion::Real = 0.5,
+        kwargs...,
+    ) where {N}
     in_chs, out_chs = ch
 
     complex_data && (stabilizer = Base.Fix1(decomposed_activation, stabilizer))
@@ -205,8 +205,8 @@ julia> SpectralKernel(2 => 5, (16,));
 ```
 """
 function SpectralKernel(
-    ch::Pair{<:Integer,<:Integer}, modes::Dims, act=identity; shift::Bool=false, kwargs...
-)
+        ch::Pair{<:Integer, <:Integer}, modes::Dims, act = identity; shift::Bool = false, kwargs...
+    )
     return OperatorKernel(
         ch, modes, FourierTransform{ComplexF32}(modes, shift), act; kwargs...
     )
@@ -218,26 +218,28 @@ end
 Appends a uniform grid embedding to the input data along the penultimate dimension.
 """
 @concrete struct GridEmbedding <: AbstractLuxLayer
-    grid_boundaries <: Vector{<:Tuple{<:Real,<:Real}}
+    grid_boundaries <: Vector{<:Tuple{<:Real, <:Real}}
 end
 
 function Base.show(io::IO, layer::GridEmbedding)
     return print(io, "GridEmbedding(", join(layer.grid_boundaries, ", "), ")")
 end
 
-function (layer::GridEmbedding)(x::AbstractArray{T,N}, ps, st) where {T,N}
+function (layer::GridEmbedding)(x::AbstractArray{T, N}, ps, st) where {T, N}
     @assert length(layer.grid_boundaries) == N - 2
 
-    grid = meshgrid(map(enumerate(layer.grid_boundaries)) do (i, (min, max))
-        return range(T(min), T(max); length=size(x, i))
-    end...)
+    grid = meshgrid(
+        map(enumerate(layer.grid_boundaries)) do (i, (min, max))
+            return range(T(min), T(max); length = size(x, i))
+        end...
+    )
 
     grid = repeat(
         Lux.Utils.contiguous(reshape(grid, size(grid)..., 1)),
         ntuple(Returns(1), N - 1)...,
         size(x, N),
     )
-    return cat(grid, x; dims=N - 1), st
+    return cat(grid, x; dims = N - 1), st
 end
 
 """
@@ -252,19 +254,19 @@ end
 
 function LuxCore.initialparameters(rng::AbstractRNG, layer::ComplexDecomposedLayer)
     return (;
-        real=LuxCore.initialparameters(rng, layer.layer),
-        imag=LuxCore.initialparameters(rng, layer.layer),
+        real = LuxCore.initialparameters(rng, layer.layer),
+        imag = LuxCore.initialparameters(rng, layer.layer),
     )
 end
 
 function LuxCore.initialstates(rng::AbstractRNG, layer::ComplexDecomposedLayer)
     return (;
-        real=LuxCore.initialstates(rng, layer.layer),
-        imag=LuxCore.initialstates(rng, layer.layer),
+        real = LuxCore.initialstates(rng, layer.layer),
+        imag = LuxCore.initialstates(rng, layer.layer),
     )
 end
 
-function (layer::ComplexDecomposedLayer)(x::AbstractArray{T,N}, ps, st) where {T,N}
+function (layer::ComplexDecomposedLayer)(x::AbstractArray{T, N}, ps, st) where {T, N}
     rx = real.(x)
     ix = imag.(x)
 
@@ -275,7 +277,7 @@ function (layer::ComplexDecomposedLayer)(x::AbstractArray{T,N}, ps, st) where {T
     ifn_ix, st_imag = layer.layer(ix, ps.imag, st_imag)
 
     out = Complex.(rfn_rx .- ifn_ix, rfn_ix .+ ifn_rx)
-    return out, (; real=st_real, imag=st_imag)
+    return out, (; real = st_real, imag = st_imag)
 end
 
 """
