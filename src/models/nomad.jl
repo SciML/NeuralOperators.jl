@@ -39,7 +39,7 @@ julia> size(first(nomad((u, y), ps, st)))
 end
 
 function NOMAD(approximator, decoder)
-    return NOMAD(Chain(; approximator=Parallel(vcat, approximator, NoOpLayer()), decoder))
+    return NOMAD(Chain(; approximator = Parallel(vcat, approximator, NoOpLayer()), decoder))
 end
 
 """
@@ -81,22 +81,22 @@ julia> size(first(nomad((u, y), ps, st)))
 ```
 """
 function NOMAD(;
-    approximator=(8, 32, 32, 16),
-    decoder=(18, 16, 8, 8),
-    approximator_activation=identity,
-    decoder_activation=identity,
-)
+        approximator = (8, 32, 32, 16),
+        decoder = (18, 16, 8, 8),
+        approximator_activation = identity,
+        decoder_activation = identity,
+    )
     approximator_net = Chain(
         [
             Dense(approximator[i] => approximator[i + 1], approximator_activation) for
-            i in 1:(length(approximator) - 1)
+                i in 1:(length(approximator) - 1)
         ]...,
     )
 
     decoder_net = Chain(
         [
             Dense(decoder[i] => decoder[i + 1], decoder_activation) for
-            i in 1:(length(decoder) - 1)
+                i in 1:(length(decoder) - 1)
         ]...,
     )
 

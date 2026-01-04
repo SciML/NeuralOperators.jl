@@ -50,7 +50,7 @@ end
 function DeepONet(branch, trunk)
     return DeepONet(
         Chain(
-            Parallel(*; branch=Chain(branch, WrappedFunction(adjoint)), trunk=trunk),
+            Parallel(*; branch = Chain(branch, WrappedFunction(adjoint)), trunk = trunk),
             WrappedFunction(adjoint),
         ),
     )
@@ -94,11 +94,11 @@ julia> size(first(deeponet((u, y), ps, st)))
 ```
 """
 function DeepONet(;
-    branch=(64, 32, 32, 16),
-    trunk=(1, 8, 8, 16),
-    branch_activation=identity,
-    trunk_activation=identity,
-)
+        branch = (64, 32, 32, 16),
+        trunk = (1, 8, 8, 16),
+        branch_activation = identity,
+        trunk_activation = identity,
+    )
 
     # checks for last dimension size
     @assert branch[end] == trunk[end] "Branch and Trunk net must share the same amount \
@@ -108,18 +108,18 @@ function DeepONet(;
     branch_net = Chain(
         [
             Dense(
-                branch[i] => branch[i + 1],
-                ifelse(i == length(branch) - 1, identity, branch_activation),
-            ) for i in 1:(length(branch) - 1)
+                    branch[i] => branch[i + 1],
+                    ifelse(i == length(branch) - 1, identity, branch_activation),
+                ) for i in 1:(length(branch) - 1)
         ]...,
     )
 
     trunk_net = Chain(
         [
             Dense(
-                trunk[i] => trunk[i + 1],
-                ifelse(i == length(trunk) - 1, identity, trunk_activation),
-            ) for i in 1:(length(trunk) - 1)
+                    trunk[i] => trunk[i + 1],
+                    ifelse(i == length(trunk) - 1, identity, trunk_activation),
+                ) for i in 1:(length(trunk) - 1)
         ]...,
     )
 

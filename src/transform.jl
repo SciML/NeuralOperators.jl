@@ -25,13 +25,13 @@ A concrete implementation of `AbstractTransform` for Fourier transforms.
 
 If `shift` is `true`, we apply a `fftshift` before truncating the modes.
 """
-struct FourierTransform{T,M} <: AbstractTransform{T}
+struct FourierTransform{T, M} <: AbstractTransform{T}
     modes::M
     shift::Bool
 end
 
-function FourierTransform{T}(modes::Dims, shift::Bool=false) where {T}
-    return FourierTransform{T,typeof(modes)}(modes, shift)
+function FourierTransform{T}(modes::Dims, shift::Bool = false) where {T}
+    return FourierTransform{T, typeof(modes)}(modes, shift)
 end
 
 function Base.show(io::IO, ft::FourierTransform)
@@ -58,8 +58,8 @@ end
 truncate_modes(ft::FourierTransform, x_fft::AbstractArray) = low_pass(ft, x_fft)
 
 function inverse(
-    ft::FourierTransform, x_fft::AbstractArray{T,N}, x::AbstractArray{T2,N}
-) where {T,T2,N}
+        ft::FourierTransform, x_fft::AbstractArray{T, N}, x::AbstractArray{T2, N}
+    ) where {T, T2, N}
     complex_data = Lux.Utils.eltype(x) <: Complex
 
     if ft.shift && ndims(ft) > 1

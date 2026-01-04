@@ -3,25 +3,25 @@
 
     setups = [
         (
-            modes=(16,),
-            chs=(2, 64, 64, 64, 64, 64, 128, 1),
-            x_size=(1024, 2, 5),
-            y_size=(1024, 1, 5),
-            shift=false,
+            modes = (16,),
+            chs = (2, 64, 64, 64, 64, 64, 128, 1),
+            x_size = (1024, 2, 5),
+            y_size = (1024, 1, 5),
+            shift = false,
         ),
         (
-            modes=(16, 16),
-            chs=(2, 64, 64, 64, 64, 64, 128, 4),
-            x_size=(32, 32, 2, 5),
-            y_size=(32, 32, 4, 5),
-            shift=false,
+            modes = (16, 16),
+            chs = (2, 64, 64, 64, 64, 64, 128, 4),
+            x_size = (32, 32, 2, 5),
+            y_size = (32, 32, 4, 5),
+            shift = false,
         ),
         (
-            modes=(16, 16),
-            chs=(2, 64, 64, 64, 64, 64, 128, 4),
-            x_size=(32, 32, 2, 5),
-            y_size=(32, 32, 4, 5),
-            shift=true,
+            modes = (16, 16),
+            chs = (2, 64, 64, 64, 64, 64, 128, 4),
+            x_size = (32, 32, 2, 5),
+            y_size = (32, 32, 4, 5),
+            shift = true,
         ),
     ]
 
@@ -40,8 +40,8 @@
 
         res = first(fno(x, ps, st))
         res_ra, _ = Reactant.with_config(;
-            dot_general_precision=PrecisionConfig.HIGH,
-            convolution_precision=PrecisionConfig.HIGH,
+            dot_general_precision = PrecisionConfig.HIGH,
+            convolution_precision = PrecisionConfig.HIGH,
         ) do
             @jit fno(x_ra, ps_ra, st_ra)
         end
@@ -49,7 +49,7 @@
 
         @test begin
             l2, l1 = train!(
-                MSELoss(), AutoEnzyme(), fno, ps_ra, st_ra, [(x_ra, y_ra)]; epochs=10
+                MSELoss(), AutoEnzyme(), fno, ps_ra, st_ra, [(x_ra, y_ra)]; epochs = 10
             )
             l2 < l1
         end
@@ -58,8 +58,8 @@
             ∂x_zyg, ∂ps_zyg = zygote_gradient(fno, x, ps, st)
 
             ∂x_ra, ∂ps_ra = Reactant.with_config(;
-                dot_general_precision=PrecisionConfig.HIGH,
-                convolution_precision=PrecisionConfig.HIGH,
+                dot_general_precision = PrecisionConfig.HIGH,
+                convolution_precision = PrecisionConfig.HIGH,
             ) do
                 @jit enzyme_gradient(fno, x_ra, ps_ra, st_ra)
             end
@@ -67,7 +67,7 @@
 
             # TODO: is zygote off here?
             @test ∂x_zyg ≈ ∂x_ra atol = 1.0f-2 rtol = 1.0f-2 skip = setup.shift
-            @test check_approx(∂ps_zyg, ∂ps_ra; atol=1.0f-2, rtol=1.0f-2) skip = setup.shift
+            @test check_approx(∂ps_zyg, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2) skip = setup.shift
         end
     end
 end

@@ -44,8 +44,8 @@ julia> size(first(fno(u, ps, st)))
 end
 
 function FourierNeuralOperator(
-    σ=gelu; chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128, 1), modes::Dims{M}=(16,), kwargs...
-) where {C,M}
+        σ = gelu; chs::Dims{C} = (2, 64, 64, 64, 64, 64, 128, 1), modes::Dims{M} = (16,), kwargs...
+    ) where {C, M}
     @assert length(chs) ≥ 5
 
     return FourierNeuralOperator(
@@ -54,7 +54,7 @@ function FourierNeuralOperator(
             Chain(
                 [
                     SpectralKernel(chs[i] => chs[i + 1], modes, σ; kwargs...) for
-                    i in 2:(C - 3)
+                        i in 2:(C - 3)
                 ]...,
             ),
             Chain(
@@ -111,23 +111,23 @@ Constructor for a Fourier neural operator (FNO) model.
   - `shift`: Whether to apply `fftshift` before truncating the modes.
 """
 function FourierNeuralOperator(
-    modes::Dims{N},
-    in_channels::Integer,
-    out_channels::Integer,
-    hidden_channels::Integer;
-    num_layers::Integer=4,
-    lifting_channel_ratio::Integer=2,
-    projection_channel_ratio::Integer=2,
-    positional_embedding::Union{Symbol,AbstractLuxLayer}=:grid, # :grid | :none
-    activation=gelu,
-    use_channel_mlp::Bool=true,
-    channel_mlp_expansion::Real=0.5,
-    channel_mlp_skip::Symbol=:soft_gating,
-    fno_skip::Symbol=:linear,
-    complex_data::Bool=false,
-    stabilizer=tanh,
-    shift::Bool=false,
-) where {N}
+        modes::Dims{N},
+        in_channels::Integer,
+        out_channels::Integer,
+        hidden_channels::Integer;
+        num_layers::Integer = 4,
+        lifting_channel_ratio::Integer = 2,
+        projection_channel_ratio::Integer = 2,
+        positional_embedding::Union{Symbol, AbstractLuxLayer} = :grid, # :grid | :none
+        activation = gelu,
+        use_channel_mlp::Bool = true,
+        channel_mlp_expansion::Real = 0.5,
+        channel_mlp_skip::Symbol = :soft_gating,
+        fno_skip::Symbol = :linear,
+        complex_data::Bool = false,
+        stabilizer = tanh,
+        shift::Bool = false,
+    ) where {N}
     lifting_channels = hidden_channels * lifting_channel_ratio
     projection_channels = out_channels * projection_channel_ratio
 
@@ -155,17 +155,17 @@ function FourierNeuralOperator(
     fno_blocks = Chain(
         [
             SpectralKernel(
-                hidden_channels => hidden_channels,
-                modes,
-                activation;
-                stabilizer,
-                shift,
-                use_channel_mlp,
-                channel_mlp_expansion,
-                channel_mlp_skip,
-                fno_skip,
-                complex_data,
-            ) for _ in 1:num_layers
+                    hidden_channels => hidden_channels,
+                    modes,
+                    activation;
+                    stabilizer,
+                    shift,
+                    use_channel_mlp,
+                    channel_mlp_expansion,
+                    channel_mlp_skip,
+                    fno_skip,
+                    complex_data,
+                ) for _ in 1:num_layers
         ]...,
     )
 
