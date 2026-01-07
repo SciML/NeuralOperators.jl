@@ -65,10 +65,9 @@ function (conv::OperatorConv)(x::AbstractArray{T, N}, ps, st) where {T, N}
     x_tr = truncate_modes(conv.tform, x_t)
     x_p = apply_pattern(x_tr, ps.weight)
 
-    pad_dims = size(x_t)[1:(end - 2)] .- size(x_p)[1:(end - 2)]
-    x_padded = pad_constant(
-        x_p, expand_pad_dims(pad_dims), false; dims = ntuple(identity, ndims(x_p) - 2)
-    )
+    # Use type-stable zero-padding to restore to FFT size
+    target_sizes = ntuple(i -> size(x_t, i), Val(N - 2))
+    x_padded = pad_zeros_spatial(x_p, target_sizes)
     out = inverse(conv.tform, x_padded, x)
 
     return out, st

@@ -28,15 +28,30 @@ function expand_pad_dims(pad_dims::Dims{N}) where {N}
     return ntuple(i -> isodd(i) ? 0 : pad_dims[i ÷ 2], 2N)
 end
 
-function meshgrid(args::AbstractVector...)
-    return let N = length(args)
-        stack(enumerate(args)) do (i, arg)
-            new_shape = ones(Int, N)
-            new_shape[i] = length(arg)
-            repeat_sizes = collect(Int, map(length, args))
-            repeat_sizes[i] = 1
-            return repeat(Lux.Utils.contiguous(reshape(arg, new_shape...)), repeat_sizes...)
-        end
+# Type-stable zero-padding for FFT operations.
+# Pads an array with zeros in the first M spatial dimensions.
+# The last two dimensions (channels, batch) are not padded.
+function pad_zeros_spatial(
+        x::AbstractArray{T, N}, target_sizes::Dims{M}
+    ) where {T, N, M}
+    @assert M == N - 2 "target_sizes must have N-2 elements (spatial dimensions only)"
+    current_sizes = ntuple(i -> size(x, i), Val(M))
+    # If no padding needed, return the original array
+    all(current_sizes .== target_sizes) && return x
+    # Create output array with target sizes + unchanged channel/batch dims
+    out_size = (target_sizes..., size(x, N - 1), size(x, N))
+    y = zeros(T, out_size)
+    # Copy the input data to the beginning of each spatial dimension
+    src_indices = (ntuple(i -> 1:size(x, i), Val(M))..., :, :)
+    y[src_indices...] = x
+    return y
+end
+
+function meshgrid(args::Vararg{AbstractVector, N}) where {N}
+    return stack(enumerate(args)) do (i, arg)
+        new_shape = ntuple(j -> j == i ? length(arg) : 1, Val(N))
+        repeat_sizes = ntuple(j -> j == i ? 1 : length(args[j]), Val(N))
+        return repeat(Lux.Utils.contiguous(reshape(arg, new_shape)), repeat_sizes...)
     end
 end
 
