@@ -8,7 +8,7 @@
         (; m = (10, 10), x_size = (22, 22, 1, 5), y_size = (22, 22, 16, 5), shift = true),
     ]
 
-    xdev = reactant_device(; force=true)
+    xdev = reactant_device(; force = true)
 
     @testset "$(op) $(length(setup.m))D | shift=$(setup.shift)" for op in opconv,
             setup in setups

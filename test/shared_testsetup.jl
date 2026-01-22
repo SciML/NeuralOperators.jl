@@ -9,7 +9,7 @@ const BACKEND_GROUP = lowercase(get(ENV, "BACKEND_GROUP", "All"))
 
 train!(args...; kwargs...) = train!(MSELoss(), AutoZygote(), args...; kwargs...)
 
-function train!(loss, backend, model, ps, st, data; epochs=10)
+function train!(loss, backend, model, ps, st, data; epochs = 10)
     l1 = @jit loss(model, ps, st, first(data))
 
     tstate = Training.TrainState(model, ps, st, Adam(0.01f0))

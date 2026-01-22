@@ -25,7 +25,7 @@
         ),
     ]
 
-    xdev = reactant_device(; force=true)
+    xdev = reactant_device(; force = true)
 
     @testset "$(length(setup.modes))D | shift=$(setup.shift)" for setup in setups
         fno = FourierNeuralOperator(; setup.chs, setup.modes, setup.shift)

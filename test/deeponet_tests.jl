@@ -20,7 +20,7 @@
         ),
     ]
 
-    xdev = reactant_device(; force=true)
+    xdev = reactant_device(; force = true)
 
     @testset "$(setup.name)" for setup in setups
         u = rand(Float32, setup.u_size...)

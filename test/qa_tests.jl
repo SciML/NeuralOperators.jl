@@ -19,5 +19,5 @@ end
 
 @testitem "Explicit Imports: Quality Assurance" tags = [:qa] begin
     using ExplicitImports
-    test_explicit_imports(NeuralOperators; all_qualified_accesses_are_public=false)
+    test_explicit_imports(NeuralOperators; all_qualified_accesses_are_public = false)
 end
