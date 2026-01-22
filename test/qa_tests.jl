@@ -18,12 +18,6 @@ end
 end
 
 @testitem "Explicit Imports: Quality Assurance" tags = [:qa] begin
-    using ExplicitImports, Lux
-
-    # Skip our own packages
-    @test check_no_implicit_imports(NeuralOperators; skip = (Base, Core, Lux)) === nothing
-    @test check_no_stale_explicit_imports(NeuralOperators) === nothing
-    @test check_no_self_qualified_accesses(NeuralOperators) === nothing
-    @test check_all_explicit_imports_via_owners(NeuralOperators) === nothing
-    @test check_all_qualified_accesses_via_owners(NeuralOperators) === nothing
+    using ExplicitImports
+    test_explicit_imports(NeuralOperators; all_qualified_accesses_are_public=false)
 end
