@@ -3,9 +3,9 @@
 
     opconv = [SpectralConv, SpectralKernel]
     setups = [
-        (; m = (16,), x_size = (1024, 2, 5), y_size = (1024, 16, 5), shift = false),
-        (; m = (10, 10), x_size = (22, 22, 1, 5), y_size = (22, 22, 16, 5), shift = false),
-        (; m = (10, 10), x_size = (22, 22, 1, 5), y_size = (22, 22, 16, 5), shift = true),
+        (; m = (4,), x_size = (8, 2, 2), y_size = (8, 4, 2), shift = false),
+        (; m = (4, 4), x_size = (8, 8, 1, 2), y_size = (8, 8, 4, 2), shift = false),
+        (; m = (4, 4), x_size = (8, 8, 1, 2), y_size = (8, 8, 4, 2), shift = true),
     ]
 
     xdev = reactant_device(; force = true)
@@ -33,21 +33,12 @@
         res_ra, _ = @jit m(x_ra, ps_ra, st_ra)
         @test res_ra ≈ res atol = 1.0f-2 rtol = 1.0f-2
 
-        # FIXME: re-enable this
-        # @test begin
-        #     l2, l1 = train!(
-        #         MSELoss(), AutoEnzyme(), m, ps_ra, st_ra, [(x_ra, y_ra)]; epochs = 10
-        #     )
-        #     l2 < l1
-        # end
+        @testset "check gradients" begin
+            ∂x_fd, ∂ps_fd = ∇sumabs2_reactant_fd(m, x_ra, ps_ra, st_ra)
+            ∂x_ra, ∂ps_ra = ∇sumabs2_reactant(m, x_ra, ps_ra, st_ra)
 
-        # FIXME: https://github.com/EnzymeAD/Enzyme-JAX/issues/1961
-        # @testset "check gradients" begin
-        #     ∂x_fd, ∂ps_fd = ∇sumabs2_reactant_fd(m, x_ra, ps_ra, st_ra)
-        #     ∂x_ra, ∂ps_ra = ∇sumabs2_reactant(m, x_ra, ps_ra, st_ra)
-
-        #     @test ∂x_fd ≈ ∂x_ra atol = 1.0f-2 rtol = 1.0f-2
-        #     @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
-        # end
+            @test ∂x_fd ≈ ∂x_ra atol = 1.0f-2 rtol = 1.0f-2
+            @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
+        end
     end
 end

@@ -3,24 +3,24 @@
 
     setups = [
         (
-            modes = (16,),
-            chs = (2, 64, 64, 64, 64, 64, 128, 1),
-            x_size = (1024, 2, 5),
-            y_size = (1024, 1, 5),
+            modes = (4,),
+            chs = (2, 4, 4, 4, 1),
+            x_size = (8, 2, 2),
+            y_size = (8, 1, 2),
             shift = false,
         ),
         (
-            modes = (16, 16),
-            chs = (2, 64, 64, 64, 64, 64, 128, 4),
-            x_size = (32, 32, 2, 5),
-            y_size = (32, 32, 4, 5),
+            modes = (4, 4),
+            chs = (2, 4, 4, 4, 4),
+            x_size = (8, 8, 2, 2),
+            y_size = (8, 8, 4, 2),
             shift = false,
         ),
         (
-            modes = (16, 16),
-            chs = (2, 64, 64, 64, 64, 64, 128, 4),
-            x_size = (32, 32, 2, 5),
-            y_size = (32, 32, 4, 5),
+            modes = (4, 4),
+            chs = (2, 4, 4, 4, 4),
+            x_size = (8, 8, 2, 2),
+            y_size = (8, 8, 4, 2),
             shift = true,
         ),
     ]
@@ -44,21 +44,12 @@
         res_ra, _ = @jit fno(x_ra, ps_ra, st_ra)
         @test res_ra ≈ res atol = 1.0f-2 rtol = 1.0f-2
 
-        # FIXME: re-enable this
-        # @test begin
-        #     l2, l1 = train!(
-        #         MSELoss(), AutoEnzyme(), fno, ps_ra, st_ra, [(x_ra, y_ra)]; epochs = 10
-        #     )
-        #     l2 < l1
-        # end
+        @testset "check gradients" begin
+            ∂x_fd, ∂ps_fd = ∇sumabs2_reactant_fd(fno, x_ra, ps_ra, st_ra)
+            ∂x_ra, ∂ps_ra = ∇sumabs2_reactant(fno, x_ra, ps_ra, st_ra)
 
-        # FIXME: https://github.com/EnzymeAD/Enzyme-JAX/issues/1961
-        # @testset "check gradients" begin
-        #     ∂x_fd, ∂ps_fd = ∇sumabs2_reactant_fd(fno, x_ra, ps_ra, st_ra)
-        #     ∂x_ra, ∂ps_ra = ∇sumabs2_reactant(fno, x_ra, ps_ra, st_ra)
-
-        #     @test ∂x_fd ≈ ∂x_ra atol = 1.0f-2 rtol = 1.0f-2
-        #     @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
-        # end
+            @test ∂x_fd ≈ ∂x_ra atol = 1.0f-2 rtol = 1.0f-2
+            @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
+        end
     end
 end

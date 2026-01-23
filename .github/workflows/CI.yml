@@ -72,6 +72,3 @@ jobs:
   #     - name: Check if the PR does increase number of invalidations
   #       if: steps.invs_pr.outputs.total > steps.invs_default.outputs.total
   #       run: exit 1
-
-env:
-  BACKEND_GROUP: "CPU"
