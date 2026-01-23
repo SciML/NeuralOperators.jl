@@ -3,37 +3,27 @@
 ## Data Loading
 
 ```julia
-using DataDeps, CSV, MLUtils, DataFrames
+using CSV, MLUtils, DataFrames, Git, Scratch
 using Printf
 
-register(
-    DataDep(
-        "DoublePendulumChaotic",
-        """
-        Dataset was generated on the basis of 21 individual runs of a double pendulum.
-        Each of the recorded sequences lasted around 40s and consisted of around 17500 frames.
-
-          * `x_red`: Horizontal pixel coordinate of the red point (the central pivot to the
-            first pendulum)
-          * `y_red`: Vertical pixel coordinate of the red point (the central pivot to the first
-            pendulum)
-          * `x_green`: Horizontal pixel coordinate of the green point (the first pendulum)
-          * `y_green`: Vertical pixel coordinate of the green point (the first pendulum)
-          * `x_blue`: Horizontal pixel coordinate of the blue point (the second pendulum)
-          * `y_blue`: Vertical pixel coordinate of the blue point (the second pendulum)
-
-        Page: https://developer.ibm.com/exchanges/data/all/double-pendulum-chaotic/
-        """,
-        "https://dax-cdn.cdn.appdomain.cloud/dax-double-pendulum-chaotic/2.0.1/double-pendulum-chaotic.tar.gz",
-        "4ca743b4b783094693d313ebedc2e8e53cf29821ee8b20abd99f8fb4c0866f8d";
-        post_fetch_method=unpack,
-    ),
-)
+function get_dataset_path()
+    scratch_path = @get_scratch!("double_pendulum")
+    if !isdir(joinpath(scratch_path, "data", "ibm-double-pendulum"))
+        run(Git.git(
+            [
+                "clone",
+                "https://github.com/erwincoumans/tiny-differentiable-simulator",
+                "$(scratch_path)",
+            ]
+        ))
+    end
+    return joinpath(scratch_path, "data", "ibm-double-pendulum")
+end
 
 function get_data(; i=0, n=-1)
-    data_path = joinpath(datadep"DoublePendulumChaotic", "original", "dpc_dataset_csv")
+    data_path = get_dataset_path()
     df = CSV.read(
-        joinpath(data_path, "$i.csv"),
+        joinpath(data_path, "original", "dpc_dataset_csv", "$i.csv"),
         DataFrame;
         header=[:x_red, :y_red, :x_green, :y_green, :x_blue, :y_blue],
     )
@@ -112,14 +102,9 @@ function train_model!(model, ps, st, trainloader, testloader; epochs=20)
     train_state = Training.TrainState(model, ps, st, AdamW(; eta=3.0f-4, lambda=1.0f-5))
 
     (xtest, ytest) = first(testloader)
-    prediction_loss_compiled = Reactant.with_config(;
-        convolution_precision=PrecisionConfig.HIGH,
-        dot_general_precision=PrecisionConfig.HIGH,
-    ) do
-        @compile prediction_loss(
-            model, xtest, train_state.parameters, train_state.states, ytest
-        )
-    end
+    prediction_loss_compiled = @compile prediction_loss(
+        model, xtest, train_state.parameters, train_state.states, ytest
+    )
 
     for epoch in 1:epochs
         for data in trainloader
@@ -167,15 +152,8 @@ n = 5
 inferenced_data = x_data[:, :, :, 1:1]
 for i in 1:n
     input_data = inferenced_data[:, :, :, i:i] |> xdev
-    prediction = first(
-        Reactant.with_config(;
-            convolution_precision=PrecisionConfig.HIGH,
-            dot_general_precision=PrecisionConfig.HIGH,
-        ) do
-            @jit fno(input_data, ps_trained, st_trained)
-        end,
-    )
-    inferenced_data = cat(inferenced_data, cdev(prediction); dims=4)
+    prediction = @jit fno(input_data, ps_trained, st_trained)
+    inferenced_data = cat(inferenced_data, cdev(prediction[1]); dims=4)
 end
 inferenced_data = cat([inferenced_data[:, :, :, i] for i in 1:n]...; dims=1)[:, :, 1]'
 
