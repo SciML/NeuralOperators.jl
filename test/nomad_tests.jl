@@ -20,7 +20,7 @@
         ),
     ]
 
-    xdev = reactant_device()
+    xdev = reactant_device(; force = true)
 
     @testset "$(setup.name)" for setup in setups
         u = rand(Float32, setup.u_size...)
@@ -35,20 +35,16 @@
         ps_ra, st_ra = xdev((ps, st))
         u_ra, y_ra = xdev(u), xdev(y)
 
+        pred_ra, _ = @jit nomad((u_ra, y_ra), ps_ra, st_ra)
+        @test pred_ra ≈ pred atol = 1.0f-2 rtol = 1.0f-2
+
         @testset "check gradients" begin
-            ∂u_zyg, ∂ps_zyg = zygote_gradient(nomad, (u, y), ps, st)
+            (∂u_fd, ∂y_fd), ∂ps_fd = ∇sumabs2_reactant_fd(nomad, (u_ra, y_ra), ps_ra, st_ra)
+            (∂u_ra, ∂y_ra), ∂ps_ra = ∇sumabs2_reactant(nomad, (u_ra, y_ra), ps_ra, st_ra)
 
-            ∂u_ra, ∂ps_ra = Reactant.with_config(;
-                dot_general_precision = PrecisionConfig.HIGH,
-                convolution_precision = PrecisionConfig.HIGH,
-            ) do
-                @jit enzyme_gradient(nomad, (u_ra, y_ra), ps_ra, st_ra)
-            end
-            ∂u_ra, ∂ps_ra = (∂u_ra, ∂ps_ra) |> cpu_device()
-
-            @test ∂u_zyg[1] ≈ ∂u_ra[1] atol = 1.0f-2 rtol = 1.0f-2
-            @test ∂u_zyg[2] ≈ ∂u_ra[2] atol = 1.0f-2 rtol = 1.0f-2
-            @test check_approx(∂ps_zyg, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
+            @test ∂u_fd ≈ ∂u_ra atol = 1.0f-2 rtol = 1.0f-2
+            @test ∂y_fd ≈ ∂y_ra atol = 1.0f-2 rtol = 1.0f-2
+            @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
         end
     end
 end
