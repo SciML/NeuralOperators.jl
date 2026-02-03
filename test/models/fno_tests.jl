@@ -1,4 +1,8 @@
-@testitem "Fourier Neural Operator" setup = [SharedTestSetup] begin
+using NeuralOperators, Test
+
+include("../shared_testsetup.jl")
+
+@testset "Fourier Neural Operator" begin
     rng = StableRNG(12345)
 
     setups = [

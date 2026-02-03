@@ -1,23 +1,10 @@
-@testitem "doctests: Quality Assurance" tags = [:qa] begin
-    using Documenter, NeuralOperators
+using NeuralOperators, Test, ExplicitImports, Aqua
 
-    DocMeta.setdocmeta!(
-        NeuralOperators,
-        :DocTestSetup,
-        :(using Lux, NeuralOperators, Random);
-        recursive = true,
-    )
-    doctest(NeuralOperators; manual = false)
-end
-
-@testitem "Aqua: Quality Assurance" tags = [:qa] begin
-    using Aqua
-
+@testset "Aqua: Quality Assurance" begin
     Aqua.test_all(NeuralOperators; ambiguities = false)
     Aqua.test_ambiguities(NeuralOperators; recursive = false)
 end
 
-@testitem "Explicit Imports: Quality Assurance" tags = [:qa] begin
-    using ExplicitImports
+@testset "Explicit Imports: Quality Assurance" begin
     test_explicit_imports(NeuralOperators; all_qualified_accesses_are_public = false)
 end

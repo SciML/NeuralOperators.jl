@@ -1,9 +1,5 @@
-@testsetup module SharedTestSetup
-import Reexport: @reexport
-
-@reexport using Lux, Optimisers, Random, StableRNGs, Reactant, Enzyme
+using Lux, Optimisers, Random, StableRNGs, Reactant, Enzyme, FastTransforms
 using LuxTestUtils: check_approx
-using FFTW
 
 sumabs2first(model, x, ps, st) = sum(abs2, first(model(x, ps, st)))
 
@@ -31,8 +27,4 @@ end
 
 function ∇sumabs2_reactant(model, x, ps, st)
     return @jit ∇sumabs2_enzyme(model, x, ps, st)
-end
-
-export check_approx, ∇sumabs2_reactant_fd, ∇sumabs2_reactant
-
 end

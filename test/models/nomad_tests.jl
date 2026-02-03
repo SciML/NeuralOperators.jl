@@ -1,4 +1,8 @@
-@testitem "NOMAD" setup = [SharedTestSetup] begin
+using NeuralOperators, Test
+
+include("../shared_testsetup.jl")
+
+@testset "NOMAD" begin
     rng = StableRNG(12345)
 
     setups = [

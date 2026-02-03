@@ -1,18 +1,18 @@
-@testitem "SpectralConv & SpectralKernel" setup = [SharedTestSetup] begin
+using NeuralOperators, Test
+
+include("../shared_testsetup.jl")
+
+const LAYERS_SETUPS = [
+    (; m = (4,), x_size = (8, 2, 2), y_size = (8, 4, 2), shift = false),
+    (; m = (4, 4), x_size = (8, 8, 1, 2), y_size = (8, 8, 4, 2), shift = false),
+    (; m = (4, 4), x_size = (8, 8, 1, 2), y_size = (8, 8, 4, 2), shift = true),
+]
+
+function run_op_tests(op, setups)
     rng = StableRNG(12345)
-
-    opconv = [SpectralConv, SpectralKernel]
-    setups = [
-        (; m = (4,), x_size = (8, 2, 2), y_size = (8, 4, 2), shift = false),
-        (; m = (4, 4), x_size = (8, 8, 1, 2), y_size = (8, 8, 4, 2), shift = false),
-        (; m = (4, 4), x_size = (8, 8, 1, 2), y_size = (8, 8, 4, 2), shift = true),
-    ]
-
     xdev = reactant_device(; force = true)
 
-    @testset "$(op) $(length(setup.m))D | shift=$(setup.shift)" for op in opconv,
-            setup in setups
-
+    @testset "$(length(setup.m))D | shift=$(setup.shift)" for setup in setups
         in_chs = setup.x_size[end - 1]
         out_chs = setup.y_size[end - 1]
         ch = 4 => out_chs
