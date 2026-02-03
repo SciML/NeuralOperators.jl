@@ -204,18 +204,18 @@ function train_model!(model, ps, st, dataloader; epochs=1000)
     return train_state.parameters, train_state.states
 end
 
-ps_trained, st_trained = train_model!(fno, ps, st, dataloader)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">I0000 00:00:1769125464.678688 1384909 dot_merger.cc:481] Merging Dots in computation: main.14
+ps_trained, st_trained = train_model!(fno, ps, st, dataloader)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">I0000 00:00:1770156839.508632  955902 dot_merger.cc:481] Merging Dots in computation: main.14
 Epoch 1: loss = 5.989288e-01
-Epoch 101: loss = 1.202353e-02
-Epoch 201: loss = 9.206906e-03
-Epoch 301: loss = 1.188478e-02
-Epoch 401: loss = 5.851986e-03
-Epoch 501: loss = 6.330648e-03
-Epoch 601: loss = 1.099601e-02
-Epoch 701: loss = 5.148020e-03
-Epoch 801: loss = 6.011738e-03
-Epoch 901: loss = 4.746711e-03
-Epoch 1000: loss = 6.992884e-03</code></pre><h2 id="Plotting"><a class="docs-heading-anchor" href="#Plotting">Plotting</a><a id="Plotting-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting" title="Permalink"></a></h2><pre><code class="language-julia hljs">using CairoMakie, AlgebraOfGraphics
+Epoch 101: loss = 1.202352e-02
+Epoch 201: loss = 9.160691e-03
+Epoch 301: loss = 1.238347e-02
+Epoch 401: loss = 6.888944e-03
+Epoch 501: loss = 5.468342e-03
+Epoch 601: loss = 1.111062e-02
+Epoch 701: loss = 5.828711e-03
+Epoch 801: loss = 5.669526e-03
+Epoch 901: loss = 5.805186e-03
+Epoch 1000: loss = 7.043186e-03</code></pre><h2 id="Plotting"><a class="docs-heading-anchor" href="#Plotting">Plotting</a><a id="Plotting-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting" title="Permalink"></a></h2><pre><code class="language-julia hljs">using CairoMakie, AlgebraOfGraphics
 const AoG = AlgebraOfGraphics
 AoG.set_aog_theme!()
 
@@ -261,4 +261,4 @@ draw(
     ),
     axis=(; xlabelsize=25, ylabelsize=25),
     legend=(; label=L&quot;u(x)&quot;, position=:bottom, labelsize=20),
-)</code></pre><img src="d7403af7.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../burgers_deeponet/">« DeepONet</a><a class="docs-footer-nextpage" href="../poisson_equation/">Solving Poisson Equation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Thursday 22 January 2026 23:54">Thursday 22 January 2026</span>. Using Julia version 1.12.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+)</code></pre><img src="03c8ad79.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../burgers_deeponet/">« DeepONet</a><a class="docs-footer-nextpage" href="../poisson_equation/">Solving Poisson Equation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Tuesday 3 February 2026 22:24">Tuesday 3 February 2026</span>. Using Julia version 1.12.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
