@@ -26,7 +26,7 @@ jobs:
       matrix:
         version:
           - "1"
-          - "lts"
+          # - "lts"
         os:
           - ubuntu-latest
           - windows-latest
@@ -40,6 +40,6 @@ jobs:
   downgrade:
     uses: LuxDL/Lux.jl/.github/workflows/CommonCI.yml@main
     with:
-      julia_version: "1.11"
+      julia_version: "1.12"
       downgrade_testing: true
       project: "."
