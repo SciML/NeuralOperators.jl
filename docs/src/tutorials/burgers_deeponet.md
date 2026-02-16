@@ -3,9 +3,8 @@
 ## Data Loading
 
 ```@example burgers
-using DataDeps, MAT, MLUtils
+using MAT, MLUtils, Printf, DataDeps
 using PythonCall, CondaPkg # For `gdown`
-using Printf
 
 const gdown = pyimport("gdown")
 

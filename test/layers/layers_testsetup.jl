@@ -41,4 +41,5 @@ function run_op_tests(op, setups)
             @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
         end
     end
+    return nothing
 end

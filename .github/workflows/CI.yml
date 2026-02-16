@@ -40,6 +40,6 @@ jobs:
   downgrade:
     uses: LuxDL/Lux.jl/.github/workflows/CommonCI.yml@main
     with:
-      julia_version: "1.12"
+      julia_version: "1.11"
       downgrade_testing: true
       project: "."
