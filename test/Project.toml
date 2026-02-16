@@ -20,6 +20,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [sources]
 NeuralOperators = {path = ".."}
+Reactant = {url = "https://github.com/EnzymeAD/Reactant.jl", rev = "ap/fix_complex_fd"}
 
 [compat]
 Aqua = "0.8.7"
