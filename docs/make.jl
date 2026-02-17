@@ -1,7 +1,14 @@
 using Documenter, NeuralOperators
 
-cp("./docs/Manifest.toml", "./docs/src/assets/Manifest.toml"; force = true)
-cp("./docs/Project.toml", "./docs/src/assets/Project.toml"; force = true)
+if isfile("Manifest.toml")
+    cp("./Manifest.toml", "./docs/src/assets/Manifest.toml"; force = true)
+elseif isfile("../Manifest.toml")
+    cp("../Manifest.toml", "./docs/src/assets/Manifest.toml"; force = true)
+end
+
+if isfile("Project.toml")
+    cp("./Project.toml", "./docs/src/assets/Project.toml"; force = true)
+end
 
 ENV["GKSwstype"] = "100"
 ENV["DATADEPS_ALWAYS_ACCEPT"] = true

@@ -94,9 +94,9 @@ function predict(model, f_input, x_input, ps, st)
     return vec(pred .* max_u)
 end
 
-compiled_predict_fn = Reactant.with_config(; dot_general_precision=PrecisionConfig.HIGH) do
-    @compile predict(deeponet, f_data[:, 1:1], x_data, ps_trained, st_trained)
-end
+compiled_predict_fn = @compile predict(
+    deeponet, f_data[:, 1:1], x_data, ps_trained, st_trained
+)
 
 # Testing and visualization
 begin
