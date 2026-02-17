@@ -1,7 +1,6 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>DeepONet · NeuralOperators.jl</title><meta name="title" content="DeepONet · NeuralOperators.jl"/><meta property="og:title" content="DeepONet · NeuralOperators.jl"/><meta property="twitter:title" content="DeepONet · NeuralOperators.jl"/><meta name="description" content="Documentation for NeuralOperators.jl."/><meta property="og:description" content="Documentation for NeuralOperators.jl."/><meta property="twitter:description" content="Documentation for NeuralOperators.jl."/><meta property="og:url" content="https://docs.sciml.ai/NeuralOperators/stable/tutorials/burgers_deeponet/"/><meta property="twitter:url" content="https://docs.sciml.ai/NeuralOperators/stable/tutorials/burgers_deeponet/"/><link rel="canonical" href="https://docs.sciml.ai/NeuralOperators/stable/tutorials/burgers_deeponet/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.png" alt="NeuralOperators.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">NeuralOperators.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">NeuralOperators.jl</a></li><li><span class="tocitem">Pre-built Models</span><ul><li><a class="tocitem" href="../../models/fno/">FNO</a></li><li><a class="tocitem" href="../../models/deeponet/">DeepONet</a></li><li><a class="tocitem" href="../../models/nomad/">NOMAD</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><input class="collapse-toggle" id="menuitem-3-1" type="checkbox" checked/><label class="tocitem" for="menuitem-3-1"><span class="docs-label">Solving Burgers Equation</span><i class="docs-chevron"></i></label><ul class="collapsed"><li class="is-active"><a class="tocitem" href>DeepONet</a><ul class="internal"><li><a class="tocitem" href="#Data-Loading"><span>Data Loading</span></a></li><li><a class="tocitem" href="#Model"><span>Model</span></a></li><li><a class="tocitem" href="#Training"><span>Training</span></a></li><li><a class="tocitem" href="#Plotting"><span>Plotting</span></a></li></ul></li><li><a class="tocitem" href="../burgers_fno/">FNO</a></li></ul></li><li><a class="tocitem" href="../poisson_equation/">Solving Poisson Equation</a></li><li><a class="tocitem" href="../double_pendulum/">Double Pendulum</a></li></ul></li><li><a class="tocitem" href="../../api/">API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li><a class="is-disabled">Solving Burgers Equation</a></li><li class="is-active"><a href>DeepONet</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>DeepONet</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/SciML/NeuralOperators.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/SciML/NeuralOperators.jl/blob/main/docs/src/tutorials/burgers_deeponet.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Burgers-Equation-using-DeepONet"><a class="docs-heading-anchor" href="#Burgers-Equation-using-DeepONet">Burgers Equation using DeepONet</a><a id="Burgers-Equation-using-DeepONet-1"></a><a class="docs-heading-anchor-permalink" href="#Burgers-Equation-using-DeepONet" title="Permalink"></a></h1><h2 id="Data-Loading"><a class="docs-heading-anchor" href="#Data-Loading">Data Loading</a><a id="Data-Loading-1"></a><a class="docs-heading-anchor-permalink" href="#Data-Loading" title="Permalink"></a></h2><pre><code class="language-julia hljs">using DataDeps, MAT, MLUtils
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>DeepONet · NeuralOperators.jl</title><meta name="title" content="DeepONet · NeuralOperators.jl"/><meta property="og:title" content="DeepONet · NeuralOperators.jl"/><meta property="twitter:title" content="DeepONet · NeuralOperators.jl"/><meta name="description" content="Documentation for NeuralOperators.jl."/><meta property="og:description" content="Documentation for NeuralOperators.jl."/><meta property="twitter:description" content="Documentation for NeuralOperators.jl."/><meta property="og:url" content="https://docs.sciml.ai/NeuralOperators/stable/tutorials/burgers_deeponet/"/><meta property="twitter:url" content="https://docs.sciml.ai/NeuralOperators/stable/tutorials/burgers_deeponet/"/><link rel="canonical" href="https://docs.sciml.ai/NeuralOperators/stable/tutorials/burgers_deeponet/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script><link href="../../assets/favicon.ico" rel="icon" type="image/x-icon"/></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.png" alt="NeuralOperators.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">NeuralOperators.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">NeuralOperators.jl</a></li><li><span class="tocitem">Pre-built Models</span><ul><li><a class="tocitem" href="../../models/fno/">FNO</a></li><li><a class="tocitem" href="../../models/deeponet/">DeepONet</a></li><li><a class="tocitem" href="../../models/nomad/">NOMAD</a></li></ul></li><li><span class="tocitem">Tutorials</span><ul><li><input class="collapse-toggle" id="menuitem-3-1" type="checkbox" checked/><label class="tocitem" for="menuitem-3-1"><span class="docs-label">Solving Burgers Equation</span><i class="docs-chevron"></i></label><ul class="collapsed"><li class="is-active"><a class="tocitem" href>DeepONet</a><ul class="internal"><li><a class="tocitem" href="#Data-Loading"><span>Data Loading</span></a></li><li><a class="tocitem" href="#Model"><span>Model</span></a></li><li><a class="tocitem" href="#Training"><span>Training</span></a></li><li><a class="tocitem" href="#Plotting"><span>Plotting</span></a></li></ul></li><li><a class="tocitem" href="../burgers_fno/">FNO</a></li></ul></li><li><a class="tocitem" href="../poisson_equation/">Solving Poisson Equation</a></li><li><a class="tocitem" href="../double_pendulum/">Double Pendulum</a></li></ul></li><li><a class="tocitem" href="../../api/">API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li><a class="is-disabled">Solving Burgers Equation</a></li><li class="is-active"><a href>DeepONet</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>DeepONet</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/SciML/NeuralOperators.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/SciML/NeuralOperators.jl/blob/main/docs/src/tutorials/burgers_deeponet.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Burgers-Equation-using-DeepONet"><a class="docs-heading-anchor" href="#Burgers-Equation-using-DeepONet">Burgers Equation using DeepONet</a><a id="Burgers-Equation-using-DeepONet-1"></a><a class="docs-heading-anchor-permalink" href="#Burgers-Equation-using-DeepONet" title="Permalink"></a></h1><h2 id="Data-Loading"><a class="docs-heading-anchor" href="#Data-Loading">Data Loading</a><a id="Data-Loading-1"></a><a class="docs-heading-anchor-permalink" href="#Data-Loading" title="Permalink"></a></h2><pre><code class="language-julia hljs">using MAT, MLUtils, Printf, DataDeps
 using PythonCall, CondaPkg # For `gdown`
-using Printf
 
 const gdown = pyimport(&quot;gdown&quot;)
 
@@ -77,58 +76,58 @@ end
 
 (ps_trained, st_trained) = train_model!(
     deeponet, ps, st, ((x_data_dev, grid_dev), y_data_dev)
-)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">I0000 00:00:1770156695.420544  955902 dot_merger.cc:481] Merging Dots in computation: main.12
-Epoch 1: loss = 4.163950e-01
-Epoch 101: loss = 2.470130e-01
-Epoch 201: loss = 1.853524e-01
-Epoch 301: loss = 1.667830e-01
-Epoch 401: loss = 1.423754e-01
-Epoch 501: loss = 1.373082e-01
-Epoch 601: loss = 1.345393e-01
-Epoch 701: loss = 1.320330e-01
-Epoch 801: loss = 1.290097e-01
-Epoch 901: loss = 1.254655e-01
-Epoch 1001: loss = 1.222275e-01
-Epoch 1101: loss = 1.189410e-01
-Epoch 1201: loss = 1.151138e-01
-Epoch 1301: loss = 1.102068e-01
-Epoch 1401: loss = 1.046349e-01
-Epoch 1501: loss = 9.867194e-02
-Epoch 1601: loss = 9.367612e-02
-Epoch 1701: loss = 8.976823e-02
-Epoch 1801: loss = 8.650377e-02
-Epoch 1901: loss = 8.369493e-02
-Epoch 2001: loss = 8.122706e-02
-Epoch 2101: loss = 7.927027e-02
-Epoch 2201: loss = 7.725023e-02
-Epoch 2301: loss = 7.558210e-02
-Epoch 2401: loss = 7.422559e-02
-Epoch 2501: loss = 7.286382e-02
-Epoch 2601: loss = 7.170504e-02
-Epoch 2701: loss = 7.061253e-02
-Epoch 2801: loss = 6.960036e-02
-Epoch 2901: loss = 6.869109e-02
-Epoch 3001: loss = 6.770413e-02
-Epoch 3101: loss = 6.678516e-02
-Epoch 3201: loss = 6.584443e-02
-Epoch 3301: loss = 6.496802e-02
-Epoch 3401: loss = 6.403645e-02
-Epoch 3501: loss = 6.320790e-02
-Epoch 3601: loss = 6.209233e-02
-Epoch 3701: loss = 6.113112e-02
-Epoch 3801: loss = 6.018487e-02
-Epoch 3901: loss = 5.928806e-02
-Epoch 4001: loss = 5.836249e-02
-Epoch 4101: loss = 5.749760e-02
-Epoch 4201: loss = 5.662230e-02
-Epoch 4301: loss = 5.567866e-02
-Epoch 4401: loss = 5.486967e-02
-Epoch 4501: loss = 5.441998e-02
-Epoch 4601: loss = 5.340724e-02
-Epoch 4701: loss = 5.280830e-02
-Epoch 4801: loss = 5.230005e-02
-Epoch 4901: loss = 5.185555e-02
-Epoch 5000: loss = 5.137621e-02</code></pre><h2 id="Plotting"><a class="docs-heading-anchor" href="#Plotting">Plotting</a><a id="Plotting-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting" title="Permalink"></a></h2><pre><code class="language-julia hljs">using CairoMakie, AlgebraOfGraphics
+)</code></pre><pre class="documenter-example-output"><code class="nohighlight hljs ansi">I0000 00:00:1771287883.987484 3609584 dot_merger.cc:481] Merging Dots in computation: main.12
+Epoch 1: loss = 4.163805e-01
+Epoch 101: loss = 2.469464e-01
+Epoch 201: loss = 1.848264e-01
+Epoch 301: loss = 1.648507e-01
+Epoch 401: loss = 1.411473e-01
+Epoch 501: loss = 1.363884e-01
+Epoch 601: loss = 1.333529e-01
+Epoch 701: loss = 1.300021e-01
+Epoch 801: loss = 1.262147e-01
+Epoch 901: loss = 1.224269e-01
+Epoch 1001: loss = 1.185174e-01
+Epoch 1101: loss = 1.138116e-01
+Epoch 1201: loss = 1.085730e-01
+Epoch 1301: loss = 1.032306e-01
+Epoch 1401: loss = 9.795375e-02
+Epoch 1501: loss = 9.334613e-02
+Epoch 1601: loss = 8.916683e-02
+Epoch 1701: loss = 8.564676e-02
+Epoch 1801: loss = 8.268099e-02
+Epoch 1901: loss = 8.010171e-02
+Epoch 2001: loss = 7.766418e-02
+Epoch 2101: loss = 7.583436e-02
+Epoch 2201: loss = 7.415964e-02
+Epoch 2301: loss = 7.269007e-02
+Epoch 2401: loss = 7.142188e-02
+Epoch 2501: loss = 7.022680e-02
+Epoch 2601: loss = 6.910869e-02
+Epoch 2701: loss = 6.802876e-02
+Epoch 2801: loss = 6.698228e-02
+Epoch 2901: loss = 6.589660e-02
+Epoch 3001: loss = 6.481840e-02
+Epoch 3101: loss = 6.373326e-02
+Epoch 3201: loss = 6.270589e-02
+Epoch 3301: loss = 6.155313e-02
+Epoch 3401: loss = 6.043043e-02
+Epoch 3501: loss = 5.936975e-02
+Epoch 3601: loss = 5.821655e-02
+Epoch 3701: loss = 5.717477e-02
+Epoch 3801: loss = 5.628358e-02
+Epoch 3901: loss = 5.536681e-02
+Epoch 4001: loss = 5.458697e-02
+Epoch 4101: loss = 5.385546e-02
+Epoch 4201: loss = 5.319627e-02
+Epoch 4301: loss = 5.273455e-02
+Epoch 4401: loss = 5.221158e-02
+Epoch 4501: loss = 5.177978e-02
+Epoch 4601: loss = 5.132154e-02
+Epoch 4701: loss = 5.095581e-02
+Epoch 4801: loss = 5.061147e-02
+Epoch 4901: loss = 5.030974e-02
+Epoch 5000: loss = 5.000002e-02</code></pre><h2 id="Plotting"><a class="docs-heading-anchor" href="#Plotting">Plotting</a><a id="Plotting-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting" title="Permalink"></a></h2><pre><code class="language-julia hljs">using CairoMakie, AlgebraOfGraphics
 const AoG = AlgebraOfGraphics
 AoG.set_aog_theme!()
 
@@ -170,4 +169,4 @@ draw(
     ),
     axis=(; xlabelsize=25, ylabelsize=25),
     legend=(; label=L&quot;u(x)&quot;, position=:bottom, labelsize=20),
-)</code></pre><img src="cc3f43e3.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../models/nomad/">« NOMAD</a><a class="docs-footer-nextpage" href="../burgers_fno/">FNO »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Tuesday 3 February 2026 22:24">Tuesday 3 February 2026</span>. Using Julia version 1.12.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+)</code></pre><img src="fb50191f.png" alt="Example block output"/></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../models/nomad/">« NOMAD</a><a class="docs-footer-nextpage" href="../burgers_fno/">FNO »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Tuesday 17 February 2026 00:32">Tuesday 17 February 2026</span>. Using Julia version 1.12.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
