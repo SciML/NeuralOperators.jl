@@ -1,0 +1,70 @@
+name: "GPU Tests"
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "ext/**"
+      - "test/**"
+      - "Project.toml"
+      - ".github/workflows/GPU.yml"
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
+jobs:
+  cuda-tests:
+    name: "CUDA GPU Tests"
+    runs-on: [self-hosted, Linux, X64, gpu]
+    timeout-minutes: 60
+    env:
+      RETESTITEMS_NWORKERS: 4
+      RETESTITEMS_NWORKER_THREADS: 2
+    steps:
+      - uses: actions/checkout@v6
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: "1"
+      - uses: julia-actions/julia-buildpkg@v1
+      - uses: julia-actions/julia-runtest@v1
+        env:
+          BACKEND_GROUP: "CUDA"
+      - uses: julia-actions/julia-processcoverage@v1
+      - uses: codecov/codecov-action@v5
+        with:
+          files: lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
+  gpu-docs:
+    name: "Documentation"
+    runs-on: [self-hosted, Linux, X64, gpu]
+    timeout-minutes: 240
+    if: github.event_name == 'push' || !github.event.pull_request.draft
+    steps:
+      - uses: actions/checkout@v6
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: "1"
+      - run: |
+          julia --project -e '
+            println("--- Instantiating project")
+            using Pkg
+            Pkg.instantiate()
+            Pkg.activate("docs")
+            Pkg.instantiate()
+            push!(LOAD_PATH, @__DIR__)
+            println("+++ Building documentation")
+            include("docs/make.jl")'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
+          DATADEPS_ALWAYS_ACCEPT: true
+          JULIA_DEBUG: "Documenter"
+          XLA_REACTANT_GPU_MEM_FRACTION: "0.95"
