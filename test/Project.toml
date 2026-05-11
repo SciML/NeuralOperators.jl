@@ -18,9 +18,12 @@ Reactant = "3c362404-f566-11ee-1572-e11a4b42c853"
 StableRNGs = "860ef19b-820b-49d6-a774-d7a799459cd3"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
-[sources]
-NeuralOperators = {path = ".."}
-Reactant = {url = "https://github.com/EnzymeAD/Reactant.jl", rev = "ap/fix_complex_fd"}
+[sources.NeuralOperators]
+path = ".."
+
+[sources.Reactant]
+rev = "ap/fix_complex_fd"
+url = "https://github.com/EnzymeAD/Reactant.jl"
 
 [compat]
 Aqua = "0.8.7"
@@ -31,6 +34,7 @@ Lux = "1"
 LuxCore = "1"
 LuxLib = "1.2"
 LuxTestUtils = "1.1.2, 2"
+NeuralOperators = "0.6"
 Optimisers = "0.4"
 ParallelTestRunner = "2.1"
 Random = "1.10"
