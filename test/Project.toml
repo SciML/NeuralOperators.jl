@@ -24,13 +24,17 @@ Reactant = {url = "https://github.com/EnzymeAD/Reactant.jl", rev = "ap/fix_compl
 
 [compat]
 Aqua = "0.8.7"
+ComponentArrays = "0.15.39"
 Documenter = "1.5.0"
 Enzyme = "0.13.48"
 ExplicitImports = "1.9.0"
+FastTransforms = "0.17.1"
+ForwardDiff = "1.3.3"
 Lux = "1"
 LuxCore = "1"
 LuxLib = "1.2"
 LuxTestUtils = "1.1.2, 2"
+NeuralOperators = "0.6.2"
 Optimisers = "0.4"
 ParallelTestRunner = "2.1"
 Random = "1.10"
