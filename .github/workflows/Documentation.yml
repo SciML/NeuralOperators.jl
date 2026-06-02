@@ -1,0 +1,26 @@
+name: "Documentation"
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "docs/**"
+      - "src/**"
+      - "ext/**"
+      - "Project.toml"
+      - ".github/workflows/Documentation.yml"
+  push:
+    branches:
+      - main
+    tags: "*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
+
+jobs:
+  documentation:
+    name: "Documentation"
+    uses: "SciML/.github/.github/workflows/documentation.yml@v1"
+    secrets: "inherit"

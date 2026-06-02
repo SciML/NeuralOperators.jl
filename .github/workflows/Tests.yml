@@ -1,4 +1,5 @@
-name: CI
+name: "Tests"
+
 on:
   pull_request:
     branches:
@@ -8,38 +9,29 @@ on:
       - "ext/**"
       - "test/**"
       - "Project.toml"
-      - ".github/workflows/CI.yml"
+      - ".github/workflows/Tests.yml"
   push:
     branches:
       - main
 
 concurrency:
-  # Skip intermediate builds: always.
-  # Cancel intermediate builds: only if it is a pull request build.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ startsWith(github.ref, 'refs/pull/') }}
 
 jobs:
-  test:
+  tests:
+    name: "Tests"
     strategy:
       fail-fast: false
       matrix:
         version:
           - "1"
-          # - "lts"
         os:
           - ubuntu-latest
           - windows-latest
           - macos-latest
-    uses: LuxDL/Lux.jl/.github/workflows/CommonCI.yml@main
+    uses: "SciML/.github/.github/workflows/tests.yml@v1"
     with:
-      julia_version: ${{ matrix.version }}
-      os: ${{ matrix.os }}
-      project: "."
-
-  downgrade:
-    uses: LuxDL/Lux.jl/.github/workflows/CommonCI.yml@main
-    with:
-      julia_version: "1.11"
-      downgrade_testing: true
-      project: "."
+      julia-version: "${{ matrix.version }}"
+      os: "${{ matrix.os }}"
+    secrets: "inherit"
