@@ -15,7 +15,10 @@ delete!(testsuite, "layers/layers_testsetup")
 
 # Dispatch on the CI test GROUP. "QA" runs only the quality-assurance suite
 # (Aqua / ExplicitImports / doctests); "Core" runs the functional suite; "All"
-# (the default for a bare local `Pkg.test()`) runs everything.
+# (the default for a bare local `Pkg.test()`) and "GPU" (the self-hosted CUDA
+# runner cell of test/test_groups.toml) run everything — on the GPU runner the
+# tests pick up CUDA through `reactant_device()`, as under the old GPU.yml
+# workflow, which ran the full suite.
 const QA_TESTS = ("qa_tests", "doctests")
 if GROUP == "QA"
     for name in collect(keys(testsuite))
