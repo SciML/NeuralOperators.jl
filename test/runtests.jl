@@ -1,43 +1,48 @@
-using NeuralOperators, Test, ParallelTestRunner
+using SafeTestsets: @safetestset
+using SciMLTesting
 
-const GROUP = get(ENV, "GROUP", "All")
-
-parsed_args = parse_args(@isdefined(TEST_ARGS) ? TEST_ARGS : ARGS)
-
-# Find all tests
-testsuite = find_tests(@__DIR__)
-
-filter_tests!(testsuite, parsed_args)
-
-# Remove shared setup files that shouldn't be run directly
-delete!(testsuite, "shared_testsetup")
-delete!(testsuite, "layers/layers_testsetup")
-
-# Dispatch on the CI test GROUP. "QA" runs only the quality-assurance suite
-# (Aqua / ExplicitImports / doctests); "Core" runs the functional suite; "All"
-# (the default for a bare local `Pkg.test()`) and "GPU" (the self-hosted CUDA
-# runner cell of test/test_groups.toml) run everything — on the GPU runner the
-# tests pick up CUDA through `reactant_device()`, as under the old GPU.yml
-# workflow, which ran the full suite.
-const QA_TESTS = ("qa_tests", "doctests")
-if GROUP == "QA"
-    for name in collect(keys(testsuite))
-        name in QA_TESTS || delete!(testsuite, name)
-    end
-elseif GROUP == "Core"
-    for name in QA_TESTS
-        delete!(testsuite, name)
-    end
-end
-
-total_jobs = min(
-    something(parsed_args.jobs, ParallelTestRunner.default_njobs()), length(keys(testsuite))
-)
-
+# Each group cell is its own CI process (grouped-tests.yml@v1 launches one job per
+# GROUP), so Reactant/CUDA gets the whole device: pin the memory knobs to a single
+# job rather than dividing across the in-process workers the old ParallelTestRunner
+# layout used.
 withenv(
-    "XLA_REACTANT_GPU_MEM_FRACTION" => 1 / (total_jobs + 0.1),
+    "XLA_REACTANT_GPU_MEM_FRACTION" => 0.9,
     "XLA_REACTANT_GPU_PREALLOCATE" => false,
-    "JULIA_CUDA_HARD_MEMORY_LIMIT" => "$(100 / (total_jobs + 0.1))%",
+    "JULIA_CUDA_HARD_MEMORY_LIMIT" => "90%",
 ) do
-    runtests(NeuralOperators, parsed_args; testsuite)
+    run_tests(;
+        core = function ()
+            @time @safetestset "Fourier Neural Operator" begin
+                include(joinpath(@__DIR__, "models", "fno_tests.jl"))
+            end
+            @time @safetestset "DeepONet" begin
+                include(joinpath(@__DIR__, "models", "deeponet_tests.jl"))
+            end
+            @time @safetestset "NOMAD" begin
+                include(joinpath(@__DIR__, "models", "nomad_tests.jl"))
+            end
+            @time @safetestset "SpectralConv" begin
+                include(joinpath(@__DIR__, "layers", "spectral_conv_tests.jl"))
+            end
+            return @time @safetestset "SpectralKernel" begin
+                include(joinpath(@__DIR__, "layers", "spectral_kernel_tests.jl"))
+            end
+        end,
+        qa = (;
+            env = joinpath(@__DIR__, "qa"),
+            body = function ()
+                @time @safetestset "Aqua / Explicit Imports" begin
+                    include(joinpath(@__DIR__, "qa", "qa_tests.jl"))
+                end
+                return @time @safetestset "Doctests" begin
+                    include(joinpath(@__DIR__, "qa", "doctests.jl"))
+                end
+            end,
+        ),
+        # The "GPU" cell historically ran the full functional + QA suite on the
+        # self-hosted CUDA runner, where the Reactant tests pick up CUDA through
+        # `reactant_device()` (the old GPU.yml workflow, folded into this group).
+        # Expand it to Core then QA to preserve that behavior.
+        umbrellas = Dict("GPU" => ["Core", "QA"]),
+    )
 end
