@@ -15,6 +15,11 @@ function add_act(act::F, x1, x2) where {F}
     return fast_activation!!(NNlib.fast_act(act, y), y)
 end
 
+# `SubArray`s returned by `view` are not contiguous; some downstream kernels (e.g. FFTs)
+# need a contiguous backing store, so materialize them.
+contiguous(x::AbstractArray) = x
+contiguous(x::SubArray) = copy(x)
+
 @concrete struct Fix1 <: Function
     f
     x
@@ -35,20 +40,20 @@ function meshgrid(args::AbstractVector...)
             new_shape[i] = length(arg)
             repeat_sizes = collect(Int, map(length, args))
             repeat_sizes[i] = 1
-            return repeat(Lux.Utils.contiguous(reshape(arg, new_shape...)), repeat_sizes...)
+            return repeat(contiguous(reshape(arg, new_shape...)), repeat_sizes...)
         end
     end
 end
 
 function decomposed_activation(f::F, x::Number) where {F}
-    Lux.Utils.eltype(x) <: Complex && return Complex(f(real(x)), f(imag(x)))
+    recursive_eltype(x) <: Complex && return Complex(f(real(x)), f(imag(x)))
     return f(x)
 end
 
 apply_complex((rfn, ifn), x::Number) = apply_complex(rfn, ifn, x)
 function apply_complex(rfn, ifn, x::Number)
-    @assert Lux.Utils.eltype(x) <: Complex "Expected a complex number, got \
-                                            $(Lux.Utils.eltype(x))"
+    @assert recursive_eltype(x) <: Complex "Expected a complex number, got \
+                                            $(recursive_eltype(x))"
     rl, img = real(x), imag(x)
     return Complex(rfn(rl) - ifn(img), rfn(img) + ifn(rl))
 end

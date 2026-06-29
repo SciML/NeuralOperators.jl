@@ -1,10 +1,12 @@
 module NeuralOperators
 
 using AbstractFFTs: fft, rfft, ifft, irfft, fftshift
+using Base.Broadcast: BroadcastFunction
 using ConcreteStructs: @concrete
 using Random: Random, AbstractRNG
 
-using Lux: Lux, Chain, Dense, Conv, Parallel, NoOpLayer, WrappedFunction, Scale
+using Lux: Lux, Chain, Dense, Conv, Parallel, NoOpLayer, WrappedFunction, Scale,
+    recursive_eltype
 using LuxCore: LuxCore, AbstractLuxLayer, AbstractLuxWrapperLayer
 using LuxLib: fast_activation!!
 using NNlib: NNlib, batched_mul, pad_constant, gelu

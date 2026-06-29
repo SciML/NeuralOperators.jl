@@ -8,21 +8,14 @@ run_qa(
     # sub-check non-recursively (recursing into deps surfaces unrelated upstream
     # ambiguities).
     aqua_kwargs = (; ambiguities = (; recursive = false)),
-    # Non-public names of *other* packages that NeuralOperators qualifies. These go
-    # public as the base libraries declare them; until then, ignore by name.
     ei_kwargs = (;
         all_qualified_accesses_are_public = (;
-            ignore = (
-                :BroadcastFunction,   # Base
-                :Fix1,                # Base
-                :Utils,               # Lux
-                :contiguous,          # Lux.Utils
-                :eltype,              # Lux.Utils
-                :fast_act,            # NNlib
-                :initialparameters,   # LuxCore (interface method NeuralOperators extends)
-                :initialstates,       # LuxCore (interface method NeuralOperators extends)
-                :parameterlength,     # LuxCore (interface method NeuralOperators extends)
-            ),
+            # NNlib.fast_act picks the fast activation variant (tanh_fast/sigmoid_fast)
+            # for the LuxLib fast_activation!! call in `add_act`. LuxLib's
+            # fast_activation!! docstring states it does NOT apply this replacement
+            # itself ("that needs to be done by the user if needed"), so we must call
+            # NNlib.fast_act directly. It is an NNlib internal with no public equivalent.
+            ignore = (:fast_act,),
         ),
     ),
 )
