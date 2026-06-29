@@ -43,7 +43,7 @@ end
 Base.ndims(T::FourierTransform) = length(T.modes)
 
 function transform(ft::FourierTransform, x::AbstractArray)
-    complex_data = Lux.Utils.eltype(x) <: Complex
+    complex_data = recursive_eltype(x) <: Complex
     res = complex_data ? fft(x, 1:ndims(ft)) : rfft(x, 1:ndims(ft))
     if ft.shift && ndims(ft) > 1
         res = fftshift(res, (1 + !complex_data):ndims(ft))
@@ -60,7 +60,7 @@ truncate_modes(ft::FourierTransform, x_fft::AbstractArray) = low_pass(ft, x_fft)
 function inverse(
         ft::FourierTransform, x_fft::AbstractArray{T, N}, x::AbstractArray{T2, N}
     ) where {T, T2, N}
-    complex_data = Lux.Utils.eltype(x) <: Complex
+    complex_data = recursive_eltype(x) <: Complex
 
     if ft.shift && ndims(ft) > 1
         x_fft = fftshift(x_fft, (1 + !complex_data):ndims(ft))

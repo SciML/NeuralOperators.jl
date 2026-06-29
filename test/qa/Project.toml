@@ -1,7 +1,6 @@
 [deps]
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-ExplicitImports = "7d51a73a-1435-4ff3-83d9-f097790105c7"
 FastTransforms = "057dd010-8810-581a-b7be-e3fc3b93f78c"
 Lux = "b2108857-7c20-44ae-9111-449ecde12c47"
 NeuralOperators = "ea5c82af-86e5-48da-8ee1-382d6ad7af4b"
@@ -16,11 +15,10 @@ NeuralOperators = {path = "../.."}
 [compat]
 Aqua = "0.8.7"
 Documenter = "1.5.0"
-ExplicitImports = "1.9.0"
 FastTransforms = "0.17.1"
 Lux = "1"
 NeuralOperators = "0.6.2"
 Random = "1.10"
 SafeTestsets = "0.1, 1"
-SciMLTesting = "1"
+SciMLTesting = "1.6"
 Test = "1.10"
