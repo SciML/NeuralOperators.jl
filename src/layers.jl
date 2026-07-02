@@ -136,7 +136,7 @@ function OperatorKernel(
     in_chs, out_chs = ch
 
     complex_data && (stabilizer = Base.Fix1(decomposed_activation, stabilizer))
-    stabilizer = WrappedFunction(Base.BroadcastFunction(stabilizer))
+    stabilizer = WrappedFunction(BroadcastFunction(stabilizer))
 
     activation = complex_data ? Base.Fix1(decomposed_activation, act) : act
 
@@ -235,7 +235,7 @@ function (layer::GridEmbedding)(x::AbstractArray{T, N}, ps, st) where {T, N}
     )
 
     grid = repeat(
-        Lux.Utils.contiguous(reshape(grid, size(grid)..., 1)),
+        contiguous(reshape(grid, size(grid)..., 1)),
         ntuple(Returns(1), N - 1)...,
         size(x, N),
     )
