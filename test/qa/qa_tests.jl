@@ -3,6 +3,7 @@ using SciMLTesting, NeuralOperators, Test
 run_qa(
     NeuralOperators;
     explicit_imports = true,
+    api_docs_kwargs = (; rendered = true),
     # Mirror the previous `Aqua.test_all(...; ambiguities = false)` +
     # `Aqua.test_ambiguities(...; recursive = false)` pair: run the ambiguities
     # sub-check non-recursively (recursing into deps surfaces unrelated upstream
