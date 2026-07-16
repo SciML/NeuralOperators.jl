@@ -34,8 +34,9 @@ function run_op_tests(op, setups)
         @test res_ra ≈ res atol = 1.0f-2 rtol = 1.0f-2
 
         @testset "check gradients" begin
-            ∂x_fd, ∂ps_fd = ∇sumabs2_reactant_fd(m, x_ra, ps_ra, st_ra)
+            ∂x_fd, ∂ps_fd = ∇sumabs2_finite_difference(m, x, ps, st)
             ∂x_ra, ∂ps_ra = ∇sumabs2_reactant(m, x_ra, ps_ra, st_ra)
+            ∂x_ra, ∂ps_ra = (∂x_ra, ∂ps_ra) |> cpu_device()
 
             @test ∂x_fd ≈ ∂x_ra atol = 1.0f-2 rtol = 1.0f-2
             @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
