@@ -10,24 +10,26 @@ withenv(
     "XLA_REACTANT_GPU_PREALLOCATE" => false,
     "JULIA_CUDA_HARD_MEMORY_LIMIT" => "90%",
 ) do
+    core_tests = function ()
+        @time @safetestset "Fourier Neural Operator" begin
+            include(joinpath(@__DIR__, "models", "fno_tests.jl"))
+        end
+        @time @safetestset "DeepONet" begin
+            include(joinpath(@__DIR__, "models", "deeponet_tests.jl"))
+        end
+        @time @safetestset "NOMAD" begin
+            include(joinpath(@__DIR__, "models", "nomad_tests.jl"))
+        end
+        @time @safetestset "SpectralConv" begin
+            include(joinpath(@__DIR__, "layers", "spectral_conv_tests.jl"))
+        end
+        return @time @safetestset "SpectralKernel" begin
+            include(joinpath(@__DIR__, "layers", "spectral_kernel_tests.jl"))
+        end
+    end
+
     run_tests(;
-        core = function ()
-            @time @safetestset "Fourier Neural Operator" begin
-                include(joinpath(@__DIR__, "models", "fno_tests.jl"))
-            end
-            @time @safetestset "DeepONet" begin
-                include(joinpath(@__DIR__, "models", "deeponet_tests.jl"))
-            end
-            @time @safetestset "NOMAD" begin
-                include(joinpath(@__DIR__, "models", "nomad_tests.jl"))
-            end
-            @time @safetestset "SpectralConv" begin
-                include(joinpath(@__DIR__, "layers", "spectral_conv_tests.jl"))
-            end
-            return @time @safetestset "SpectralKernel" begin
-                include(joinpath(@__DIR__, "layers", "spectral_kernel_tests.jl"))
-            end
-        end,
+        core = core_tests,
         qa = (;
             env = joinpath(@__DIR__, "qa"),
             body = function ()
@@ -39,10 +41,15 @@ withenv(
                 end
             end,
         ),
-        # The "GPU" cell historically ran the full functional + QA suite on the
-        # self-hosted CUDA runner, where the Reactant tests pick up CUDA through
-        # `reactant_device()` (the old GPU.yml workflow, folded into this group).
-        # Expand it to Core then QA to preserve that behavior.
-        umbrellas = Dict("GPU" => ["Core", "QA"]),
+        groups = Dict(
+            "GPUCore" => (;
+                env = joinpath(@__DIR__, "gpu"),
+                body = core_tests,
+            ),
+        ),
+        # Keep the historical full functional + QA coverage on the CUDA runner.
+        # GPUCore needs its own environment so Reactant's CUDA artifact preference
+        # is active before Reactant_jll is loaded.
+        umbrellas = Dict("GPU" => ["GPUCore", "QA"]),
     )
 end
