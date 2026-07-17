@@ -44,7 +44,10 @@ withenv(
         groups = Dict(
             "GPUCore" => (;
                 env = joinpath(@__DIR__, "gpu"),
-                body = core_tests,
+                body = function ()
+                    include(joinpath(@__DIR__, "gpu", "gpu_testsetup.jl"))
+                    return core_tests()
+                end,
             ),
         ),
         # Keep the historical full functional + QA coverage on the CUDA runner.

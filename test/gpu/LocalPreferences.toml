@@ -1,4 +1,7 @@
 # The T4 runner's CUDA 13.0 driver cannot load Reactant's CUDA 13.1 artifact.
-# CUDA 12.9 is the newest bundled artifact compatible with that driver.
+# Keep Reactant and the CUDA libraries it loads on the same 12.9 toolkit.
 [Reactant_jll]
 gpu_version = "12.9"
+
+[CUDA_Runtime_jll]
+version = "12.9"
