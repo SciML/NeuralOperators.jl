@@ -21,7 +21,44 @@ concurrency:
 jobs:
   downgrade:
     name: "Downgrade"
-    uses: "SciML/.github/.github/workflows/downgrade.yml@v1"
-    with:
-      julia-version: "lts"
-    secrets: "inherit"
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "actions/checkout@v7"
+
+      - uses: "julia-actions/setup-julia@v3"
+        with:
+          version: "lts"
+
+      - name: "Compute downgrade skip list"
+        run: |
+          skip="$(julia --startup-file=no -e '
+            using Pkg, TOML
+            names = String[]
+            for value in values(Pkg.Types.stdlibs())
+                push!(names, value isa AbstractString ? value : first(value))
+            end
+            for dir in (".", "test")
+                sources = get(TOML.parsefile(joinpath(dir, "Project.toml")), "sources", Dict())
+                append!(names, keys(sources))
+            end
+            println(join(sort!(unique!(names)), ","))
+          ')"
+          echo "DOWNGRADE_SKIP=$skip" >> "$GITHUB_ENV"
+
+      - uses: "julia-actions/julia-downgrade-compat@v2"
+        with:
+          skip: "${{ env.DOWNGRADE_SKIP }}"
+          projects: ".,test"
+          mode: "deps"
+
+      - name: "Test locked minimum environment"
+        env:
+          GROUP: "Core"
+        run: |
+          julia --project=test --color=yes -e '
+            import Pkg
+            Pkg.develop(Pkg.PackageSpec(path = pwd()))
+            Pkg.instantiate()
+            Pkg.status(; mode = Pkg.PKGMODE_MANIFEST)
+            include("test/runtests.jl")
+          '

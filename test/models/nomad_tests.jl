@@ -43,8 +43,9 @@ include("../shared_testsetup.jl")
         @test pred_ra ≈ pred atol = 1.0f-2 rtol = 1.0f-2
 
         @testset "check gradients" begin
-            (∂u_fd, ∂y_fd), ∂ps_fd = ∇sumabs2_reactant_fd(nomad, (u_ra, y_ra), ps_ra, st_ra)
+            (∂u_fd, ∂y_fd), ∂ps_fd = ∇sumabs2_finite_difference(nomad, (u, y), ps, st)
             (∂u_ra, ∂y_ra), ∂ps_ra = ∇sumabs2_reactant(nomad, (u_ra, y_ra), ps_ra, st_ra)
+            (∂u_ra, ∂y_ra), ∂ps_ra = ((∂u_ra, ∂y_ra), ∂ps_ra) |> cpu_device()
 
             @test ∂u_fd ≈ ∂u_ra atol = 1.0f-2 rtol = 1.0f-2
             @test ∂y_fd ≈ ∂y_ra atol = 1.0f-2 rtol = 1.0f-2

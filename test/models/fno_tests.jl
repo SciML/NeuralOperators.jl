@@ -5,6 +5,15 @@ include("../shared_testsetup.jl")
 @testset "Fourier Neural Operator" begin
     rng = StableRNG(12345)
 
+    @testset "complex finite-difference reference" begin
+        parameters = (; complex = ComplexF64[1 + 2im, -3 + 4im], real = [5.0, -6.0])
+        gradient = finite_difference_structure(parameters) do ps
+            return sum(abs2, ps.complex) + sum(abs2, ps.real)
+        end
+        @test gradient.complex ≈ 2 .* parameters.complex
+        @test gradient.real ≈ 2 .* parameters.real
+    end
+
     setups = [
         (
             modes = (4,),
@@ -49,8 +58,9 @@ include("../shared_testsetup.jl")
         @test res_ra ≈ res atol = 1.0f-2 rtol = 1.0f-2
 
         @testset "check gradients" begin
-            ∂x_fd, ∂ps_fd = ∇sumabs2_reactant_fd(fno, x_ra, ps_ra, st_ra)
+            ∂x_fd, ∂ps_fd = ∇sumabs2_finite_difference(fno, x, ps, st)
             ∂x_ra, ∂ps_ra = ∇sumabs2_reactant(fno, x_ra, ps_ra, st_ra)
+            ∂x_ra, ∂ps_ra = (∂x_ra, ∂ps_ra) |> cpu_device()
 
             @test ∂x_fd ≈ ∂x_ra atol = 1.0f-2 rtol = 1.0f-2
             @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
