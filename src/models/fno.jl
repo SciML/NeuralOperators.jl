@@ -1,32 +1,39 @@
 """
     FourierNeuralOperator(
-        σ=gelu;
-        chs::Dims{C}=(2, 64, 64, 64, 64, 64, 128, 1),
-        modes::Dims{M}=(16,),
-        kwargs...
-    ) where {C, M}
+        σ = gelu;
+        chs::Dims = (2, 64, 64, 64, 64, 64, 128, 1),
+        modes::Dims = (16,),
+        kwargs...,
+    ) -> FourierNeuralOperator
 
-The Fourier neural operator is a operator learning model that uses a Fourier kernel to
-perform spectral convolutions. It is a promising operator for surrogate methods, and can be
-regarded as a physics operator.
+Construct a Fourier neural operator from an explicit sequence of channel widths. The model
+uses Fourier kernels to learn mappings between discretized functions.
 
-The model is composed of a `Dense` layer to lift a `(d + 1)`-dimensional vector field to an
-`n`-dimensional vector field, an integral kernel operator which consists of four Fourier
-kernels, and two `Dense` layers to project data back to the scalar field of the space of
-interest.
+The model lifts inputs with a pointwise convolution, applies Fourier operator kernels, and
+projects their output with two pointwise convolutions.
 
-## Arguments
+# Arguments
 
-  - `σ`: Activation function for all layers in the model.
+- `σ = gelu`: Activation function used by the spectral kernels and penultimate
+  projection layer.
 
-## Keyword Arguments
+# Keywords
 
-  - `chs`: A `Tuple` or `Vector` of the size of each of the 8 channels.
-  - `modes`: The modes to be preserved. A tuple of length `d`, where `d` is the dimension
-    of data.  For example, one-dimensional data would have a 1-element tuple, and
-    two-dimensional data would have a 2-element tuple.
+- `chs::Dims`: Channel widths. The first and last entries are input and output widths; the
+  intermediate entries configure lifting, spectral, and projection layers. At least five
+  entries are required.
+- `modes::Dims`: Number of retained Fourier modes along each spatial dimension.
+- `kwargs...`: Additional keywords forwarded to every [`SpectralKernel`](@ref).
 
-## Example
+# Fields
+
+- `model::AbstractLuxLayer`: Assembled Lux model.
+
+# Returns
+
+- A `FourierNeuralOperator` Lux layer.
+
+# Examples
 
 ```jldoctest
 julia> fno = FourierNeuralOperator(gelu; chs=(2, 64, 64, 128, 1), modes=(16,));
@@ -83,32 +90,56 @@ end
         complex_data::Bool=false,
         stabilizer=tanh,
         shift::Bool=false,
-    ) where {N}
+    ) -> FourierNeuralOperator
 
-Constructor for a Fourier neural operator (FNO) model.
+Construct a configurable Fourier neural operator with lifting and projection networks.
 
-## Arguments
+# Arguments
 
-  - `modes`: The modes to be preserved. A tuple of length `d`, where `d` is the dimension
-    of data.
-  - `in_channels`: Number of input channels.
-  - `out_channels`: Number of output channels.
-  - `hidden_channels`: Number of hidden channels.
+- `modes::Dims{N}`: Number of retained Fourier modes along each of the `N` spatial
+  dimensions.
+- `in_channels::Integer`: Channel count presented to the lifting network. With
+  `positional_embedding = :grid`, this is the input data's channels plus `N` coordinate
+  channels.
+- `out_channels::Integer`: Number of output channels.
+- `hidden_channels::Integer`: Width of each Fourier operator block.
 
-## Keyword Arguments
+# Keywords
 
-  - `num_layers`: Number of layers in the FNO.
-  - `lifting_channel_ratio`: Ratio of the number of channels in the lifting layer.
-  - `projection_channel_ratio`: Ratio of the number of channels in the projection layer.
-  - `positional_embedding`: Positional embedding to be used. Either `:grid` or `:none`.
-  - `activation`: Activation function for all layers in the model.
-  - `use_channel_mlp`: Whether to use channel MLP.
-  - `channel_mlp_expansion`: Expansion factor for the channel MLP.
-  - `channel_mlp_skip`: Skip connection type for the channel MLP.
-  - `fno_skip`: Skip connection type for the FNO.
-  - `complex_data`: Whether the data is complex.
-  - `stabilizer`: Stabilizer function to be used.
-  - `shift`: Whether to apply `fftshift` before truncating the modes.
+- `num_layers::Integer = 4`: Number of Fourier operator blocks.
+- `lifting_channel_ratio::Integer = 2`: Lifting hidden width divided by
+  `hidden_channels`.
+- `projection_channel_ratio::Integer = 2`: Projection hidden width divided by
+  `out_channels`.
+- `positional_embedding::Union{Symbol,AbstractLuxLayer} = :grid`: Positional layer, or
+  `:grid` to append uniform coordinates, or `:none` to append nothing.
+- `activation = gelu`: Activation used by lifting, projection, and operator blocks.
+- `use_channel_mlp::Bool = true`: Whether each operator block includes a channel MLP.
+- `channel_mlp_expansion::Real = 0.5`: Channel-MLP hidden width as a fraction of
+  `hidden_channels`.
+- `channel_mlp_skip::Symbol = :soft_gating`: Channel-MLP skip connection; one of
+  `:linear`, `:soft_gating`, or `:none`.
+- `fno_skip::Symbol = :linear`: Fourier-block skip connection; one of `:linear`,
+  `:soft_gating`, or `:none`.
+- `complex_data::Bool = false`: Whether lifting, operator, and projection layers process
+  complex-valued data.
+- `stabilizer = tanh`: Function applied before each transformed convolution.
+- `shift::Bool = false`: Whether Fourier coefficients are shifted before truncation.
+
+# Returns
+
+- A `FourierNeuralOperator` Lux layer.
+
+# Examples
+
+```jldoctest
+julia> fno = FourierNeuralOperator((4,), 3, 1, 8; num_layers=2);
+
+julia> ps, st = Lux.setup(Xoshiro(0), fno);
+
+julia> size(first(fno(rand(Float32, 8, 2, 3), ps, st)))
+(8, 1, 3)
+```
 """
 function FourierNeuralOperator(
         modes::Dims{N},

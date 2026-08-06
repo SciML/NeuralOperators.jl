@@ -1,21 +1,30 @@
 """
-    DeepONet(branch, trunk, additional)
+    DeepONet(branch, trunk) -> DeepONet
 
-Constructs a DeepONet from a `branch` and `trunk` architectures. Make sure that both the
-nets output should have the same first dimension.
+Construct a DeepONet from branch and trunk Lux architectures. Their output feature counts
+must agree so the model can combine them by matrix multiplication.
 
-## Arguments
+# Arguments
 
-  - `branch`: `Lux` network to be used as branch net.
-  - `trunk`: `Lux` network to be used as trunk net.
+- `branch`: Lux layer mapping sampled input functions to latent features. Its output is
+  transposed before multiplication.
+- `trunk`: Lux layer mapping query coordinates to the same number of latent features.
 
-## References
+# Fields
+
+- `model::AbstractLuxLayer`: Assembled Lux model containing branch and trunk networks.
+
+# Returns
+
+- A `DeepONet` Lux layer accepting `(branch_input, trunk_input)`.
+
+# References
 
 [1] Lu Lu, Pengzhan Jin, George Em Karniadakis, "DeepONet: Learning nonlinear operators for
 identifying differential equations based on the universal approximation theorem of
 operators", doi: https://arxiv.org/abs/1910.03193
 
-## Input Output Dimensions
+# Input and Output Dimensions
 
 Consider a transient 1D advection problem ∂ₜu + u ⋅ ∇u = 0, with an IC u(x,0) = g(x).
 We are given several (b = 200) instances of the IC, discretized at 50 points each, and want
@@ -24,7 +33,7 @@ to query the solution for 100 different locations and times [0;1].
 That makes the branch input of shape [50 x 200] and the trunk input of shape [2 x 100]. So,
 the input for the branch net is 50 and 100 for the trunk net.
 
-## Example
+# Examples
 
 ```jldoctest
 julia> branch_net = Chain(Dense(64 => 32), Dense(32 => 32), Dense(32 => 16));
@@ -60,25 +69,31 @@ end
     DeepONet(;
         branch = (64, 32, 32, 16), trunk = (1, 8, 8, 16),
         branch_activation = identity, trunk_activation = identity
-    )
+    ) -> DeepONet
 
-Constructs a DeepONet composed of Dense layers. Make sure the last node of `branch` and
-`trunk` are same.
+Construct a DeepONet whose branch and trunk networks are chains of dense layers. The final
+widths of `branch` and `trunk` must agree.
 
-## Keyword arguments:
+# Keywords
 
-  - `branch`: Tuple of integers containing the number of nodes in each layer for branch net
-  - `trunk`: Tuple of integers containing the number of nodes in each layer for trunk net
-  - `branch_activation`: activation function for branch net
-  - `trunk_activation`: activation function for trunk net
+- `branch = (64, 32, 32, 16)`: Widths of the branch network, including its input and latent
+  output widths.
+- `trunk = (1, 8, 8, 16)`: Widths of the trunk network, including its coordinate input and
+  latent output widths.
+- `branch_activation = identity`: Activation on all branch layers except the final layer.
+- `trunk_activation = identity`: Activation on all trunk layers except the final layer.
 
-## References
+# Returns
+
+- A `DeepONet` Lux layer accepting `(branch_input, trunk_input)`.
+
+# References
 
 [1] Lu Lu, Pengzhan Jin, George Em Karniadakis, "DeepONet: Learning nonlinear operators for
 identifying differential equations based on the universal approximation theorem of
 operators", doi: https://arxiv.org/abs/1910.03193
 
-## Example
+# Examples
 
 ```jldoctest
 julia> deeponet = DeepONet(; branch=(64, 32, 32, 16), trunk=(1, 8, 8, 16));

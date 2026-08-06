@@ -1,21 +1,30 @@
 """
-    NOMAD(approximator, decoder)
+    NOMAD(approximator, decoder) -> NOMAD
 
-Constructs a NOMAD from `approximator` and `decoder` architectures. Make sure the output
-from `approximator` combined with the coordinate dimension has compatible size for input to
-`decoder`
+Construct a nonlinear manifold decoder model from approximator and decoder Lux
+architectures. The approximator output is concatenated with each coordinate input before
+being passed to the decoder.
 
-## Arguments
+# Arguments
 
-  - `approximator`: `Lux` network to be used as approximator net.
-  - `decoder`: `Lux` network to be used as decoder net.
+- `approximator`: Lux layer mapping the sampled input function to a latent representation.
+- `decoder`: Lux layer mapping the concatenated latent representation and coordinates to
+  the model output.
 
-## References
+# Fields
+
+- `model::AbstractLuxLayer`: Assembled Lux model containing approximator and decoder.
+
+# Returns
+
+- A `NOMAD` Lux layer accepting `(approximator_input, coordinates)`.
+
+# References
 
 [1] Jacob H. Seidman and Georgios Kissas and Paris Perdikaris and George J. Pappas, "NOMAD:
 Nonlinear Manifold Decoders for Operator Learning", doi: https://arxiv.org/abs/2206.03551
 
-## Example
+# Examples
 
 ```jldoctest
 julia> approximator_net = Chain(Dense(8 => 32), Dense(32 => 32), Dense(32 => 16));
@@ -46,26 +55,31 @@ end
     NOMAD(;
         approximator = (8, 32, 32, 16), decoder = (18, 16, 8, 8),
         approximator_activation = identity, decoder_activation = identity
-    )
+    ) -> NOMAD
 
-Constructs a NOMAD composed of Dense layers. Make sure that last node of `approximator` +
-coordinate length = first node of `decoder`.
+Construct a NOMAD whose approximator and decoder are chains of dense layers. The first
+decoder width must equal the final approximator width plus the coordinate width supplied at
+evaluation time.
 
-## Keyword arguments:
+# Keywords
 
-  - `approximator`: Tuple of integers containing the number of nodes in each layer for
-    approximator net
-  - `decoder`: Tuple of integers containing the number of nodes in each layer for decoder
-    net
-  - `approximator_activation`: activation function for approximator net
-  - `decoder_activation`: activation function for decoder net
+- `approximator = (8, 32, 32, 16)`: Widths of the approximator network, including input and
+  latent output widths.
+- `decoder = (18, 16, 8, 8)`: Widths of the decoder network. Its input width must include
+  both latent and coordinate features.
+- `approximator_activation = identity`: Activation applied to every approximator layer.
+- `decoder_activation = identity`: Activation applied to every decoder layer.
 
-## References
+# Returns
+
+- A `NOMAD` Lux layer accepting `(approximator_input, coordinates)`.
+
+# References
 
 [1] Jacob H. Seidman and Georgios Kissas and Paris Perdikaris and George J. Pappas, "NOMAD:
 Nonlinear Manifold Decoders for Operator Learning", doi: https://arxiv.org/abs/2206.03551
 
-## Example
+# Examples
 
 ```jldoctest
 julia> nomad = NOMAD(; approximator=(8, 32, 32, 16), decoder=(18, 16, 8, 8));
