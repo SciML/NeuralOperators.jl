@@ -1,25 +1,48 @@
 """
     OperatorConv(
-        ch::Pair{<:Integer, <:Integer}, modes::Dims, tr::AbstractTransform;
-        init_weight=glorot_uniform
-    )
+        ch::Pair{<:Integer,<:Integer},
+        modes::Dims,
+        tform::AbstractTransform;
+        init_weight = glorot_uniform,
+    ) -> OperatorConv
 
-## Arguments
+Construct a Lux layer that transforms its input, applies learned weights to retained modes,
+and maps the result back to physical space.
 
-  - `ch`: A `Pair` of input and output channel size `ch_in => ch_out`, e.g. `64 => 64`.
-  - `modes`: The modes to be preserved. A tuple of length `d`, where `d` is the dimension of
-    data.
-  - `tr`: The transform to operate the transformation.
+# Arguments
 
-## Keyword Arguments
+- `ch::Pair{<:Integer,<:Integer}`: Input and output channels as `in_chs => out_chs`.
+- `modes::Dims`: Number of retained modes along each spatial dimension.
+- `tform::AbstractTransform`: Transform implementation satisfying the
+  [`AbstractTransform`](@ref) interface.
 
-  - `init_weight`: Initial function to initialize parameters.
+# Keywords
 
-## Example
+- `init_weight = glorot_uniform`: Function called as
+  `init_weight(rng, coefficient_type, out_chs, in_chs, prod(modes))`.
+
+# Fields
+
+- `in_chs::Int`: Number of input channels.
+- `out_chs::Int`: Number of output channels.
+- `prod_modes::Int`: Product of the retained mode counts.
+- `tform::AbstractTransform`: Transform used by the layer.
+- `init_weight`: Parameter initializer for transformed-space weights.
+
+# Returns
+
+- An `OperatorConv` Lux layer whose input and output shapes are
+  `(spatial..., channels, batches)`.
+
+# Examples
 
 ```jldoctest
-julia> OperatorConv(2 => 5, (16,), FourierTransform{ComplexF32}((16,)));
+julia> layer = OperatorConv(2 => 5, (8,), FourierTransform{ComplexF32}((8,)));
 
+julia> ps, st = Lux.setup(Xoshiro(0), layer);
+
+julia> size(first(layer(rand(Float32, 16, 2, 1), ps, st)))
+(16, 5, 1)
 ```
 """
 @concrete struct OperatorConv <: AbstractLuxLayer
@@ -75,15 +98,32 @@ function (conv::OperatorConv)(x::AbstractArray{T, N}, ps, st) where {T, N}
 end
 
 """
-    SpectralConv(args...; kwargs...)
+    SpectralConv(
+        ch::Pair{<:Integer,<:Integer}, modes::Dims; shift::Bool = false, kwargs...
+    ) -> OperatorConv
 
-Construct a `OperatorConv` with `FourierTransform{ComplexF32}` as the transform. See
-[`OperatorConv`](@ref) for the individual arguments.
+Construct an [`OperatorConv`](@ref) with a [`FourierTransform`](@ref) using `ComplexF32`
+coefficients.
 
-## Example
+# Arguments
+
+- `ch::Pair{<:Integer,<:Integer}`: Input and output channels as `in_chs => out_chs`.
+- `modes::Dims`: Number of retained Fourier modes along each spatial dimension.
+
+# Keywords
+
+- `shift::Bool = false`: Whether to shift non-redundant Fourier dimensions before
+  truncation.
+- `kwargs...`: Additional keywords forwarded to [`OperatorConv`](@ref).
+
+# Returns
+
+- An `OperatorConv` configured for Fourier transforms with `ComplexF32` weights.
+
+# Examples
 
 ```jldoctest
-julia> SpectralConv(2 => 5, (16,));
+julia> SpectralConv(2 => 5, (8,));
 
 ```
 """
@@ -96,20 +136,42 @@ end
 """
     OperatorKernel(
         ch::Pair{<:Integer, <:Integer}, modes::Dims, transform::AbstractTransform,
-        act=identity; kwargs...
-    )
+        act = identity;
+        kwargs...,
+    ) -> OperatorKernel
 
-## Arguments
+Construct a Lux operator block that combines a transformed convolution with a skip
+connection and optional channel MLP.
 
-  - `ch`: A `Pair` of input and output channel size `ch_in => ch_out`, e.g. `64 => 64`.
-  - `modes`: The modes to be preserved. A tuple of length `d`, where `d` is the dimension of
-    data.
-  - `transform`: The transform to operate the transformation.
-  - `act`: Activation function.
+# Arguments
 
-All the keyword arguments are passed to the [`OperatorConv`](@ref) constructor.
+- `ch::Pair{<:Integer,<:Integer}`: Input and output channels as `in_chs => out_chs`.
+- `modes::Dims`: Number of retained modes along each spatial dimension.
+- `transform::AbstractTransform`: Transform used by the convolution branch.
+- `act = identity`: Activation applied after branch outputs are combined.
 
-## Example
+# Keywords
+
+- `stabilizer = identity`: Function broadcast over inputs before the transformed
+  convolution.
+- `complex_data::Bool = false`: Whether the block operates on complex-valued data.
+- `fno_skip::Symbol = :linear`: Spectral-branch skip connection; one of `:linear`,
+  `:soft_gating`, or `:none`.
+- `channel_mlp_skip::Symbol = :soft_gating`: Skip connection for the optional channel MLP;
+  one of `:linear`, `:soft_gating`, or `:none`.
+- `use_channel_mlp::Bool = false`: Whether to add a two-layer channel MLP.
+- `channel_mlp_expansion::Real = 0.5`: Hidden width as a fraction of output channels.
+- `kwargs...`: Additional keywords forwarded to [`OperatorConv`](@ref).
+
+# Fields
+
+- `layer::AbstractLuxLayer`: Assembled Lux layer implementing the operator block.
+
+# Returns
+
+- An `OperatorKernel` wrapping the assembled Lux block.
+
+# Examples
 
 ```jldoctest
 julia> OperatorKernel(2 => 5, (16,), FourierTransform{ComplexF64}((16,)));
@@ -192,12 +254,31 @@ function __fno_skip_connection(in_chs, out_chs, n_dims, use_bias, skip_type)
 end
 
 """
-    SpectralKernel(args...; kwargs...)
+    SpectralKernel(
+        ch::Pair{<:Integer,<:Integer}, modes::Dims, act = identity;
+        shift::Bool = false, kwargs...,
+    ) -> OperatorKernel
 
-Construct a `OperatorKernel` with `FourierTransform{ComplexF32}` as the transform. See
-[`OperatorKernel`](@ref) for the individual arguments.
+Construct an [`OperatorKernel`](@ref) with a [`FourierTransform`](@ref) using `ComplexF32`
+coefficients.
 
-## Example
+# Arguments
+
+- `ch::Pair{<:Integer,<:Integer}`: Input and output channels as `in_chs => out_chs`.
+- `modes::Dims`: Number of retained Fourier modes along each spatial dimension.
+- `act = identity`: Activation applied after branch outputs are combined.
+
+# Keywords
+
+- `shift::Bool = false`: Whether to shift non-redundant Fourier dimensions before
+  truncation.
+- `kwargs...`: Additional keywords forwarded to [`OperatorKernel`](@ref).
+
+# Returns
+
+- An `OperatorKernel` configured for Fourier transforms with `ComplexF32` weights.
+
+# Examples
 
 ```jldoctest
 julia> SpectralKernel(2 => 5, (16,));
@@ -213,9 +294,33 @@ function SpectralKernel(
 end
 
 """
-    GridEmbedding(grid_boundaries::Vector{<:Tuple{<:Real,<:Real}})
+    GridEmbedding(grid_boundaries::Vector{<:Tuple{<:Real,<:Real}}) -> GridEmbedding
 
 Appends a uniform grid embedding to the input data along the penultimate dimension.
+
+# Arguments
+
+- `grid_boundaries`: Inclusive lower and upper coordinate bounds for each spatial
+  dimension.
+
+# Fields
+
+- `grid_boundaries::Vector{<:Tuple{<:Real,<:Real}}`: Coordinate bounds used to construct
+  the embedding.
+
+# Returns
+
+- A `GridEmbedding` Lux layer. Applying it to `(spatial..., channels, batches)` appends one
+  coordinate channel per spatial dimension.
+
+# Examples
+
+```jldoctest
+julia> layer = GridEmbedding([(0.0f0, 1.0f0)]);
+
+julia> size(first(layer(zeros(Float32, 4, 2, 1), NamedTuple(), NamedTuple())))
+(4, 3, 1)
+```
 """
 @concrete struct GridEmbedding <: AbstractLuxLayer
     grid_boundaries <: Vector{<:Tuple{<:Real, <:Real}}
@@ -243,10 +348,33 @@ function (layer::GridEmbedding)(x::AbstractArray{T, N}, ps, st) where {T, N}
 end
 
 """
-    ComplexDecomposedLayer(layer::AbstractLuxLayer)
+    ComplexDecomposedLayer(layer::AbstractLuxLayer) -> ComplexDecomposedLayer
 
 Decomposes complex activations into real and imaginary parts and applies the given layer to
 each component separately, and then recombines the real and imaginary parts.
+
+# Arguments
+
+- `layer::AbstractLuxLayer`: Real-valued Lux layer applied to each component.
+
+# Fields
+
+- `layer::AbstractLuxLayer`: Wrapped real-valued Lux layer.
+
+# Returns
+
+- A `ComplexDecomposedLayer` with independent real and imaginary parameter sets.
+
+# Examples
+
+```jldoctest
+julia> layer = ComplexDecomposedLayer(Dense(2 => 2));
+
+julia> ps, st = Lux.setup(Xoshiro(0), layer);
+
+julia> size(first(layer(ones(ComplexF32, 2, 1), ps, st)))
+(2, 1)
+```
 """
 @concrete struct ComplexDecomposedLayer <: AbstractLuxWrapperLayer{:layer}
     layer <: AbstractLuxLayer
@@ -281,10 +409,38 @@ function (layer::ComplexDecomposedLayer)(x::AbstractArray{T, N}, ps, st) where {
 end
 
 """
-    SoftGating(chs::Integer, ndims::Integer; kwargs...)
+    SoftGating(chs::Integer, ndims::Integer; kwargs...) -> SoftGating
 
 Constructs a wrapper over `Scale` with `dims = (ntuple(Returns(1), ndims)..., chs)`. All
 keyword arguments are passed to the `Scale` constructor.
+
+# Arguments
+
+- `chs::Integer`: Number of channels in the scaled dimension.
+- `ndims::Integer`: Number of spatial dimensions before the channel dimension.
+
+# Keywords
+
+- `kwargs...`: Additional keywords forwarded to `Lux.Scale`.
+
+# Fields
+
+- `layer::Scale`: Wrapped Lux scale layer.
+
+# Returns
+
+- A `SoftGating` layer with one trainable scale per channel.
+
+# Examples
+
+```jldoctest
+julia> layer = SoftGating(3, 1);
+
+julia> ps, st = Lux.setup(Xoshiro(0), layer);
+
+julia> size(first(layer(ones(Float32, 4, 3, 2), ps, st)))
+(4, 3, 2)
+```
 """
 @concrete struct SoftGating <: AbstractLuxWrapperLayer{:layer}
     layer <: Scale

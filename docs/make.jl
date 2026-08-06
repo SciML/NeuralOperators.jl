@@ -15,10 +15,18 @@ ENV["DATADEPS_ALWAYS_ACCEPT"] = true
 
 include("pages.jl")
 
+DocMeta.setdocmeta!(
+    NeuralOperators,
+    :DocTestSetup,
+    :(using Lux, NeuralOperators, Random);
+    recursive = true,
+)
+
 makedocs(;
     sitename = "NeuralOperators.jl",
     clean = true,
-    doctest = false,
+    doctest = true,
+    checkdocs = :exports,
     linkcheck = true,
     modules = [NeuralOperators],
     format = Documenter.HTML(;

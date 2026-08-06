@@ -10,9 +10,13 @@ function apply_pattern(
     return reshape(x_weighted, x_size[1:(N - 2)]..., size(x_weighted)[2:3]...)
 end
 
-function add_act(act::F, x1, x2) where {F}
+fast_activation_function(::typeof(tanh)) = tanh_fast
+fast_activation_function(::typeof(sigmoid)) = sigmoid_fast
+fast_activation_function(act) = act
+
+function add_act(act, x1, x2)
     y = x1 .+ x2
-    return fast_activation!!(NNlib.fast_act(act, y), y)
+    return fast_activation!!(fast_activation_function(act), y)
 end
 
 # `SubArray`s returned by `view` are not contiguous; some downstream kernels (e.g. FFTs)
