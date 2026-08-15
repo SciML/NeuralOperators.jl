@@ -2,13 +2,6 @@ using NeuralOperators, Test
 
 include("../shared_testsetup.jl")
 
-@testset "Nested approximation helper" begin
-    left = (; a = [1.0, 2.0], b = ((; c = [3.0]),))
-    right = (; a = [1.0, 2.0], b = ((; c = [nextfloat(3.0)]),))
-    @test check_approx(left, right; atol = 1.0e-12, rtol = 0)
-    @test !check_approx(left, right; atol = 0, rtol = 0)
-end
-
 const LAYERS_SETUPS = [
     (; m = (4,), x_size = (8, 2, 2), y_size = (8, 4, 2), shift = false),
     (; m = (4, 4), x_size = (8, 8, 1, 2), y_size = (8, 8, 4, 2), shift = false),

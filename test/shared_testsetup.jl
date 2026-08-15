@@ -1,20 +1,6 @@
 using Lux, Optimisers, Random, StableRNGs, Reactant, Enzyme, FastTransforms
+using LuxTestUtils: check_approx
 using MLDataDevices: cpu_device, reactant_device
-
-check_approx(x::AbstractArray, y::AbstractArray; kwargs...) =
-    isapprox(cpu_device()(x), cpu_device()(y); kwargs...)
-
-function check_approx(x::NamedTuple{names}, y::NamedTuple{names}; kwargs...) where {names}
-    return all(check_approx(x[name], y[name]; kwargs...) for name in names)
-end
-
-function check_approx(x::Tuple, y::Tuple; kwargs...)
-    length(x) == length(y) || return false
-    return all(check_approx(xi, yi; kwargs...) for (xi, yi) in zip(x, y))
-end
-
-check_approx(::Nothing, ::Nothing; kwargs...) = true
-check_approx(x, y; kwargs...) = isapprox(x, y; kwargs...)
 
 sumabs2first(model, x, ps, st) = sum(abs2, first(model(x, ps, st)))
 
