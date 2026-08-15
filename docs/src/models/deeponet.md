@@ -90,7 +90,7 @@ function train!(model, ps, st, data; epochs=10)
     return losses
 end
 
-losses = train!(deeponet, ps, st, data; epochs=1000)
+losses = train!(deeponet, ps, st, data; epochs=3)
 
 draw(
     AoG.data((; losses, iteration=1:length(losses))) *

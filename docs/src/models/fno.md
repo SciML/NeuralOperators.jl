@@ -100,7 +100,7 @@ function train!(model, ps, st, data; epochs=10)
     return losses
 end
 
-losses = train!(fno, ps, st, data; epochs=1000)
+losses = train!(fno, ps, st, data; epochs=3)
 
 draw(
     AoG.data((; losses, iteration=1:length(losses))) *
@@ -251,7 +251,7 @@ end
 Now we train our model!
 
 ```@example fno_tutorial_details
-losses, ps, st = @time train!(fno, ps, st, data; epochs=500)
+losses, ps, st = @time train!(fno, ps, st, data; epochs=3)
 ```
 
 ### Applying the model

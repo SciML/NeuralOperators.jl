@@ -86,7 +86,7 @@ f_data = f_data |> xdev;
 x_data = x_data |> xdev;
 u_data = u_data |> xdev;
 data = ((f_data, x_data), u_data)
-ps_trained, st_trained, losses = train_model!(deeponet, ps, st, data)
+ps_trained, st_trained, losses = train_model!(deeponet, ps, st, data; epochs=3)
 
 # Prediction function
 function predict(model, f_input, x_input, ps, st)
