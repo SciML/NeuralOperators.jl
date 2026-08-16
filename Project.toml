@@ -30,3 +30,5 @@ julia = "1.10"
 
 [workspace]
 projects = ["test", "docs"]
+
+# Temporary CI probe: comment-only change to trigger the path-filtered Tests workflow.
