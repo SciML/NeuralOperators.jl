@@ -90,7 +90,7 @@ function train_model!(model, ps, st, data; epochs=5000)
 end
 
 (ps_trained, st_trained) = train_model!(
-    deeponet, ps, st, ((x_data_dev, grid_dev), y_data_dev)
+    deeponet, ps, st, ((x_data_dev, grid_dev), y_data_dev); epochs=2
 )
 nothing #hide
 ```

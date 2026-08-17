@@ -132,7 +132,7 @@ function train_model!(model, ps, st, trainloader, testloader; epochs=20)
     return train_state.parameters, train_state.states
 end
 
-ps_trained, st_trained = train_model!(fno, ps, st, trainloader, testloader; epochs=50);
+ps_trained, st_trained = train_model!(fno, ps, st, trainloader, testloader; epochs=2);
 nothing #hide
 ```
 
