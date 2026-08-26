@@ -26,10 +26,10 @@ withenv(
         @time @safetestset "SpectralKernel" begin
             include(joinpath(@__DIR__, "layers", "spectral_kernel_tests.jl"))
         end
-        return @time @safetestset "Transform Interface" begin
+        @time @safetestset "Transform Interface" begin
             include(joinpath(@__DIR__, "layers", "transform_interface_tests.jl"))
         end
-        @time @safetestset "Precompile workload" begin
+        return @time @safetestset "Precompile workload" begin
             include(joinpath(@__DIR__, "precompile_workload.jl"))
         end
     end
