@@ -1,8 +1,25 @@
 using Lux, Optimisers, Random, StableRNGs, Reactant, Enzyme, FastTransforms
-using LuxTestUtils: check_approx
 using MLDataDevices: cpu_device, reactant_device
 
 sumabs2first(model, x, ps, st) = sum(abs2, first(model(x, ps, st)))
+
+# Local replacement for `LuxTestUtils.check_approx`: LuxTestUtils unconditionally skips
+# loading Enzyme on prerelease Julia versions
+# (https://github.com/LuxDL/Lux.jl/blob/main/lib/LuxTestUtils/src/LuxTestUtils.jl) but
+# still references `Enzyme.ReverseMode` in a method signature, which throws
+# `UndefVarError: Enzyme not defined` and breaks precompilation of LuxTestUtils itself on
+# Julia prereleases (e.g. 1.13.0-rc). Avoid the whole dependency for this one recursive
+# approximate-equality helper on Lux parameter structures.
+check_approx(x::AbstractArray, y::AbstractArray; kwargs...) = isapprox(x, y; kwargs...)
+check_approx(x::Number, y::Number; kwargs...) = isapprox(x, y; kwargs...)
+check_approx(::Nothing, ::Nothing; kwargs...) = true
+function check_approx(x::Tuple, y::Tuple; kwargs...)
+    return all(check_approx(a, b; kwargs...) for (a, b) in zip(x, y))
+end
+function check_approx(x::NamedTuple{fields}, y::NamedTuple{fields}; kwargs...) where {fields}
+    return all(check_approx(a, b; kwargs...) for (a, b) in zip(values(x), values(y)))
+end
+check_approx(x, y; kwargs...) = x == y
 
 function central_finite_difference(f, x::AbstractArray{T}) where {T <: Real}
     epsilon = cbrt(eps(T))
