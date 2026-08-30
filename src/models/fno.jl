@@ -186,17 +186,17 @@ function FourierNeuralOperator(
     fno_blocks = Chain(
         [
             SpectralKernel(
-                    hidden_channels => hidden_channels,
-                    modes,
-                    activation;
-                    stabilizer,
-                    shift,
-                    use_channel_mlp,
-                    channel_mlp_expansion,
-                    channel_mlp_skip,
-                    fno_skip,
-                    complex_data,
-                ) for _ in 1:num_layers
+                hidden_channels => hidden_channels,
+                modes,
+                activation;
+                stabilizer,
+                shift,
+                use_channel_mlp,
+                channel_mlp_expansion,
+                channel_mlp_skip,
+                fno_skip,
+                complex_data,
+            ) for _ in 1:num_layers
         ]...,
     )
 
