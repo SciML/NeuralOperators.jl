@@ -2,11 +2,13 @@
 versions = ["lts", "1", "pre"]
 os = ["ubuntu-latest", "windows-latest", "macos-latest"]
 
-["Core 32-bit"]
-group = "Core"
-versions = ["1"]
-os = ["ubuntu-latest"]
-arch = "x86"
+# Core 32-bit dropped: Reactant CPU backend register_backend requires Int64
+# priority; bare `100` is Int32 on i686 (EnzymeAD/Reactant.jl#3274).
+# ["Core 32-bit"]
+# group = "Core"
+# versions = ["1"]
+# os = ["ubuntu-latest"]
+# arch = "x86"
 
 [QA]
 versions = ["lts", "1"]
