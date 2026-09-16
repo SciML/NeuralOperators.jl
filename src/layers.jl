@@ -336,7 +336,7 @@ function (layer::GridEmbedding)(x::AbstractArray{T, N}, ps, st) where {T, N}
     grid = meshgrid(
         map(enumerate(layer.grid_boundaries)) do (i, (min, max))
             return range(T(min), T(max); length = size(x, i))
-        end...
+        end...,
     )
 
     grid = repeat(
@@ -344,6 +344,10 @@ function (layer::GridEmbedding)(x::AbstractArray{T, N}, ps, st) where {T, N}
         ntuple(Returns(1), N - 1)...,
         size(x, N),
     )
+
+    # Move the CPU-built grid to the same device as x (fixes CUDA scalar indexing, #125)
+    grid = Lux.get_device(x)(grid)
+
     return cat(grid, x; dims = N - 1), st
 end
 
