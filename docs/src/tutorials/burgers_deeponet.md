@@ -4,16 +4,14 @@
 
 ```@example burgers
 using MAT, MLUtils, Printf, DataDeps
-using PythonCall, CondaPkg # For `gdown`
-
-const gdown = pyimport("gdown")
 
 register(
     DataDep(
-        "Burgers",
+        "BurgersR10",
         """
         Burgers' equation dataset from
-        [fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator)
+        [fourier_neural_operator](https://github.com/zongyi-li/fourier_neural_operator),
+        mirrored at [kks32/sciml-dataset](https://huggingface.co/datasets/kks32/sciml-dataset).
 
         mapping between initial conditions to the solutions at the last point of time \
         evolution in some function space.
@@ -23,16 +21,12 @@ register(
           * `a`: initial conditions u(x,0)
           * `u`: solutions u(x,t_end)
         """,
-        "https://drive.google.com/uc?id=16a8od4vidbiNR3WtaBPCSZ0T3moxjhYe",
-        "9cbbe5070556c777b1ba3bacd49da5c36ea8ed138ba51b6ee76a24b971066ecd";
-        fetch_method=(url, local_dir) -> begin
-            pyconvert(String, gdown.download(url, joinpath(local_dir, "Burgers_R10.zip")))
-        end,
-        post_fetch_method=unpack,
+        "https://huggingface.co/datasets/kks32/sciml-dataset/resolve/main/fno/burgers_data_R10.mat",
+        "d1a0456776255a4bd841dbc18951d3f468266d945d96e24ae531a12f18bb5a1a",
     ),
 )
 
-filepath = joinpath(datadep"Burgers", "burgers_data_R10.mat")
+filepath = joinpath(datadep"BurgersR10", "burgers_data_R10.mat")
 
 const N = 2048
 const Δsamples = 2^3
