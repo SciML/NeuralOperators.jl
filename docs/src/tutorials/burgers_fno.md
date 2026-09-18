@@ -22,7 +22,7 @@ register(
           * `a`: initial conditions u(x,0)
           * `u`: solutions u(x,t_end)
         """,
-        "https://huggingface.co/datasets/kks32/sciml-dataset/resolve/main/fno/burgers_data_R10.mat",
+        "https://huggingface.co/datasets/kks32/sciml-dataset/resolve/982685ff70965591682682dddd284d35e670ac7f/fno/burgers_data_R10.mat",
         "d1a0456776255a4bd841dbc18951d3f468266d945d96e24ae531a12f18bb5a1a",
     ),
 )
