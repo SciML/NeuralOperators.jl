@@ -9,6 +9,7 @@ and the Fourier transform used by spectral layers.
 NOMAD
 DeepONet
 FourierNeuralOperator
+ConvolutionalNeuralOperator
 ```
 
 ## Building blocks
