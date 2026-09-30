@@ -7,7 +7,7 @@ import FFTW
 using Random: Random, AbstractRNG
 
 using Lux: Lux, Chain, Dense, Conv, Parallel, NoOpLayer, WrappedFunction, Scale,
-    recursive_eltype, Upsample, MeanPool, SamePad
+    recursive_eltype, SamePad
 using LuxCore: LuxCore, AbstractLuxLayer, AbstractLuxWrapperLayer
 using LuxLib: fast_activation!!
 using NNlib: batched_mul, gelu, pad_constant, sigmoid, sigmoid_fast, tanh_fast

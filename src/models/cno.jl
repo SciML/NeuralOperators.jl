@@ -9,14 +9,13 @@
 
 A single Convolutional Neural Operator (CNO) block.
 
-Each block:
-1. **Upsamples** the input by `upsample_factor` using bilinear/trilinear interpolation.
-2. Applies a **3×(…×3) convolution** in the higher-resolution space with `SamePad`.
-3. Applies the **activation function** pointwise.
-4. **Downsamples** back to the original resolution via average pooling.
+Each block applies a `3×(…×3)` convolution followed by the CNO activation operator: the
+signal is upsampled by `upsample_factor` with band-limited (sinc) interpolation, the
+activation is applied pointwise at the higher resolution, and the result is low-pass
+filtered and downsampled back to the input resolution. Filtering before downsampling keeps
+the harmonics created by the activation from aliasing into lower frequencies.
 
-This design ensures the discrete operator converges to a continuous limit as resolution
-increases, unlike standard CNNs which only approximate finite-dimensional maps.
+Resampling uses the FFT, so the spatial dimensions are treated as periodic.
 
 ## Arguments
 
@@ -24,11 +23,11 @@ increases, unlike standard CNNs which only approximate finite-dimensional maps.
   - `out_channels`: Number of output channels.
   - `modes`: Spatial dimensions tuple (length = data dimensionality). Only the length is
     used to set the kernel dimensionality.
-  - `activation`: Pointwise activation applied after convolution.
+  - `activation`: Pointwise activation applied at the upsampled resolution.
 
 ## Keyword Arguments
 
-  - `upsample_factor`: Integer upsampling factor. Default is `2`.
+  - `upsample_factor`: Integer upsampling factor of the activation operator. Default is `2`.
 
 ## References
 
@@ -46,20 +45,53 @@ function CNOBlock(
         activation = gelu;
         upsample_factor::Integer = 2,
     ) where {N}
-    spatial_dims = ntuple(identity, N)
     kernel = ntuple(Returns(3), N)
-    pool_window = ntuple(Returns(upsample_factor), N)
-
     return CNOBlock(
         Chain(
-            # 1. Upsample to higher resolution
-            Upsample(:bilinear; scale = upsample_factor),
-            # 2. Convolution at high resolution (preserves spatial size via SamePad)
-            Conv(kernel, in_channels => out_channels, activation; pad = SamePad()),
-            # 3. Downsample back via average pooling (paper Section 3.1)
-            MeanPool(pool_window),
+            Conv(kernel, in_channels => out_channels; pad = SamePad()),
+            CNOActivation(activation, upsample_factor),
         ),
     )
+end
+
+@concrete struct CNOActivation <: AbstractLuxLayer
+    activation
+    upsample_factor::Int
+end
+
+function (act::CNOActivation)(x::AbstractArray{T, M}, _, st::NamedTuple) where {T, M}
+    sz = size(x)[1:(M - 2)]
+    y = act.activation.(spectral_resample(x, sz .* act.upsample_factor))
+    return spectral_resample(y, sz), st
+end
+
+# Band-limited resampling of the spatial dimensions of `x` to size `sz`. Frequencies at or
+# above the lower of the two Nyquist limits are dropped.
+function spectral_resample(x::AbstractArray{T}, sz::Dims{N}) where {T, N}
+    in_sz = size(x)[1:N]
+    in_sz == sz && return x
+    x_fft = resize_half_spectrum(rfft(x, 1:N), first(in_sz), first(sz))
+    for d in 2:N
+        x_fft = resize_full_spectrum(x_fft, d, sz[d])
+    end
+    y = irfft(x_fft, first(sz), 1:N)
+    return y .* T(length(y) / length(x))
+end
+
+function select_range(x::AbstractArray, d::Int, r::AbstractUnitRange)
+    return x[ntuple(i -> i == d ? r : Colon(), ndims(x))...]
+end
+
+function resize_half_spectrum(x_fft::AbstractArray, n::Int, m::Int)
+    k = (min(n, m) - 1) ÷ 2
+    return pad_constant(select_range(x_fft, 1, 1:(k + 1)), (0, m ÷ 2 - k), false; dims = 1)
+end
+
+function resize_full_spectrum(x_fft::AbstractArray, d::Int, m::Int)
+    n = size(x_fft, d)
+    k = (min(n, m) - 1) ÷ 2
+    pos = pad_constant(select_range(x_fft, d, 1:(k + 1)), (0, m - 2k - 1), false; dims = d)
+    return cat(pos, select_range(x_fft, d, (n - k + 1):n); dims = d)
 end
 
 """
@@ -75,15 +107,17 @@ end
 
 Convolutional Neural Operator (CNO) for learning PDE solution operators.
 
-CNO applies a sequence of resolution-preserving continuous convolutional blocks. Each
-block upsamples the input, applies a convolution in the higher-resolution space, and
-downsamples back. This design is proven to converge to a well-defined continuous operator
-as resolution increases, making CNO resolution-invariant by construction.
+CNO applies a sequence of resolution-preserving blocks. Each block is a convolution
+followed by an anti-aliased activation: the signal is upsampled with band-limited (sinc)
+interpolation, the activation is applied at the higher resolution, and the result is
+low-pass filtered and downsampled back. Resampling uses the FFT, so the spatial dimensions
+are treated as periodic.
 
 **Architecture**:
 1. **Lifting** `Conv(1×…×1)`: maps `in_channels → hidden_channels`
-2. **CNO blocks** × `num_layers`: each is upsample → conv → activation → avgpool
-3. **Projection**: `Conv(1×…×1, act)` → `Conv(1×…×1)` maps to `out_channels`
+2. **CNO blocks** × `num_layers`: each is conv → anti-aliased activation
+3. **Projection**: `Conv(1×…×1)` → anti-aliased activation → `Conv(1×…×1)` maps to
+   `out_channels`
 
 ## Arguments
 
@@ -96,8 +130,9 @@ as resolution increases, making CNO resolution-invariant by construction.
 ## Keyword Arguments
 
   - `num_layers`: Number of `CNOBlock` layers. Default is `4`.
-  - `activation`: Activation function used inside each block. Default is `gelu`.
-  - `upsample_factor`: Spatial upsampling factor inside each block. Default is `2`.
+  - `activation`: Activation function used by the anti-aliased activations. Default is
+    `gelu`.
+  - `upsample_factor`: Upsampling factor of the anti-aliased activations. Default is `2`.
 
 ## References
 
@@ -143,7 +178,8 @@ function ConvolutionalNeuralOperator(
     )
 
     projection = Chain(
-        Conv(ones_kernel, hidden_channels => hidden_channels, activation),
+        Conv(ones_kernel, hidden_channels => hidden_channels),
+        CNOActivation(activation, upsample_factor),
         Conv(ones_kernel, hidden_channels => out_channels),
     )
 
