@@ -345,8 +345,10 @@ function (layer::GridEmbedding)(x::AbstractArray{T, N}, ps, st) where {T, N}
         size(x, N),
     )
 
-    # Move the CPU-built grid to the same device as x (fixes CUDA scalar indexing, #125)
-    grid = Lux.get_device(x)(grid)
+    # Place the CPU-built grid on `x`'s device (fixes CUDA scalar indexing, #125).
+    # This must not query the device at runtime: `Lux.get_device(x)` errors
+    # inside `Reactant.@compile`.
+    grid = (similar(x, eltype(grid), size(grid)) .= grid)
 
     return cat(grid, x; dims = N - 1), st
 end
