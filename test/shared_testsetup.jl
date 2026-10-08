@@ -1,4 +1,5 @@
 using Lux, Optimisers, Random, StableRNGs, Reactant, Enzyme, FastTransforms
+using Reactant: Reactant_jll
 using MLDataDevices: cpu_device, reactant_device
 
 sumabs2first(model, x, ps, st) = sum(abs2, first(model(x, ps, st)))

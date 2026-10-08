@@ -24,7 +24,10 @@ include("../shared_testsetup.jl")
         ),
     ]
 
-    xdev = reactant_device(; force = true)
+    # Reactant_jll has no artifact on this platform.
+    if Reactant_jll.is_available()
+        xdev = reactant_device(; force = true)
+    end
 
     @testset "$(setup.name)" for setup in setups
         u = rand(Float32, setup.u_size...)
@@ -36,20 +39,24 @@ include("../shared_testsetup.jl")
         pred = first(nomad((u, y), ps, st))
         @test setup.out_size == size(pred)
 
-        ps_ra, st_ra = xdev((ps, st))
-        u_ra, y_ra = xdev(u), xdev(y)
+        if Reactant_jll.is_available()
+            ps_ra, st_ra = xdev((ps, st))
+            u_ra, y_ra = xdev(u), xdev(y)
 
-        pred_ra, _ = @jit nomad((u_ra, y_ra), ps_ra, st_ra)
-        @test pred_ra ≈ pred atol = 1.0f-2 rtol = 1.0f-2
+            pred_ra, _ = @jit nomad((u_ra, y_ra), ps_ra, st_ra)
+            @test pred_ra ≈ pred atol = 1.0f-2 rtol = 1.0f-2
 
-        @testset "check gradients" begin
-            (∂u_fd, ∂y_fd), ∂ps_fd = ∇sumabs2_finite_difference(nomad, (u, y), ps, st)
-            (∂u_ra, ∂y_ra), ∂ps_ra = ∇sumabs2_reactant(nomad, (u_ra, y_ra), ps_ra, st_ra)
-            (∂u_ra, ∂y_ra), ∂ps_ra = ((∂u_ra, ∂y_ra), ∂ps_ra) |> cpu_device()
+            @testset "check gradients" begin
+                (∂u_fd, ∂y_fd), ∂ps_fd = ∇sumabs2_finite_difference(nomad, (u, y), ps, st)
+                (∂u_ra, ∂y_ra), ∂ps_ra = ∇sumabs2_reactant(
+                    nomad, (u_ra, y_ra), ps_ra, st_ra
+                )
+                (∂u_ra, ∂y_ra), ∂ps_ra = ((∂u_ra, ∂y_ra), ∂ps_ra) |> cpu_device()
 
-            @test ∂u_fd ≈ ∂u_ra atol = 1.0f-2 rtol = 1.0f-2
-            @test ∂y_fd ≈ ∂y_ra atol = 1.0f-2 rtol = 1.0f-2
-            @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
+                @test ∂u_fd ≈ ∂u_ra atol = 1.0f-2 rtol = 1.0f-2
+                @test ∂y_fd ≈ ∂y_ra atol = 1.0f-2 rtol = 1.0f-2
+                @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
+            end
         end
     end
 end
