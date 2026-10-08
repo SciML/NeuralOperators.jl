@@ -10,8 +10,7 @@ const LAYERS_SETUPS = [
 
 function run_op_tests(op, setups)
     rng = StableRNG(12345)
-    # Reactant_jll has no artifact on this platform.
-    if Reactant_jll.is_available()
+    if REACTANT_AVAILABLE
         xdev = reactant_device(; force = true)
     end
 
@@ -29,7 +28,7 @@ function run_op_tests(op, setups)
         @test size(first(m(x, ps, st))) == setup.y_size
         res = first(m(x, ps, st))
 
-        if Reactant_jll.is_available()
+        if REACTANT_AVAILABLE
             ps_ra, st_ra = xdev((ps, st))
             x_ra = xdev(x)
             y_ra = xdev(rand(rng, Float32, setup.y_size...))

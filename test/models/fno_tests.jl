@@ -3,6 +3,8 @@ using NeuralOperators, Test
 include("../shared_testsetup.jl")
 
 @testset "Fourier Neural Operator" begin
+    @test REACTANT_AVAILABLE || Sys.WORD_SIZE == 32
+
     rng = StableRNG(12345)
 
     @testset "complex finite-difference reference" begin
@@ -38,8 +40,7 @@ include("../shared_testsetup.jl")
         ),
     ]
 
-    # Reactant_jll has no artifact on this platform.
-    if Reactant_jll.is_available()
+    if REACTANT_AVAILABLE
         xdev = reactant_device(; force = true)
     end
 
@@ -53,7 +54,7 @@ include("../shared_testsetup.jl")
 
         @test size(first(fno(x, ps, st))) == setup.y_size
 
-        if Reactant_jll.is_available()
+        if REACTANT_AVAILABLE
             ps_ra, st_ra = (ps, st) |> xdev
             x_ra, y_ra = (x, y) |> xdev
 

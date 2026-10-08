@@ -2,6 +2,9 @@ using Lux, Optimisers, Random, StableRNGs, Reactant, Enzyme, FastTransforms
 using Reactant: Reactant_jll
 using MLDataDevices: cpu_device, reactant_device
 
+# Reactant_jll ships no 32-bit artifact.
+const REACTANT_AVAILABLE = Reactant_jll.is_available()
+
 sumabs2first(model, x, ps, st) = sum(abs2, first(model(x, ps, st)))
 
 # Local replacement for `LuxTestUtils.check_approx`: LuxTestUtils unconditionally skips

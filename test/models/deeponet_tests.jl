@@ -24,8 +24,7 @@ include("../shared_testsetup.jl")
         ),
     ]
 
-    # Reactant_jll has no artifact on this platform.
-    if Reactant_jll.is_available()
+    if REACTANT_AVAILABLE
         xdev = reactant_device(; force = true)
     end
 
@@ -39,7 +38,7 @@ include("../shared_testsetup.jl")
         pred = first(deeponet((u, y), ps, st))
         @test setup.out_size == size(pred)
 
-        if Reactant_jll.is_available()
+        if REACTANT_AVAILABLE
             ps_ra, st_ra = (ps, st) |> xdev
             u_ra, y_ra = (u, y) |> xdev
 
