@@ -10,7 +10,9 @@ const LAYERS_SETUPS = [
 
 function run_op_tests(op, setups)
     rng = StableRNG(12345)
-    xdev = reactant_device(; force = true)
+    if REACTANT_AVAILABLE
+        xdev = reactant_device(; force = true)
+    end
 
     @testset "$(length(setup.m))D | shift=$(setup.shift)" for setup in setups
         in_chs = setup.x_size[end - 1]
@@ -26,20 +28,22 @@ function run_op_tests(op, setups)
         @test size(first(m(x, ps, st))) == setup.y_size
         res = first(m(x, ps, st))
 
-        ps_ra, st_ra = xdev((ps, st))
-        x_ra = xdev(x)
-        y_ra = xdev(rand(rng, Float32, setup.y_size...))
+        if REACTANT_AVAILABLE
+            ps_ra, st_ra = xdev((ps, st))
+            x_ra = xdev(x)
+            y_ra = xdev(rand(rng, Float32, setup.y_size...))
 
-        res_ra, _ = @jit m(x_ra, ps_ra, st_ra)
-        @test res_ra ≈ res atol = 1.0f-2 rtol = 1.0f-2
+            res_ra, _ = @jit m(x_ra, ps_ra, st_ra)
+            @test res_ra ≈ res atol = 1.0f-2 rtol = 1.0f-2
 
-        @testset "check gradients" begin
-            ∂x_fd, ∂ps_fd = ∇sumabs2_finite_difference(m, x, ps, st)
-            ∂x_ra, ∂ps_ra = ∇sumabs2_reactant(m, x_ra, ps_ra, st_ra)
-            ∂x_ra, ∂ps_ra = (∂x_ra, ∂ps_ra) |> cpu_device()
+            @testset "check gradients" begin
+                ∂x_fd, ∂ps_fd = ∇sumabs2_finite_difference(m, x, ps, st)
+                ∂x_ra, ∂ps_ra = ∇sumabs2_reactant(m, x_ra, ps_ra, st_ra)
+                ∂x_ra, ∂ps_ra = (∂x_ra, ∂ps_ra) |> cpu_device()
 
-            @test ∂x_fd ≈ ∂x_ra atol = 1.0f-2 rtol = 1.0f-2
-            @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
+                @test ∂x_fd ≈ ∂x_ra atol = 1.0f-2 rtol = 1.0f-2
+                @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
+            end
         end
     end
     return nothing

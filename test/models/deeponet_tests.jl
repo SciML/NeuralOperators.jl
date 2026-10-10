@@ -24,7 +24,9 @@ include("../shared_testsetup.jl")
         ),
     ]
 
-    xdev = reactant_device(; force = true)
+    if REACTANT_AVAILABLE
+        xdev = reactant_device(; force = true)
+    end
 
     @testset "$(setup.name)" for setup in setups
         u = rand(Float32, setup.u_size...)
@@ -36,22 +38,26 @@ include("../shared_testsetup.jl")
         pred = first(deeponet((u, y), ps, st))
         @test setup.out_size == size(pred)
 
-        ps_ra, st_ra = (ps, st) |> xdev
-        u_ra, y_ra = (u, y) |> xdev
+        if REACTANT_AVAILABLE
+            ps_ra, st_ra = (ps, st) |> xdev
+            u_ra, y_ra = (u, y) |> xdev
 
-        pred_ra = @jit deeponet((u_ra, y_ra), ps_ra, st_ra)
-        @test first(pred_ra) ≈ pred atol = 1.0f-2 rtol = 1.0f-2
+            pred_ra = @jit deeponet((u_ra, y_ra), ps_ra, st_ra)
+            @test first(pred_ra) ≈ pred atol = 1.0f-2 rtol = 1.0f-2
 
-        @testset "check gradients" begin
-            (∂u_fd, ∂y_fd), ∂ps_fd = ∇sumabs2_finite_difference(
-                deeponet, (u, y), ps, st
-            )
-            (∂u_ra, ∂y_ra), ∂ps_ra = ∇sumabs2_reactant(deeponet, (u_ra, y_ra), ps_ra, st_ra)
-            (∂u_ra, ∂y_ra), ∂ps_ra = ((∂u_ra, ∂y_ra), ∂ps_ra) |> cpu_device()
+            @testset "check gradients" begin
+                (∂u_fd, ∂y_fd), ∂ps_fd = ∇sumabs2_finite_difference(
+                    deeponet, (u, y), ps, st
+                )
+                (∂u_ra, ∂y_ra), ∂ps_ra = ∇sumabs2_reactant(
+                    deeponet, (u_ra, y_ra), ps_ra, st_ra
+                )
+                (∂u_ra, ∂y_ra), ∂ps_ra = ((∂u_ra, ∂y_ra), ∂ps_ra) |> cpu_device()
 
-            @test ∂u_fd ≈ ∂u_ra atol = 1.0f-2 rtol = 1.0f-2
-            @test ∂y_fd ≈ ∂y_ra atol = 1.0f-2 rtol = 1.0f-2
-            @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
+                @test ∂u_fd ≈ ∂u_ra atol = 1.0f-2 rtol = 1.0f-2
+                @test ∂y_fd ≈ ∂y_ra atol = 1.0f-2 rtol = 1.0f-2
+                @test check_approx(∂ps_fd, ∂ps_ra; atol = 1.0f-2, rtol = 1.0f-2)
+            end
         end
     end
 end
