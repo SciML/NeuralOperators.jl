@@ -35,7 +35,6 @@ export DeepONet
 export NOMAD
 export ConvolutionalNeuralOperator
 
-
 @public AbstractTransform, transform, truncate_modes, inverse
 
 end
