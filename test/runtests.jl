@@ -20,6 +20,9 @@ withenv(
         @time @safetestset "NOMAD" begin
             include(joinpath(@__DIR__, "models", "nomad_tests.jl"))
         end
+        @time @safetestset "Convolutional Neural Operator" begin
+            include(joinpath(@__DIR__, "models", "cno_tests.jl"))
+        end
         @time @safetestset "SpectralConv" begin
             include(joinpath(@__DIR__, "layers", "spectral_conv_tests.jl"))
         end
