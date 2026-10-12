@@ -114,15 +114,15 @@ low-pass filtered and downsampled back. Resampling uses the FFT, so the spatial 
 are treated as periodic.
 
 **Architecture**:
-1. **Lifting** `Conv(1×…×1)`: maps `in_channels → hidden_channels`
-2. **CNO blocks** × `num_layers`: each is conv → anti-aliased activation
-3. **Projection**: `Conv(1×…×1)` → anti-aliased activation → `Conv(1×…×1)` maps to
+1. **Lifting** `Conv(1×…×1)`: maps `in_channels => hidden_channels`
+2. **CNO blocks** × `num_layers`: each is a conv followed by an anti-aliased activation
+3. **Projection**: `Conv(1×…×1)`, anti-aliased activation, `Conv(1×…×1)`, mapping to
    `out_channels`
 
 ## Arguments
 
   - `modes`: Spatial size tuple (length `d` for d-dimensional data). Only its length
-    matters — kept consistent with the FNO API.
+    matters, kept consistent with the FNO API.
   - `in_channels`: Number of input channels.
   - `out_channels`: Number of output channels.
   - `hidden_channels`: Number of channels inside the CNO blocks.
