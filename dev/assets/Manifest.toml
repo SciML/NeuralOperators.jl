@@ -1213,10 +1213,10 @@ version = "0.17.4"
 
 [[deps.HDF5_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "LibCURL_jll", "Libdl", "MPIABI_jll", "MPICH_jll", "MPIPreferences", "MPItrampoline_jll", "MicrosoftMPI_jll", "OpenMPI_jll", "OpenSSL_jll", "TOML", "Zlib_jll", "aws_c_s3_jll", "dlfcn_win32_jll", "libaec_jll", "mpif_jll"]
-git-tree-sha1 = "d791a1c4c3c8f383b248a799be31105d00310204"
+git-tree-sha1 = "50d3523c90f2392334956375d2129a84e3df328b"
 registries = "General"
 uuid = "0234f1f7-429e-5d53-9886-15a909be8d59"
-version = "2.2.4+0"
+version = "2.3.0+0"
 
 [[deps.HarfBuzz_jll]]
 deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "Graphite2_jll", "JLLWrappers", "Libdl", "Libffi_jll"]
@@ -1813,10 +1813,10 @@ version = "1.5.5"
 
 [[deps.LuxLib]]
 deps = ["ArrayInterface", "CPUSummary", "ChainRulesCore", "DispatchDoctor", "EnzymeCore", "FastClosures", "Functors", "KernelAbstractions", "LinearAlgebra", "LuxCore", "MLDataDevices", "Markdown", "NNlib", "Preferences", "Random", "Reexport", "SciMLPublic", "Static", "StaticArraysCore", "Statistics", "UUIDs"]
-git-tree-sha1 = "afb5cae1bb08bacd0ff83fb6da4b3d19190e0ae3"
+git-tree-sha1 = "f8f5b83831851296b9a90bd8499ed2bf5a90cdbc"
 registries = "General"
 uuid = "82251201-b29d-42c6-8e01-566dec8acb11"
-version = "1.15.15"
+version = "1.16.0"
 
     [deps.LuxLib.extensions]
     AppleAccelerateExt = "AppleAccelerate"
